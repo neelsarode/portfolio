@@ -1,0 +1,46 @@
+---
+import Sidebar from "../components/Sidebar.astro";
+import "../styles/global.css";
+interface Props { title: string; activePath: string; }
+const { title, activePath } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="left"><Sidebar activePath={activePath} /></div>
+      <main class="right"><slot /></main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .shell { min-height: 100vh; }
+  .left {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-min);
+    height: 100vh;
+    border-right: 1px solid var(--border);
+  }
+  .right {
+    margin-left: max(var(--sidebar-w), var(--sidebar-min));
+    padding: var(--space-5) var(--space-5) var(--space-6);
+  }
+  @media (max-width: 767px) {
+    .left {
+      position: static;
+      width: 100%;
+      min-width: 0;
+      height: auto;
+      border-right: none;
+    }
+    .right { margin-left: 0; padding: var(--space-4); }
+  }
+</style>

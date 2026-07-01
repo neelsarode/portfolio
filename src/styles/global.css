@@ -29,8 +29,8 @@
   --border: var(--hairline);
   --placeholder: #1b1c1e;
   --max-w: 820px;
-  --sidebar-w: 28%;
-  --sidebar-min: 288px;
+  --sidebar-w: 350px;
+  --sidebar-min: 350px;
 
   /* — Fonts (loaded via Google Fonts in Layout head) — */
   --font-geist-sans: "Geist", "Geist Variable", ui-sans-serif, system-ui,

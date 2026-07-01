@@ -58,7 +58,7 @@ const { title, activePath } = Astro.props;
   }
   .right {
     margin-left: max(var(--sidebar-w), var(--sidebar-min));
-    padding: var(--spacing-64) var(--spacing-64) var(--spacing-120);
+    padding: var(--spacing-40) var(--spacing-40) var(--spacing-80);
     background: var(--void);
     min-height: 100vh;
   }
@@ -73,10 +73,10 @@ const { title, activePath } = Astro.props;
     }
     .right {
       margin-left: 0;
-      padding: var(--spacing-48) var(--spacing-48) var(--spacing-80);
+      padding: var(--spacing-32) var(--spacing-32) var(--spacing-64);
     }
   }
   @media (max-width: 767px) {
-    .right { padding: var(--spacing-32) var(--spacing-24) var(--spacing-64); }
+    .right { padding: var(--spacing-24) var(--spacing-20) var(--spacing-48); }
   }
 </style>

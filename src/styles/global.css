@@ -42,8 +42,8 @@
   /* — Spacing rhythm (4px base) — */
   --spacing-4: 4px;   --spacing-8: 8px;    --spacing-12: 12px;
   --spacing-16: 16px; --spacing-20: 20px;  --spacing-24: 24px;
-  --spacing-32: 32px; --spacing-48: 48px;  --spacing-64: 64px;
-  --spacing-80: 80px; --spacing-120: 120px;
+  --spacing-32: 32px; --spacing-40: 40px;  --spacing-48: 48px;
+  --spacing-64: 64px; --spacing-80: 80px;  --spacing-120: 120px;
 
   /* legacy spacing aliases */
   --space-2: 8px; --space-3: 16px; --space-4: 24px; --space-5: 48px; --space-6: 64px;

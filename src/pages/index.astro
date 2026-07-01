@@ -1,6 +1,60 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import CaseStudyPanel from "../components/CaseStudyPanel.astro";
+import GridItem from "../components/GridItem.astro";
+
+const studies = (await getCollection("case-studies")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const archive = [
+  "Poster series", "Type study", "Icon set", "Wordmark exploration",
+  "Landing page", "Mobile app concept", "Editorial layout", "Motion study",
+  "Packaging", "Data viz",
+];
 ---
 <Layout title="Neel Sarode — Work" activePath="/">
-  <p>right panel placeholder</p>
+  <section class="case-studies">
+    {studies.map((s, i) => (
+      <CaseStudyPanel
+        index={i + 1}
+        title={s.data.title}
+        category={s.data.category}
+        year={s.data.year}
+        tagline={s.data.tagline}
+        href={`/work/${s.id}`}
+      />
+    ))}
+  </section>
+
+  <div class="section-label">More work</div>
+
+  <section class="grid">
+    {archive.map((label) => <GridItem label={label} />)}
+  </section>
 </Layout>
+
+<style>
+  .case-studies { max-width: var(--max-w); }
+  .section-label {
+    max-width: var(--max-w);
+    margin-top: var(--space-6);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .grid {
+    max-width: var(--max-w);
+    margin-top: var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+  @media (max-width: 767px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

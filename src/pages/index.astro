@@ -44,6 +44,26 @@ const archive = [
     flex-direction: column;
     gap: var(--spacing-24);
   }
+
+  /* Ultrawide: case studies become a horizontal-scroll gallery */
+  @media (min-width: 1600px) {
+    .case-studies {
+      flex-direction: row;
+      gap: var(--spacing-24);
+      overflow-x: auto;
+      overflow-y: visible;
+      padding-bottom: var(--spacing-16);
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+      scrollbar-color: var(--hairline-hover) transparent;
+    }
+    .case-studies::-webkit-scrollbar { height: 8px; }
+    .case-studies::-webkit-scrollbar-track { background: transparent; }
+    .case-studies::-webkit-scrollbar-thumb {
+      background: var(--hairline-hover);
+      border-radius: var(--radius-pill);
+    }
+  }
   .section-eyebrow {
     margin-top: var(--spacing-120);
     padding-top: var(--spacing-24);

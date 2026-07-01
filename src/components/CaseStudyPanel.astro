@@ -84,4 +84,14 @@ const num = String(index).padStart(2, "0");
     color: var(--cream-88);
     max-width: 52ch;
   }
+
+  /* Ultrawide: panels become fixed-width cards in a horizontal gallery */
+  @media (min-width: 1600px) {
+    .panel {
+      flex: 0 0 auto;
+      width: clamp(520px, 33vw, 720px);
+      scroll-snap-align: start;
+    }
+    .media { aspect-ratio: 4 / 3; }
+  }
 </style>

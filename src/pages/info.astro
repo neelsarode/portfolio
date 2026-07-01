@@ -3,21 +3,45 @@ import Layout from "../layouts/Layout.astro";
 ---
 <Layout title="Info — Neel Sarode" activePath="/info">
   <section class="page">
-    <h1>Info</h1>
-    <p>
-      Placeholder about copy. Neel is a product and brand designer focused on
-      early-stage teams — from first identity to shipped interface. This page
-      will hold a longer bio, background, and approach.
+    <p class="eyebrow">Info</p>
+    <h1 class="title">About the practice</h1>
+    <p class="lead">
+      Neel is a product and brand designer focused on early-stage teams — from
+      first identity to shipped interface. Placeholder copy; this page will hold
+      a longer bio, background, and approach.
     </p>
-    <p>
-      Currently open to select freelance and full-time opportunities.
-      Replace this with real content later.
+    <p class="body">
+      The work favors measurable clarity over flourish: legible systems, tight
+      typography, and interfaces that get out of the way. Currently open to
+      select freelance and full-time opportunities. Replace this with real
+      content later.
     </p>
   </section>
 </Layout>
 
 <style>
   .page { max-width: var(--max-w); }
-  .page h1 { font-size: 20px; font-weight: 600; }
-  .page p { margin-top: var(--space-3); max-width: 60ch; }
+  .title {
+    margin-top: var(--spacing-16);
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -1px;
+    color: var(--cream);
+  }
+  .lead {
+    margin-top: var(--spacing-24);
+    font-size: 20px;
+    line-height: 1.4;
+    color: var(--cream-88);
+    max-width: 60ch;
+  }
+  .body {
+    margin-top: var(--spacing-16);
+    color: var(--cream-88);
+    max-width: 65ch;
+  }
+  @media (max-width: 767px) {
+    .title { font-size: 32px; letter-spacing: -0.5px; }
+  }
 </style>

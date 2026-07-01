@@ -3,18 +3,72 @@ import Layout from "../layouts/Layout.astro";
 ---
 <Layout title="Contact — Neel Sarode" activePath="/contact">
   <section class="page">
-    <h1>Contact</h1>
-    <p>Placeholder contact copy. The best way to reach me:</p>
-    <ul class="links">
-      <li><a href="mailto:neel@example.com">neel@example.com ↗</a></li>
-      <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a></li>
-    </ul>
+    <p class="eyebrow">Contact</p>
+    <h1 class="title">Start a conversation</h1>
+    <p class="lead">
+      Placeholder contact copy. The best way to reach me is email — I reply
+      within a day or two.
+    </p>
+
+    <p class="status">
+      <span class="dot" aria-hidden="true"></span>
+      Available for select projects
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="mailto:neel@example.com">Email me ↗</a>
+      <a
+        class="btn btn-secondary"
+        href="https://linkedin.com"
+        target="_blank"
+        rel="noopener"
+      >LinkedIn ↗</a>
+    </div>
   </section>
 </Layout>
 
 <style>
   .page { max-width: var(--max-w); }
-  .page h1 { font-size: 20px; font-weight: 600; }
-  .page p { margin-top: var(--space-3); max-width: 60ch; }
-  .links { margin-top: var(--space-3); padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+  .title {
+    margin-top: var(--spacing-16);
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -1px;
+    color: var(--cream);
+  }
+  .lead {
+    margin-top: var(--spacing-24);
+    font-size: 20px;
+    line-height: 1.4;
+    color: var(--cream-88);
+    max-width: 60ch;
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-32);
+    font-family: var(--font-geist-mono);
+    font-size: 12px;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: var(--cream-60);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--verdant);
+    box-shadow: 0 0 0 4px rgba(42, 216, 127, 0.15);
+  }
+  .actions {
+    margin-top: var(--spacing-24);
+    display: flex;
+    gap: var(--spacing-12);
+    flex-wrap: wrap;
+  }
+  @media (max-width: 767px) {
+    .title { font-size: 32px; letter-spacing: -0.5px; }
+  }
 </style>

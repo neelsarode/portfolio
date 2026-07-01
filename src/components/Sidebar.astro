@@ -9,6 +9,7 @@ const links = [
 ---
 <aside class="sidebar">
   <div class="sidebar-top">
+    <p class="eyebrow">Design Portfolio</p>
     <p class="name">Neel Sarode</p>
     <p class="bio">
       Product &amp; brand designer based in San Francisco. I design clear,
@@ -25,8 +26,8 @@ const links = [
     </nav>
   </div>
   <div class="sidebar-footer">
-    <a href="mailto:neel@example.com">email ↗</a>
-    <a href="https://linkedin.com" target="_blank" rel="noopener">linkedin ↗</a>
+    <a class="mono-label" href="mailto:neel@example.com">Email ↗</a>
+    <a class="mono-label" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a>
   </div>
 </aside>
 
@@ -36,39 +37,65 @@ const links = [
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    padding: var(--space-5) var(--space-4);
-    gap: var(--space-5);
+    padding: var(--spacing-64) var(--spacing-32);
+    gap: var(--spacing-64);
   }
-  .name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .name {
+    margin-top: var(--spacing-16);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: var(--cream);
+  }
   .bio {
-    margin-top: var(--space-3);
+    margin-top: var(--spacing-16);
     max-width: 34ch;
-    color: var(--fg);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--cream-88);
   }
   .nav {
-    margin-top: var(--space-5);
+    margin-top: var(--spacing-48);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--spacing-12);
   }
-  .nav-link { color: var(--muted); width: fit-content; }
-  .nav-link:hover { color: var(--fg); }
-  .nav-link.active { color: var(--fg); text-decoration: underline; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    width: fit-content;
+    font-size: 14px;
+    color: var(--cream-60);
+  }
+  .nav-link::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 6px;
+    height: 6px;
+    background: transparent;
+    transition: background var(--dur-ui) linear;
+  }
+  .nav-link:hover { color: var(--cream); }
+  .nav-link.active { color: var(--cream); }
+  .nav-link.active::before { background: var(--ember); }
+
   .sidebar-footer {
     display: flex;
-    gap: var(--space-3);
-    color: var(--muted);
-    font-size: 13px;
+    gap: var(--spacing-16);
+    color: var(--cream-60);
   }
+  .sidebar-footer a:hover { color: var(--ember); }
+
   @media (max-width: 767px) {
     .sidebar {
       flex-direction: column;
       height: auto;
-      padding: var(--space-4);
-      gap: var(--space-4);
-      border-bottom: 1px solid var(--border);
+      padding: var(--spacing-24);
+      gap: var(--spacing-24);
     }
-    .nav { flex-direction: row; gap: var(--space-4); margin-top: var(--space-3); }
+    .name { margin-top: var(--spacing-12); font-size: 20px; }
+    .nav { flex-direction: row; gap: var(--spacing-24); margin-top: var(--spacing-16); }
     .bio { display: none; }
   }
 </style>

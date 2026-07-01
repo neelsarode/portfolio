@@ -15,6 +15,8 @@ const archive = [
 ];
 ---
 <Layout title="Neel Sarode — Work" activePath="/">
+  <p class="eyebrow page-eyebrow">Selected Work — 2026</p>
+
   <section class="case-studies">
     {studies.map((s, i) => (
       <CaseStudyPanel
@@ -28,7 +30,7 @@ const archive = [
     ))}
   </section>
 
-  <div class="section-label">More work</div>
+  <p class="eyebrow section-eyebrow">More work</p>
 
   <section class="grid">
     {archive.map((label) => <GridItem label={label} />)}
@@ -36,25 +38,29 @@ const archive = [
 </Layout>
 
 <style>
-  .case-studies { max-width: var(--max-w); }
-  .section-label {
+  .page-eyebrow { max-width: var(--max-w); }
+  .case-studies {
     max-width: var(--max-w);
-    margin-top: var(--space-6);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    margin-top: var(--spacing-32);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-24);
+  }
+  .section-eyebrow {
+    max-width: var(--max-w);
+    margin-top: var(--spacing-120);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--hairline);
   }
   .grid {
     max-width: var(--max-w);
-    margin-top: var(--space-4);
+    margin-top: var(--spacing-24);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
+    gap: var(--spacing-24);
   }
   @media (max-width: 767px) {
     .grid { grid-template-columns: repeat(2, 1fr); }
+    .section-eyebrow { margin-top: var(--spacing-64); }
   }
 </style>

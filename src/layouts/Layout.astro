@@ -9,7 +9,14 @@ const { title, activePath } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@300&display=swap"
+    />
     <title>{title}</title>
   </head>
   <body>
@@ -24,27 +31,39 @@ const { title, activePath } = Astro.props;
 <style>
   .skip-link {
     position: absolute;
-    left: var(--space-2);
-    top: -40px;
-    background: var(--fg);
-    color: var(--bg);
-    padding: var(--space-2) var(--space-3);
+    left: var(--spacing-16);
+    top: -48px;
+    background: var(--cream);
+    color: var(--void);
+    font-family: var(--font-geist-mono);
+    font-size: 12px;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    padding: var(--spacing-8) var(--spacing-16);
+    border-radius: var(--radius);
     z-index: 10;
-    transition: top 0.15s;
+    transition: top var(--dur-ui) linear;
   }
-  .skip-link:focus { top: var(--space-2); }
-  .shell { min-height: 100vh; }
+  .skip-link:focus { top: var(--spacing-16); }
+
+  .shell { min-height: 100vh; background: var(--void); }
   .left {
     position: fixed;
     top: 0; left: 0;
     width: var(--sidebar-w);
     min-width: var(--sidebar-min);
     height: 100vh;
-    border-right: 1px solid var(--border);
+    background: var(--onyx);
+    border-right: 1px solid var(--hairline);
   }
   .right {
     margin-left: max(var(--sidebar-w), var(--sidebar-min));
-    padding: var(--space-5) var(--space-5) var(--space-6);
+    padding: var(--spacing-64) var(--spacing-64) var(--spacing-120);
+    background: var(--void);
+    min-height: 100vh;
+  }
+  @media (max-width: 991px) {
+    .right { padding: var(--spacing-48) var(--spacing-48) var(--spacing-80); }
   }
   @media (max-width: 767px) {
     .left {
@@ -53,7 +72,11 @@ const { title, activePath } = Astro.props;
       min-width: 0;
       height: auto;
       border-right: none;
+      border-bottom: 1px solid var(--hairline);
     }
-    .right { margin-left: 0; padding: var(--space-4); }
+    .right {
+      margin-left: 0;
+      padding: var(--spacing-32) var(--spacing-24) var(--spacing-64);
+    }
   }
 </style>

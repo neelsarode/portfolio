@@ -11,12 +11,12 @@ const { index, title, category, year, tagline, href } = Astro.props;
 const num = String(index).padStart(2, "0");
 ---
 <a class="panel" href={href}>
-  <div class="media" aria-hidden="true"><span>{title}</span></div>
+  <div class="media machined" aria-hidden="true">
+    <span class="ghost">{title}</span>
+    <span class="chip">↗</span>
+  </div>
   <div class="meta">
-    <div class="row">
-      <span class="num">{num}</span>
-      <span class="cat">{category} · {year}</span>
-    </div>
+    <p class="eyebrow">{num} / {category} — {year}</p>
     <h2 class="title">{title}</h2>
     <p class="tagline">{tagline}</p>
   </div>
@@ -25,30 +25,63 @@ const num = String(index).padStart(2, "0");
 <style>
   .panel {
     display: block;
-    padding: var(--space-5) 0;
-    border-top: 1px solid var(--border);
+    background: var(--onyx);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: var(--spacing-24);
+    transition: border-color var(--dur-ui) linear, background var(--dur-ui) linear;
   }
-  .panel:hover { text-decoration: none; }
-  .panel:hover .title { text-decoration: underline; }
+  .panel:hover { color: inherit; border-color: var(--hairline-hover); }
+
   .media {
+    position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: var(--placeholder);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--muted);
-    font-size: 13px;
+    overflow: hidden;
   }
-  .meta { margin-top: var(--space-3); }
-  .row {
-    display: flex;
-    gap: var(--space-3);
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 0.02em;
+  .ghost {
+    font-family: var(--font-geist-mono);
+    font-size: 12px;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: var(--cream-39);
   }
-  .num { font-variant-numeric: tabular-nums; }
-  .title { margin-top: var(--space-2); font-size: 20px; font-weight: 600; }
-  .tagline { margin-top: var(--space-2); color: var(--fg); max-width: 52ch; }
+  .chip {
+    position: absolute;
+    right: var(--spacing-12);
+    bottom: var(--spacing-12);
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--ember);
+    color: var(--ember);
+    background: rgba(10, 10, 11, 0.55);
+    box-shadow: var(--rim-light);
+    font-size: 15px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--dur-ui) linear, transform var(--dur-ui) linear;
+  }
+  .panel:hover .chip { opacity: 1; transform: translateY(0); }
+
+  .meta { margin-top: var(--spacing-20); }
+  .title {
+    margin-top: var(--spacing-12);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: var(--cream);
+  }
+  .tagline {
+    margin-top: var(--spacing-8);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--cream-88);
+    max-width: 52ch;
+  }
 </style>

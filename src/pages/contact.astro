@@ -1,0 +1,20 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Contact — Neel Sarode" activePath="/contact">
+  <section class="page">
+    <h1>Contact</h1>
+    <p>Placeholder contact copy. The best way to reach me:</p>
+    <ul class="links">
+      <li><a href="mailto:neel@example.com">neel@example.com ↗</a></li>
+      <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .page { max-width: var(--max-w); }
+  .page h1 { font-size: 20px; font-weight: 600; }
+  .page p { margin-top: var(--space-3); max-width: 60ch; }
+  .links { margin-top: var(--space-3); padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+</style>

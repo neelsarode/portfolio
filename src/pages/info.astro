@@ -23,18 +23,18 @@ import Layout from "../layouts/Layout.astro";
   .page { max-width: var(--max-w); }
   .title {
     margin-top: var(--spacing-16);
-    font-size: 40px;
-    line-height: 1;
+    font-size: 24px;
+    line-height: 1.15;
     font-weight: 500;
-    letter-spacing: -1px;
+    letter-spacing: -0.4px;
     color: var(--cream);
   }
   .lead {
-    margin-top: var(--spacing-24);
-    font-size: 20px;
-    line-height: 1.4;
+    margin-top: var(--spacing-20);
+    font-size: 16px;
+    line-height: 1.5;
     color: var(--cream-88);
-    max-width: 60ch;
+    max-width: 64ch;
   }
   .body {
     margin-top: var(--spacing-16);
@@ -42,6 +42,6 @@ import Layout from "../layouts/Layout.astro";
     max-width: 65ch;
   }
   @media (max-width: 767px) {
-    .title { font-size: 32px; letter-spacing: -0.5px; }
+    .title { font-size: 22px; letter-spacing: -0.3px; }
   }
 </style>

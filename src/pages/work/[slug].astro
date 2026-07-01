@@ -40,18 +40,18 @@ const { Content } = await entry.render();
   .head { margin-top: var(--spacing-32); }
   .title {
     margin-top: var(--spacing-16);
-    font-size: 40px;
-    line-height: 1;
+    font-size: 24px;
+    line-height: 1.15;
     font-weight: 500;
-    letter-spacing: -1px;
+    letter-spacing: -0.4px;
     color: var(--cream);
   }
   .tagline {
-    margin-top: var(--spacing-16);
-    font-size: 20px;
-    line-height: 1.4;
+    margin-top: var(--spacing-12);
+    font-size: 16px;
+    line-height: 1.5;
     color: var(--cream-88);
-    max-width: 52ch;
+    max-width: 56ch;
   }
   .body { margin-top: var(--spacing-64); }
   .body :global(h2) {
@@ -79,6 +79,6 @@ const { Content } = await entry.render();
     max-width: 65ch;
   }
   @media (max-width: 767px) {
-    .title { font-size: 32px; letter-spacing: -0.5px; }
+    .title { font-size: 22px; letter-spacing: -0.3px; }
   }
 </style>

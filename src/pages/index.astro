@@ -45,8 +45,10 @@ const archive = [
     gap: var(--spacing-24);
   }
 
-  /* Ultrawide: case studies become a horizontal-scroll gallery */
-  @media (min-width: 1600px) {
+  /* True ultrawide only (21:9+ viewport, not 16:9/4K): horizontal-scroll gallery.
+     Requires an ultrawide ASPECT RATIO plus a large width so 16:9 4K screens and
+     landscape phones/tablets keep the normal vertical layout. */
+  @media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
     .case-studies {
       flex-direction: row;
       gap: var(--spacing-24);

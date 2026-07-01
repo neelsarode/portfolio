@@ -85,8 +85,8 @@ const num = String(index).padStart(2, "0");
     max-width: 52ch;
   }
 
-  /* Ultrawide: panels become fixed-width cards in a horizontal gallery */
-  @media (min-width: 1600px) {
+  /* True ultrawide only (21:9+ viewport): fixed-width cards in a horizontal gallery */
+  @media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
     .panel {
       flex: 0 0 auto;
       width: clamp(520px, 33vw, 720px);

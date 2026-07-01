@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const studies = await getCollection("case-studies");
+  return studies.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<Layout title={`${entry.data.title} — Neel Sarode`} activePath="/">
+  <article class="study">
+    <a class="back" href="/">← Work</a>
+    <div class="media" aria-hidden="true"></div>
+    <header class="head">
+      <div class="cat">{entry.data.category} · {entry.data.year}</div>
+      <h1 class="title">{entry.data.title}</h1>
+      <p class="tagline">{entry.data.tagline}</p>
+    </header>
+    <div class="body">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .study { max-width: var(--max-w); }
+  .back { color: var(--muted); font-size: 13px; }
+  .back:hover { color: var(--fg); }
+  .media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--placeholder);
+    margin-top: var(--space-4);
+  }
+  .head { margin-top: var(--space-4); }
+  .cat {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .title { margin-top: var(--space-2); font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+  .tagline { margin-top: var(--space-2); color: var(--fg); max-width: 52ch; }
+  .body { margin-top: var(--space-5); }
+  .body :global(h2) { margin-top: var(--space-5); font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .body :global(p) { margin-top: var(--space-3); max-width: 60ch; }
+</style>

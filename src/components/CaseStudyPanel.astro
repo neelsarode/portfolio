@@ -6,11 +6,12 @@ interface Props {
   year: number;
   tagline: string;
   href: string;
+  featured?: boolean;
 }
-const { index, title, category, year, tagline, href } = Astro.props;
+const { index, title, category, year, tagline, href, featured = false } = Astro.props;
 const num = String(index).padStart(2, "0");
 ---
-<a class="panel" href={href}>
+<a class:list={["panel", { featured }]} href={href}>
   <div class="media machined" aria-hidden="true">
     <span class="ghost">{title}</span>
     <span class="chip">↗</span>
@@ -23,15 +24,9 @@ const num = String(index).padStart(2, "0");
 </a>
 
 <style>
-  .panel {
-    display: block;
-    background: var(--onyx);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius);
-    padding: var(--spacing-24);
-    transition: border-color var(--dur-ui) linear, background var(--dur-ui) linear;
-  }
-  .panel:hover { color: inherit; border-color: var(--hairline-hover); }
+  /* No card frame — the media is the object, meta is clean text beneath it. */
+  .panel { display: block; }
+  .panel:hover { color: inherit; }
 
   .media {
     position: relative;
@@ -41,7 +36,16 @@ const num = String(index).padStart(2, "0");
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    transition: border-color var(--dur-ui) linear;
   }
+  .panel:hover .media { border-color: var(--hairline-hover); }
+
+  /* Featured (first) study reads as a commanding, near-full-height image. */
+  .panel.featured .media {
+    aspect-ratio: auto;
+    height: clamp(440px, 72vh, 900px);
+  }
+
   .ghost {
     font-family: var(--font-geist-mono);
     font-size: 12px;
@@ -51,8 +55,8 @@ const num = String(index).padStart(2, "0");
   }
   .chip {
     position: absolute;
-    right: var(--spacing-12);
-    bottom: var(--spacing-12);
+    right: var(--spacing-16);
+    bottom: var(--spacing-16);
     width: 40px;
     height: 40px;
     display: grid;
@@ -85,13 +89,15 @@ const num = String(index).padStart(2, "0");
     max-width: 52ch;
   }
 
-  /* True ultrawide only (21:9+ viewport): fixed-width cards in a horizontal gallery */
+  /* True ultrawide only: uniform fixed-width cards in a horizontal gallery
+     (featured hero height is reset so the row stays aligned). */
   @media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
     .panel {
       flex: 0 0 auto;
       width: clamp(520px, 33vw, 720px);
       scroll-snap-align: start;
     }
-    .media { aspect-ratio: 4 / 3; }
+    .media,
+    .panel.featured .media { aspect-ratio: 4 / 3; height: auto; }
   }
 </style>

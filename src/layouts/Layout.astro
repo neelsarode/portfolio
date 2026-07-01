@@ -63,9 +63,6 @@ const { title, activePath } = Astro.props;
     min-height: 100vh;
   }
   @media (max-width: 991px) {
-    .right { padding: var(--spacing-48) var(--spacing-48) var(--spacing-80); }
-  }
-  @media (max-width: 767px) {
     .left {
       position: static;
       width: 100%;
@@ -76,7 +73,10 @@ const { title, activePath } = Astro.props;
     }
     .right {
       margin-left: 0;
-      padding: var(--spacing-32) var(--spacing-24) var(--spacing-64);
+      padding: var(--spacing-48) var(--spacing-48) var(--spacing-80);
     }
+  }
+  @media (max-width: 767px) {
+    .right { padding: var(--spacing-32) var(--spacing-24) var(--spacing-64); }
   }
 </style>

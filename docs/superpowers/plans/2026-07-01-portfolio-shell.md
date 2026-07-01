@@ -673,7 +673,7 @@ git commit -m "feat: build home page with case-study panels and work grid"
 
 **Interfaces:**
 - Consumes: `case-studies` collection (Task 4), `Layout.astro` (Task 3).
-- Produces: a static page per case study at `/work/<id>`, rendering the markdown body with the sidebar shell intact and a back link to `/`.
+- Produces: a static page per case study at `/work/<slug>` (slug = `entry.slug`, extension-less, e.g. `case-study-01`), rendering the markdown body with the sidebar shell intact and a back link to `/`. NOTE: use `entry.slug` (not `entry.id`) — in Astro 4 `type: "content"` collections, `entry.id` includes the `.md` extension and would produce `/work/case-study-01.md`. Task 5's home hrefs use `/work/${s.slug}` to match.
 
 - [ ] **Step 1: Write `src/pages/work/[slug].astro`**
 
@@ -685,7 +685,7 @@ import Layout from "../../layouts/Layout.astro";
 export async function getStaticPaths() {
   const studies = await getCollection("case-studies");
   return studies.map((entry) => ({
-    params: { slug: entry.id },
+    params: { slug: entry.slug },
     props: { entry },
   }));
 }
@@ -870,4 +870,4 @@ git commit -m "polish: spacing and typography pass on portfolio shell"
 
 **Placeholder scan:** No "TBD/TODO/handle appropriately" — every step ships concrete code. Placeholder *copy* is intentional per spec.
 
-**Type consistency:** `case-studies` collection name, frontmatter fields (`title/category/year/tagline/order`), and `entry.id` used consistently across Tasks 4, 5, 6. `CaseStudyPanel`/`GridItem` prop names match their call sites. `Layout` props (`title`, `activePath`) match every page. `href` pattern `/work/${s.id}` matches `getStaticPaths` `params.slug = entry.id`.
+**Type consistency:** `case-studies` collection name, frontmatter fields (`title/category/year/tagline/order`), and `entry.id` used consistently across Tasks 4, 5, 6. `CaseStudyPanel`/`GridItem` prop names match their call sites. `Layout` props (`title`, `activePath`) match every page. `href` pattern `/work/${s.slug}` matches `getStaticPaths` `params.slug = entry.slug` (extension-less clean URLs).

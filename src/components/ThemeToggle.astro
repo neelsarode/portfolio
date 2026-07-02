@@ -165,8 +165,9 @@
             ],
           },
           {
-            duration: 500,
-            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            // Soft gather at the button, sweep, then a long settle at the edges.
+            duration: 850,
+            easing: "cubic-bezier(0.45, 0.05, 0.15, 1)",
             pseudoElement: "::view-transition-new(root)",
           }
         );

@@ -58,7 +58,9 @@
   .eclipse-btn:active { transform: scale(0.92); }
 
   .eclipse {
-    transform: rotate(-40deg);
+    /* Orient the crescent so its opening faces right (bite enters at 45°
+       up-right; +50° swings it to ~horizontal with a slight tilt). */
+    transform: rotate(50deg);
     transform-origin: center;
     scale: 1;
     transition:

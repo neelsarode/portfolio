@@ -7,6 +7,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: dark;
+
   /* — Modulabs colors — */
   --void: #0a0a0b;          /* Graphite Void — page base */
   --onyx: #121212;          /* Lifted Onyx — cards, sidebar, panels */
@@ -66,6 +68,8 @@
    Parchment Cream canvas, Lifted Paper surfaces, Stone Depth, dark ink text.
    The ember + verdant accents are shared across both themes. */
 :root[data-theme="light"] {
+  color-scheme: light;
+
   --void: #f6f3ec;          /* canvas  → Parchment Cream */
   --onyx: #fcfaf6;          /* lifted  → Lifted Paper */
   --charcoal: #e6e0da;      /* depth   → Stone Depth */
@@ -88,6 +92,19 @@
 :root[data-theme="light"] .chip { background: rgba(246, 243, 236, 0.7); }
 :root[data-theme="light"] .btn-secondary { background: rgba(10, 10, 11, 0.05); }
 :root[data-theme="light"] .btn-primary:hover { background: #1a1a1c; }
+
+/* ---- Theme-change circular reveal ----
+   The ThemeToggle script adds .theme-vt to <html> for the duration of its
+   view transition, so these overrides never touch other view transitions.
+   The new theme's snapshot is clipped to a circle grown from the button
+   (animated via WAAPI in ThemeToggle.astro); the old theme sits beneath. */
+:root.theme-vt::view-transition-old(root),
+:root.theme-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+:root.theme-vt::view-transition-old(root) { z-index: 1; }
+:root.theme-vt::view-transition-new(root) { z-index: 2; }
 
 *, *::before, *::after { box-sizing: border-box; }
 

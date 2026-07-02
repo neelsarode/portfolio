@@ -39,7 +39,7 @@
     display: grid;
     place-items: center;
     width: 32px;
-    height: 28px;
+    height: 32px;
     padding: 0;
     border: 1px solid var(--hairline);
     border-radius: var(--radius);
@@ -58,9 +58,9 @@
   .eclipse-btn:active { transform: scale(0.92); }
 
   .eclipse {
-    /* Orient the crescent so its opening faces right (bite enters at 45°
-       up-right; +50° swings it to ~horizontal with a slight tilt). */
-    transform: rotate(50deg);
+    /* Orient the crescent so its opening faces exactly right (the bite
+       enters at 45° up-right; +45° swings it to horizontal). */
+    transform: rotate(45deg);
     transform-origin: center;
     scale: 1;
     transition:

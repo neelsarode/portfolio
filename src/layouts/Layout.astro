@@ -11,12 +11,23 @@ const { title, activePath } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
     <script is:inline>
-      // Apply saved theme before paint to avoid a flash of the wrong theme.
+      // Apply saved theme before paint to avoid a flash of the wrong theme,
+      // and gate the entrance-reveal system on live JS (html.js) so no-JS
+      // visitors see everything instantly. html.first-visit arms the
+      // once-per-session sidebar entrance. If the orchestrator never runs
+      // (blocked/failed bundle), the failsafe strips the gates after 3s.
       (function () {
+        var el = document.documentElement;
         try {
-          document.documentElement.dataset.theme =
-            localStorage.getItem("theme") || "dark";
+          el.dataset.theme = localStorage.getItem("theme") || "dark";
         } catch (e) {}
+        el.classList.add("js");
+        try {
+          if (!sessionStorage.getItem("entrance")) el.classList.add("first-visit");
+        } catch (e) {}
+        window.__revealFailsafe = setTimeout(function () {
+          el.classList.remove("js", "first-visit");
+        }, 3000);
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -36,6 +47,91 @@ const { title, activePath } = Astro.props;
     </div>
   </body>
 </html>
+
+<script>
+  // Entrance orchestrator — see the reveal system block in global.css.
+  // Above-fold targets cascade in document order (--reveal-step apart);
+  // below-fold targets reveal once via IntersectionObserver. WAAPI only:
+  // never touches `transition`, so component hover styles stay intact.
+  const root = document.documentElement;
+  clearTimeout((window as any).__revealFailsafe);
+
+  const firstVisit = root.classList.contains("first-visit");
+  if (firstVisit) {
+    try { sessionStorage.setItem("entrance", "1"); } catch (e) {}
+  }
+
+  const targets = [
+    ...document.querySelectorAll<HTMLElement>(
+      "[data-reveal], [data-reveal-stagger] > *" +
+        (firstVisit ? ", [data-reveal-session]" : "")
+    ),
+  ];
+
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-revealed"));
+  } else {
+    const rootStyle = getComputedStyle(root);
+    const step = parseFloat(rootStyle.getPropertyValue("--reveal-step")) || 70;
+    const dur = parseFloat(rootStyle.getPropertyValue("--dur-reveal")) || 600;
+    const ease =
+      rootStyle.getPropertyValue("--ease-reveal").trim() ||
+      "cubic-bezier(0.16, 1, 0.3, 1)";
+
+    const reveal = (el: HTMLElement, delay: number) => {
+      delay += Number(el.dataset.revealDelay || 0);
+      // From-state read from the stylesheet, so rise vs media-scale variants
+      // need no JS branching. fill:"backwards" holds hidden through the
+      // delay; adding .is-revealed in the same task = no paintable gap.
+      const from = getComputedStyle(el);
+      el.animate(
+        [
+          { opacity: from.opacity, transform: from.transform },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: dur, delay, easing: ease, fill: "backwards" }
+      );
+      el.style.setProperty("--reveal-delay", `${delay}ms`); // eyebrow ::before bloom
+      el.classList.add("is-revealed");
+    };
+
+    // Partition by viewport presence on BOTH axes (the ultrawide gallery
+    // scrolls horizontally). Zero-size targets (display: none at this
+    // breakpoint, e.g. the sidebar bio on mobile) reveal instantly so a
+    // later resize can never strand them invisible.
+    const above: HTMLElement[] = [];
+    const below: HTMLElement[] = [];
+    for (const el of targets) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) el.classList.add("is-revealed");
+      else if (r.top < innerHeight && r.bottom > 0 && r.left < innerWidth && r.right > 0)
+        above.push(el);
+      else below.push(el);
+    }
+
+    above.forEach((el, i) => reveal(el, i * step));
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) =>
+            a.target.compareDocumentPosition(b.target) &
+            Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+          )
+          .forEach((e, j) => {
+            reveal(e.target as HTMLElement, Math.min(j, 6) * step);
+            io.unobserve(e.target);
+          });
+      },
+      // threshold:0 + negative bottom rootMargin, NOT a ratio threshold —
+      // very tall targets (72vh hero, long .body) may never reach ratio 0.15.
+      { threshold: 0, rootMargin: "0px 0px -10% 0px" }
+    );
+    below.forEach((el) => io.observe(el));
+  }
+</script>
 
 <style>
   .skip-link {

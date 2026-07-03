@@ -15,7 +15,7 @@ const archive = [
 ];
 ---
 <Layout title="Neel Sarode — Work" activePath="/">
-  <p class="eyebrow page-eyebrow">Selected Work — 2026</p>
+  <p class="eyebrow page-eyebrow" data-reveal>Selected Work — 2026</p>
 
   <section class="case-studies">
     {studies.map((s, i) => (
@@ -31,9 +31,9 @@ const archive = [
     ))}
   </section>
 
-  <p class="eyebrow section-eyebrow">More work</p>
+  <p class="eyebrow section-eyebrow" data-reveal>More work</p>
 
-  <section class="grid">
+  <section class="grid" data-reveal-stagger>
     {archive.map((label) => <GridItem label={label} />)}
   </section>
 </Layout>

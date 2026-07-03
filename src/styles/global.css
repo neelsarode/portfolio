@@ -61,6 +61,10 @@
   --dur-color: 150ms;
   --dur-ui: 300ms;
   --dur-bg: 650ms;
+  --dur-reveal: 600ms;
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1); /* expo-out — snappy start, soft settle */
+  --reveal-rise: 12px;
+  --reveal-step: 70ms; /* stagger interval — read by the Layout orchestrator */
 }
 
 /* ---- Light theme (Modulabs light palette) — v2 experiment ----
@@ -105,6 +109,42 @@
 }
 :root.theme-vt::view-transition-old(root) { z-index: 1; }
 :root.theme-vt::view-transition-new(root) { z-index: 2; }
+
+/* ---- Entrance reveal system ----
+   Targets marked data-reveal (or direct children of data-reveal-stagger)
+   start hidden ONLY when JS is live (html.js, set pre-paint in Layout's
+   head script) and motion is allowed; the Layout orchestrator animates
+   them in via WAAPI — on load (staggered cascade) or on first scroll
+   into view. data-reveal-session targets (sidebar) hide only on the
+   session's first page load (html.first-visit). The :not(.is-revealed)
+   guard makes these rules stop matching after reveal, so they never
+   fight component hover transitions/transforms. Never nest targets. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal]:not(.is-revealed),
+  html.js [data-reveal-stagger] > :not(.is-revealed) {
+    opacity: 0;
+    transform: translateY(var(--reveal-rise));
+  }
+  html.js [data-reveal="media"]:not(.is-revealed) {
+    transform: scale(0.985);
+  }
+  html.first-visit [data-reveal-session]:not(.is-revealed) {
+    opacity: 0;
+    transform: translateY(var(--reveal-rise));
+  }
+
+  /* Ember square blooms in just after its eyebrow text lands. */
+  html.js [data-reveal].eyebrow::before,
+  html.js [data-reveal-stagger] > .eyebrow::before {
+    transition: transform var(--dur-ui) var(--ease-reveal)
+      calc(var(--reveal-delay, 0ms) + 300ms);
+  }
+  html.js [data-reveal].eyebrow:not(.is-revealed)::before,
+  html.js [data-reveal-stagger] > .eyebrow:not(.is-revealed)::before {
+    transform: scale(0);
+    transition: none;
+  }
+}
 
 *, *::before, *::after { box-sizing: border-box; }
 

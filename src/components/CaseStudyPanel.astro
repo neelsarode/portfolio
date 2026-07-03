@@ -12,11 +12,11 @@ const { index, title, category, year, tagline, href, featured = false } = Astro.
 const num = String(index).padStart(2, "0");
 ---
 <a class:list={["panel", { featured }]} href={href}>
-  <div class="media machined" aria-hidden="true">
+  <div class="media machined" aria-hidden="true" data-reveal="media">
     <span class="ghost">{title}</span>
     <span class="chip">↗</span>
   </div>
-  <div class="meta">
+  <div class="meta" data-reveal>
     <p class="eyebrow">{num} / {category} — {year}</p>
     <h2 class="title">{title}</h2>
     <p class="tagline">{tagline}</p>

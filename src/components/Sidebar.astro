@@ -12,14 +12,14 @@ const links = [
 ---
 <aside class="sidebar">
   <div class="sidebar-top">
-    <p class="eyebrow">Design Portfolio</p>
-    <p class="name">Neel Sarode</p>
-    <p class="bio">
+    <p class="eyebrow" data-reveal-session>Design Portfolio</p>
+    <p class="name" data-reveal-session>Neel Sarode</p>
+    <p class="bio" data-reveal-session>
       Product &amp; brand designer based in San Francisco. I design clear,
       considered interfaces and identities for early-stage teams. Selected work
       below.
     </p>
-    <nav class="nav">
+    <nav class="nav" data-reveal-session>
       {links.map((l) => (
         <a
           href={l.href}
@@ -28,7 +28,7 @@ const links = [
       ))}
     </nav>
   </div>
-  <div class="sidebar-footer">
+  <div class="sidebar-footer" data-reveal-session>
     <a class="mono-label" href="mailto:neel@example.com">Email ↗</a>
     <a class="mono-label" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a>
     <div class="theme-slot"><ThemeToggle /></div>

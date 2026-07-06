@@ -8,6 +8,9 @@ const caseStudies = defineCollection({
     year: z.number(),
     tagline: z.string(),
     order: z.number(),
+    /* Optional looping preview video for the media block (public/ path). */
+    video: z.string().optional(),
+    videoPoster: z.string().optional(),
   }),
 });
 

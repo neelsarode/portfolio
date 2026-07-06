@@ -7,13 +7,32 @@ interface Props {
   tagline: string;
   href: string;
   featured?: boolean;
+  video?: string;
+  videoPoster?: string;
 }
-const { index, title, category, year, tagline, href, featured = false } = Astro.props;
+const {
+  index, title, category, year, tagline, href,
+  featured = false, video, videoPoster,
+} = Astro.props;
 const num = String(index).padStart(2, "0");
 ---
 <a class:list={["panel", { featured }]} href={href}>
   <div class="media machined" aria-hidden="true" data-reveal="media">
-    <span class="ghost">{title}</span>
+    {video ? (
+      <video
+        class="media-video"
+        src={video}
+        poster={videoPoster}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        tabindex="-1"
+      ></video>
+    ) : (
+      <span class="ghost">{title}</span>
+    )}
     <span class="chip">↗</span>
   </div>
   <div class="meta" data-reveal>
@@ -46,6 +65,13 @@ const num = String(index).padStart(2, "0");
     height: clamp(440px, 72vh, 900px);
   }
 
+  .media-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   .ghost {
     font-family: var(--font-geist-mono);
     font-size: 12px;
@@ -101,3 +127,14 @@ const num = String(index).padStart(2, "0");
     .panel.featured .media { aspect-ratio: 4 / 3; height: auto; }
   }
 </style>
+
+<script>
+  // Preview loops stay on their poster frame for reduced-motion users.
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll<HTMLVideoElement>(".media-video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+</script>

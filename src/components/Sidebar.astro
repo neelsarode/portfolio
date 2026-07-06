@@ -75,14 +75,16 @@ const links = [
   .nav-link::before {
     content: "";
     flex: 0 0 auto;
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
     background: transparent;
+    -webkit-mask: var(--icon-spark) no-repeat center / contain;
+    mask: var(--icon-spark) no-repeat center / contain;
     transition: background var(--dur-ui) linear;
   }
   .nav-link:hover { color: var(--cream); }
   .nav-link.active { color: var(--cream); }
-  .nav-link.active::before { background: var(--ember); }
+  .nav-link.active::before { background: currentColor; }
 
   .sidebar-footer {
     display: flex;

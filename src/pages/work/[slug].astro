@@ -69,9 +69,11 @@ const { Content } = await entry.render();
   .body :global(h2)::before {
     content: "";
     flex: 0 0 auto;
-    width: 8px;
-    height: 8px;
-    background: var(--ember);
+    width: 12px;
+    height: 12px;
+    background: currentColor;
+    -webkit-mask: var(--icon-spark) no-repeat center / contain;
+    mask: var(--icon-spark) no-repeat center / contain;
   }
   .body :global(p) {
     margin-top: var(--spacing-16);

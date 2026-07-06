@@ -197,6 +197,20 @@ h1, h2, h3, p { margin: 0; }
   mask: var(--icon-spark) no-repeat center / contain;
 }
 
+/* Sparks rotate slowly clockwise. Animated via the standalone `rotate`
+   property (not `transform`) so the entrance bloom's scale transition
+   composes with the spin instead of being overridden by it. */
+@keyframes spark-spin {
+  to { rotate: 360deg; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .eyebrow::before,
+  .nav-link::before,
+  .body h2::before {
+    animation: spark-spin 10s linear infinite;
+  }
+}
+
 /* ---- Mono micro-label without the ember square (footer legal links) ---- */
 .mono-label {
   font-family: var(--font-geist-mono);

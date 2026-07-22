@@ -1,87 +1,237 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "../layouts/Layout.astro";
-import CaseStudyPanel from "../components/CaseStudyPanel.astro";
-import GridItem from "../components/GridItem.astro";
+import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
+// Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
+//   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
+//      fixed scene while at the top; scrolls away to reveal it.
+//   2. BG   — pinned as a FIXED, full-viewport background, revealed on scroll.
+// One UnicornStudio.init() initializes BOTH [data-us-project] elements.
+// GSAP/ScrollTrigger reveals each section's text as it enters.
+const HERO_PROJECT = "J3nKIyvrA2pTD0nflb6G"; // hero embed (video texture)
+const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background, revealed on scroll
 
-const studies = (await getCollection("case-studies")).sort(
-  (a, b) => a.data.order - b.data.order
-);
-
-const archive = [
-  "Poster series", "Type study", "Icon set", "Wordmark exploration",
-  "Landing page", "Mobile app concept", "Editorial layout", "Motion study",
-  "Packaging", "Data viz",
+const sections = [
+  {
+    n: "01",
+    title: "First section",
+    body:
+      "You've scrolled past the hero — this scene is now pinned behind the content and reacts to scroll. Placeholder copy; swap for real content later.",
+  },
+  {
+    n: "02",
+    title: "Second section",
+    body:
+      "Another viewport of scroll so you can judge legibility and how the fixed scene resolves as it animates.",
+  },
+  {
+    n: "03",
+    title: "Third section",
+    body:
+      "Final placeholder section. Add or remove sections to give the scroll-driven scene more or less runway.",
+  },
 ];
 ---
-<Layout title="Neel Sarode — Work" activePath="/">
-  <p class="eyebrow page-eyebrow" data-reveal>Selected Work — 2026</p>
+<FullscreenLayout title="Neel Sarode — Founding Design Engineer">
+  <!-- Fixed background scene: hidden behind the hero, revealed on scroll. -->
+  <div
+    class="us-scene us-fixed"
+    data-us-project={BG_PROJECT}
+    data-us-scale="1"
+    data-us-dpi="1.5"
+  ></div>
 
-  <section class="case-studies">
-    {studies.map((s, i) => (
-      <CaseStudyPanel
-        index={i + 1}
-        title={s.data.title}
-        category={s.data.category}
-        year={s.data.year}
-        tagline={s.data.tagline}
-        href={`/work/${s.slug}`}
-        featured={i === 0}
-        video={s.data.video}
-        videoPoster={s.data.videoPoster}
-      />
+  <main class="content">
+    <!-- Hero: original embed, full-screen and opaque; scrolls away to reveal
+         the fixed scene behind it. Text overlay implemented from Figma. -->
+    <section class="hero">
+      <div
+        class="us-scene us-hero"
+        data-us-project={HERO_PROJECT}
+        data-us-scale="1"
+        data-us-dpi="1.5"
+      ></div>
+
+      <div class="hero-overlay">
+        <SiteNav activePath="/" />
+
+        <div class="hero-bottom">
+          <h1 class="hero-title">Founding<br />Design Engineer</h1>
+          <p class="hero-desc">
+            Specializing in taking companies from 0→ 1 with ownership of all
+            things visual.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sections that reveal the fixed background as they scroll over it. -->
+    {sections.map((s) => (
+      <section class="section">
+        <div class="section-inner">
+          <p class="eyebrow">Section {s.n}</p>
+          <h2 class="section-title">{s.title}</h2>
+          <p class="section-body">{s.body}</p>
+        </div>
+      </section>
     ))}
-  </section>
+  </main>
+</FullscreenLayout>
 
-  <p class="eyebrow section-eyebrow" data-reveal>More work</p>
+<!-- Unicorn Studio — self-loading vanilla snippet (SDK v2.2.8, loads on demand,
+     idempotent). init() picks up every [data-us-project] on the page. -->
+<script is:inline>
+  !(function () {
+    var u = window.UnicornStudio;
+    if (u && u.init) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { u.init(); });
+      } else { u.init(); }
+    } else {
+      window.UnicornStudio = { isInitialized: !1 };
+      var i = document.createElement("script");
+      i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
+      i.onload = function () {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () { UnicornStudio.init(); });
+        } else { UnicornStudio.init(); }
+      };
+      (document.head || document.body).appendChild(i);
+    }
+  })();
+</script>
 
-  <section class="grid" data-reveal-stagger>
-    {archive.map((label) => <GridItem label={label} />)}
-  </section>
-</Layout>
+<!-- GSAP + ScrollTrigger — bundled by Vite from the npm package (vanilla, no
+     React). Reveals each section's text as it scrolls into view over the fixed
+     scene. gsap.from() only sets the hidden from-state when this runs, so if
+     the bundle fails to load the sections just render normally. -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray<HTMLElement>(".section .section-inner").forEach((inner) => {
+      gsap.from(inner.children, {
+        opacity: 0,
+        y: 24,
+        duration: 0.7,
+        ease: "power3.out",
+        stagger: 0.08,
+        scrollTrigger: {
+          trigger: inner,
+          start: "top 82%",
+          once: true,
+        },
+      });
+    });
+  }
+</script>
 
 <style>
-  .case-studies {
-    margin-top: var(--spacing-48);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-80);
+  /* Fixed, full-viewport background — pinned behind everything (z-index 0). */
+  .us-fixed {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* fits the visible area on mobile browser chrome */
+    background: #0a0a0b; /* fallback while the scene loads */
   }
 
-  /* True ultrawide only (21:9+ viewport, not 16:9/4K): horizontal-scroll gallery.
-     Requires an ultrawide ASPECT RATIO plus a large width so 16:9 4K screens and
-     landscape phones/tablets keep the normal vertical layout. */
-  @media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
-    .case-studies {
-      flex-direction: row;
-      gap: var(--spacing-32);
-      overflow-x: auto;
-      overflow-y: visible;
-      padding-bottom: var(--spacing-16);
-      scroll-snap-type: x proximity;
-      scrollbar-width: thin;
-      scrollbar-color: var(--hairline-hover) transparent;
-    }
-    .case-studies::-webkit-scrollbar { height: 8px; }
-    .case-studies::-webkit-scrollbar-track { background: transparent; }
-    .case-studies::-webkit-scrollbar-thumb {
-      background: var(--hairline-hover);
-      border-radius: var(--radius-pill);
-    }
+  /* Content stack sits above the fixed scene. */
+  .content { position: relative; z-index: 1; }
+
+  /* Hero: full-screen original embed. Solid background makes it OPAQUE so it
+     covers the fixed scene while at the top, then scrolls away to reveal it. */
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #0a0a0b;
   }
-  .section-eyebrow {
-    margin-top: var(--spacing-120);
-    padding-top: var(--spacing-24);
-    border-top: 1px solid var(--hairline);
+  .us-hero { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ---- Hero text overlay (from Figma node 2138:11513) ---- */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+    color: #fff;
+    font-family: var(--font-geist-sans);
+    font-weight: 400;
   }
-  .grid {
-    margin-top: var(--spacing-24);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+
+  /* Title (left) + descriptor (right), pinned to the bottom edge */
+  .hero-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     gap: var(--spacing-24);
+    width: 100%;
   }
-  @media (max-width: 767px) {
-    .grid { grid-template-columns: repeat(2, 1fr); }
-    .section-eyebrow { margin-top: var(--spacing-64); }
+  .hero-title {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em; /* -2.08px @ 52px */
+    font-weight: 400;
+    color: #fff;
+  }
+  .hero-desc {
+    flex: 0 1 auto;
+    max-width: 293px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em; /* -0.16px @ 16px */
+    color: #fff;
+  }
+
+  /* Stack title over descriptor on narrow screens. */
+  @media (max-width: 640px) {
+    .hero-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-16);
+    }
+    .hero-desc { max-width: 42ch; }
+  }
+
+  /* Sections over the fixed scene — transparent so the scene shows through. */
+  .section {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding: clamp(24px, 5vw, 72px);
+  }
+  .section-inner { max-width: 56ch; }
+
+  /* Fixed light palette + text-shadow so copy stays legible over the moving
+     scene regardless of theme (the WebGL scene doesn't flip with the theme). */
+  .content .eyebrow { color: rgba(246, 243, 236, 0.72); }
+  .section-title {
+    margin-top: var(--spacing-16);
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.08;
+    font-weight: 500;
+    letter-spacing: -0.6px;
+    color: #f6f3ec;
+    text-shadow: 0 1px 24px rgba(10, 10, 11, 0.55);
+  }
+  .section-body {
+    margin-top: var(--spacing-20);
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    color: rgba(246, 243, 236, 0.88);
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
   }
 </style>

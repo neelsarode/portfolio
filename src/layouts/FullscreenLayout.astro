@@ -1,0 +1,43 @@
+---
+// Minimal full-bleed layout: same head essentials (fonts, tokens, theme
+// no-flash) as Layout, but NO sidebar and NO shell/padding — the page's
+// content owns the whole viewport. Deliberately omits the entrance-reveal
+// orchestrator, so [data-reveal] gating never applies here.
+import "../styles/global.css";
+interface Props { title: string; }
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <script is:inline>
+      // Apply saved theme before paint to avoid a flash of the wrong theme.
+      (function () {
+        try {
+          document.documentElement.dataset.theme =
+            localStorage.getItem("theme") || "dark";
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@300&display=swap"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style>
+  /* Full-bleed. Allow vertical scroll (pages may stack sections over a fixed
+     scene); clip horizontal overflow from 100vw elements. */
+  body { overflow-x: hidden; }
+</style>

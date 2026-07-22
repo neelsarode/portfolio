@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
-import SiteNav from "../../components/SiteNav.astro";
+import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
   const studies = await getCollection("case-studies");
@@ -14,35 +13,23 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
-<FullscreenLayout title={`${entry.data.title} — Neel Sarode`}>
-  <div class="page-shell">
-    <SiteNav activePath="/" />
-    <article class="study">
-      <a class="back mono-label" href="/">← Work</a>
-      <div class="media machined" aria-hidden="true"></div>
-      <header class="head">
-        <p class="eyebrow">{entry.data.category} — {entry.data.year}</p>
-        <h1 class="title">{entry.data.title}</h1>
-        <p class="tagline">{entry.data.tagline}</p>
-      </header>
-      <div class="body">
-        <Content />
-      </div>
-    </article>
-  </div>
-</FullscreenLayout>
+<Layout title={`${entry.data.title} — Neel Sarode`} activePath="/">
+  <article class="study">
+    <a class="back mono-label" href="/" data-reveal>← Work</a>
+    <div class="media machined" aria-hidden="true" data-reveal="media"></div>
+    <header class="head" data-reveal-stagger>
+      <p class="eyebrow">{entry.data.category} — {entry.data.year}</p>
+      <h1 class="title">{entry.data.title}</h1>
+      <p class="tagline">{entry.data.tagline}</p>
+    </header>
+    <div class="body" data-reveal>
+      <Content />
+    </div>
+  </article>
+</Layout>
 
 <style>
-  .page-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(20px, 2.4vw, 40px);
-    background: var(--void);
-  }
-  .study {
-    max-width: var(--max-w);
-    margin-top: clamp(48px, 10vh, 120px);
-  }
+  .study { max-width: var(--max-w); }
   .back { color: var(--cream-60); }
   .back:hover { color: var(--ember); }
   .media {
@@ -53,10 +40,10 @@ const { Content } = await entry.render();
   .head { margin-top: var(--spacing-32); }
   .title {
     margin-top: var(--spacing-16);
-    font-size: clamp(24px, 2.8vw, 34px);
-    line-height: 1.12;
+    font-size: 24px;
+    line-height: 1.15;
     font-weight: 500;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.4px;
     color: var(--cream);
   }
   .tagline {
@@ -92,5 +79,8 @@ const { Content } = await entry.render();
     margin-top: var(--spacing-16);
     color: var(--cream-88);
     max-width: 65ch;
+  }
+  @media (max-width: 767px) {
+    .title { font-size: 22px; letter-spacing: -0.3px; }
   }
 </style>

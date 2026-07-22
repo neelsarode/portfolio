@@ -1,0 +1,87 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import CaseStudyPanel from "../components/CaseStudyPanel.astro";
+import GridItem from "../components/GridItem.astro";
+
+const studies = (await getCollection("case-studies")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const archive = [
+  "Poster series", "Type study", "Icon set", "Wordmark exploration",
+  "Landing page", "Mobile app concept", "Editorial layout", "Motion study",
+  "Packaging", "Data viz",
+];
+---
+<Layout title="Neel Sarode — Work" activePath="/">
+  <p class="eyebrow page-eyebrow" data-reveal>Highlighted Works</p>
+
+  <section class="case-studies">
+    {studies.map((s, i) => (
+      <CaseStudyPanel
+        index={i + 1}
+        title={s.data.title}
+        category={s.data.category}
+        year={s.data.year}
+        tagline={s.data.tagline}
+        href={`/work/${s.slug}`}
+        featured={i === 0}
+        video={s.data.video}
+        videoPoster={s.data.videoPoster}
+      />
+    ))}
+  </section>
+
+  <p class="eyebrow section-eyebrow" data-reveal>More work</p>
+
+  <section class="grid" data-reveal-stagger>
+    {archive.map((label) => <GridItem label={label} />)}
+  </section>
+</Layout>
+
+<style>
+  .case-studies {
+    margin-top: var(--spacing-48);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-80);
+  }
+
+  /* True ultrawide only (21:9+ viewport, not 16:9/4K): horizontal-scroll gallery.
+     Requires an ultrawide ASPECT RATIO plus a large width so 16:9 4K screens and
+     landscape phones/tablets keep the normal vertical layout. */
+  @media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
+    .case-studies {
+      flex-direction: row;
+      gap: var(--spacing-32);
+      overflow-x: auto;
+      overflow-y: visible;
+      padding-bottom: var(--spacing-16);
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+      scrollbar-color: var(--hairline-hover) transparent;
+    }
+    .case-studies::-webkit-scrollbar { height: 8px; }
+    .case-studies::-webkit-scrollbar-track { background: transparent; }
+    .case-studies::-webkit-scrollbar-thumb {
+      background: var(--hairline-hover);
+      border-radius: var(--radius-pill);
+    }
+  }
+  .section-eyebrow {
+    margin-top: var(--spacing-120);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--hairline);
+  }
+  .grid {
+    margin-top: var(--spacing-24);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-24);
+  }
+  @media (max-width: 767px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .section-eyebrow { margin-top: var(--spacing-64); }
+  }
+</style>

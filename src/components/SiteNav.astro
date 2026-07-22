@@ -1,0 +1,64 @@
+---
+// Primary navigation for the full-screen (no-sidebar) site. Replaces the
+// sidebar's nav. Renders padding-free (parent supplies edge padding): logo +
+// name on the left, section links on the right. White text — sits over the
+// dark canvas / hero scene on every page.
+interface Props { activePath?: string; }
+const { activePath = "" } = Astro.props;
+const links = [
+  { href: "/", label: "Work" },
+  { href: "/info", label: "Info" },
+  { href: "/contact", label: "Contact" },
+];
+---
+<nav class="site-nav" aria-label="Primary">
+  <a class="site-logo" href="/" aria-label="Neel Sarode — home">
+    <svg class="site-logomark" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill="currentColor" d="M5.76562 17.6538C5.76562 17.845 5.61065 18 5.41947 18H0.346154C0.154978 18 0 17.845 0 17.6538V12.4467C0 12.2556 0.154978 12.1006 0.346154 12.1006H5.41947C5.61065 12.1006 5.76562 12.2556 5.76562 12.4467V17.6538ZM7.62312 0.0056229C7.64182 0.0132722 7.65667 0.0280943 7.66436 0.046776L9.76617 5.15295C9.85995 5.38077 9.69244 5.63086 9.44607 5.63086H8.46263C8.08345 5.63086 7.98021 6.15272 8.33083 6.29709L10.4926 7.18728C10.578 7.22242 10.6457 7.29019 10.6809 7.37554L11.5701 9.53465C11.7145 9.88525 12.2363 9.782 12.2363 9.40284V8.42126C12.2363 8.17486 12.4865 8.00735 12.7143 8.1012L17.7145 10.161C17.7997 10.1961 17.8674 10.2637 17.9026 10.349L17.9738 10.5215C17.9911 10.5634 18 10.6083 18 10.6536V17.6538C18 17.845 17.845 18 17.6538 18H11.1143C11.0691 18 11.0244 17.9912 10.9826 17.974L10.484 17.7688C10.3986 17.7336 10.3308 17.6658 10.2957 17.5805L8.23588 12.5785C8.14206 12.3507 8.30957 12.1006 8.55596 12.1006H9.53835C9.91752 12.1006 10.0208 11.5787 9.67015 11.4344L7.50839 10.5442C7.42302 10.509 7.35523 10.4412 7.32009 10.3559L6.43188 8.19784C6.28755 7.84717 5.76562 7.95038 5.76562 8.32959V9.30932C5.76562 9.5557 5.51552 9.7232 5.28769 9.62941L0.286826 7.57059C0.201389 7.53541 0.133559 7.46754 0.0984367 7.38209L0.0259862 7.20581C0.00882777 7.16406 0 7.11936 0 7.07422V0.346154C0 0.154978 0.154978 0 0.346154 0H7.59452C7.60433 0 7.61404 0.00190985 7.62312 0.0056229ZM18 5.28471C18 5.47588 17.845 5.63086 17.6538 5.63086H12.5825C12.3913 5.63086 12.2363 5.47588 12.2363 5.28471V0.346154C12.2363 0.154978 12.3913 0 12.5825 0H17.6538C17.845 0 18 0.154978 18 0.346154V5.28471Z" />
+    </svg>
+    <span class="site-name">Neel Sarode</span>
+  </a>
+
+  <div class="site-links">
+    {links.map((l) => (
+      <a href={l.href} class:list={["site-link", { active: activePath === l.href }]}>{l.label}</a>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .site-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-24);
+    width: 100%;
+    color: #fff;
+    font-family: var(--font-geist-sans);
+    font-weight: 400;
+  }
+  .site-logo { display: inline-flex; align-items: center; gap: 6px; color: #fff; }
+  .site-logo:hover { color: #fff; }
+  .site-logomark { display: block; width: 18px; height: 18px; flex: 0 0 auto; }
+  .site-name {
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .site-links { display: flex; align-items: center; gap: var(--spacing-20); }
+  .site-link {
+    font-size: 14px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 150ms linear;
+  }
+  .site-link:hover { color: #fff; }
+  .site-link.active { color: #fff; }
+
+  @media (max-width: 480px) {
+    .site-name { display: none; } /* keep just the mark on very small screens */
+    .site-links { gap: var(--spacing-16); }
+  }
+</style>

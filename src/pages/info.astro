@@ -1,32 +1,45 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
 ---
-<Layout title="Info — Neel Sarode" activePath="/info">
-  <section class="page" data-reveal-stagger>
-    <p class="eyebrow">Info</p>
-    <h1 class="title">About the practice</h1>
-    <p class="lead">
-      Neel is a product and brand designer focused on early-stage teams — from
-      first identity to shipped interface. Placeholder copy; this page will hold
-      a longer bio, background, and approach.
-    </p>
-    <p class="body">
-      The work favors measurable clarity over flourish: legible systems, tight
-      typography, and interfaces that get out of the way. Currently open to
-      select freelance and full-time opportunities. Replace this with real
-      content later.
-    </p>
-  </section>
-</Layout>
+<FullscreenLayout title="Info — Neel Sarode">
+  <div class="page-shell">
+    <SiteNav activePath="/info" />
+    <main class="page-main">
+      <p class="eyebrow">Info</p>
+      <h1 class="title">About the practice</h1>
+      <p class="lead">
+        Neel is a product and brand designer focused on early-stage teams — from
+        first identity to shipped interface. Placeholder copy; this page will hold
+        a longer bio, background, and approach.
+      </p>
+      <p class="body">
+        The work favors measurable clarity over flourish: legible systems, tight
+        typography, and interfaces that get out of the way. Currently open to
+        select freelance and full-time opportunities. Replace this with real
+        content later.
+      </p>
+    </main>
+  </div>
+</FullscreenLayout>
 
 <style>
-  .page { max-width: var(--max-w); }
+  .page-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: clamp(20px, 2.4vw, 40px);
+    background: var(--void);
+  }
+  .page-main {
+    max-width: var(--max-w);
+    margin-top: clamp(64px, 14vh, 180px);
+  }
   .title {
     margin-top: var(--spacing-16);
-    font-size: 24px;
-    line-height: 1.15;
+    font-size: clamp(24px, 2.8vw, 34px);
+    line-height: 1.12;
     font-weight: 500;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: var(--cream);
   }
   .lead {
@@ -40,8 +53,5 @@ import Layout from "../layouts/Layout.astro";
     margin-top: var(--spacing-16);
     color: var(--cream-88);
     max-width: 65ch;
-  }
-  @media (max-width: 767px) {
-    .title { font-size: 22px; letter-spacing: -0.3px; }
   }
 </style>

@@ -1,40 +1,53 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
 ---
-<Layout title="Contact — Neel Sarode" activePath="/contact">
-  <section class="page" data-reveal-stagger>
-    <p class="eyebrow">Contact</p>
-    <h1 class="title">Start a conversation</h1>
-    <p class="lead">
-      Placeholder contact copy. The best way to reach me is email — I reply
-      within a day or two.
-    </p>
+<FullscreenLayout title="Contact — Neel Sarode">
+  <div class="page-shell">
+    <SiteNav activePath="/contact" />
+    <main class="page-main">
+      <p class="eyebrow">Contact</p>
+      <h1 class="title">Start a conversation</h1>
+      <p class="lead">
+        Placeholder contact copy. The best way to reach me is email — I reply
+        within a day or two.
+      </p>
 
-    <p class="status">
-      <span class="dot" aria-hidden="true"></span>
-      Available for select projects
-    </p>
+      <p class="status">
+        <span class="dot" aria-hidden="true"></span>
+        Available for select projects
+      </p>
 
-    <div class="actions">
-      <a class="btn btn-primary" href="mailto:neel@example.com">Email me ↗</a>
-      <a
-        class="btn btn-secondary"
-        href="https://linkedin.com"
-        target="_blank"
-        rel="noopener"
-      >LinkedIn ↗</a>
-    </div>
-  </section>
-</Layout>
+      <div class="actions">
+        <a class="btn btn-primary" href="mailto:neel@example.com">Email me ↗</a>
+        <a
+          class="btn btn-secondary"
+          href="https://linkedin.com"
+          target="_blank"
+          rel="noopener"
+        >LinkedIn ↗</a>
+      </div>
+    </main>
+  </div>
+</FullscreenLayout>
 
 <style>
-  .page { max-width: var(--max-w); }
+  .page-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: clamp(20px, 2.4vw, 40px);
+    background: var(--void);
+  }
+  .page-main {
+    max-width: var(--max-w);
+    margin-top: clamp(64px, 14vh, 180px);
+  }
   .title {
     margin-top: var(--spacing-16);
-    font-size: 24px;
-    line-height: 1.15;
+    font-size: clamp(24px, 2.8vw, 34px);
+    line-height: 1.12;
     font-weight: 500;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: var(--cream);
   }
   .lead {
@@ -67,8 +80,5 @@ import Layout from "../layouts/Layout.astro";
     display: flex;
     gap: var(--spacing-12);
     flex-wrap: wrap;
-  }
-  @media (max-width: 767px) {
-    .title { font-size: 22px; letter-spacing: -0.3px; }
   }
 </style>

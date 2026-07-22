@@ -1,0 +1,47 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Info — Neel Sarode" activePath="/info">
+  <section class="page" data-reveal-stagger>
+    <p class="eyebrow">Info</p>
+    <h1 class="title">About the practice</h1>
+    <p class="lead">
+      Neel is a product and brand designer focused on early-stage teams — from
+      first identity to shipped interface. Placeholder copy; this page will hold
+      a longer bio, background, and approach.
+    </p>
+    <p class="body">
+      The work favors measurable clarity over flourish: legible systems, tight
+      typography, and interfaces that get out of the way. Currently open to
+      select freelance and full-time opportunities. Replace this with real
+      content later.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page { max-width: var(--max-w); }
+  .title {
+    margin-top: var(--spacing-16);
+    font-size: 24px;
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+    color: var(--cream);
+  }
+  .lead {
+    margin-top: var(--spacing-20);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--cream-88);
+    max-width: 64ch;
+  }
+  .body {
+    margin-top: var(--spacing-16);
+    color: var(--cream-88);
+    max-width: 65ch;
+  }
+  @media (max-width: 767px) {
+    .title { font-size: 22px; letter-spacing: -0.3px; }
+  }
+</style>

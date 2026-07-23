@@ -382,6 +382,13 @@ const sections = [
   .intro-bg video {
     width: 100%;
     height: auto;
+    /* Lift the carousel so its back row sits behind the statement text
+       (Figma comp). The lifted-out top portion is clipped — it must not
+       paint over the hero above — while the bottom bleed stays uncut.
+       The two values must match; tune the lift with this one number. */
+    --bg-lift: 18%;
+    transform: translateY(calc(-1 * var(--bg-lift)));
+    clip-path: inset(var(--bg-lift) 0 0 0);
   }
   .intro-band > .content-grid { position: relative; z-index: 1; }
 

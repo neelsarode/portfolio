@@ -11,6 +11,22 @@ import DevGrid from "../components/DevGrid.astro";
 const HERO_PROJECT = "J3nKIyvrA2pTD0nflb6G"; // hero embed (video texture)
 const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background, revealed on scroll
 
+// Featured Work rows (Figma 2167:11568). Row 2 duplicates TL;DR in the Figma
+// as a placeholder until the second study is designed; its media is empty.
+const fwRoles = [
+  "Brand Identity Design",
+  "Product UI/UX",
+  "Website Design",
+  "Website Development",
+  "Product Front-End Code",
+  "Document Design",
+  "Deck Design",
+];
+const fwRows = [
+  { flip: false, video: "/tldr-dashboard.mp4", poster: "/tldr-dashboard-poster.jpg" },
+  { flip: true },
+];
+
 const sections = [
   {
     n: "01",
@@ -138,6 +154,83 @@ const sections = [
       </div>
     </section>
 
+    <!-- Featured Work (Figma 2167:11568): section title + mirrored case-study
+         rows — media on the macro grid (10 cols) with a TL;DR meta rail
+         (2 cols) beside it; the rail's connector line stretches so the rail
+         always matches the media height. -->
+    <section class="section fw-band">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="fw-stack">
+            <h2 class="fw-title" data-reveal-group>
+              <span class="mask"><span class="line">Featured Work</span></span>
+            </h2>
+
+            <div class="fw-rows">
+              {fwRows.map((row) => (
+                <div class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
+                  <div class="fw-media" data-fade>
+                    {row.video && (
+                      <video
+                        class="fw-video"
+                        src={row.video}
+                        poster={row.poster}
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        tabindex="-1"
+                      ></video>
+                    )}
+                  </div>
+                  <aside class="fw-meta">
+                    <span class="mask">
+                      <!-- TL;DR wordmark (Figma vectors, composed inline) -->
+                      <svg class="fw-logo" viewBox="0 0 63 17.17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="TL;DR">
+                        <path fill="currentColor" d="M0 0H13.1962V3.55661H8.46228V17.1698H4.7585V3.55661H0V0Z" />
+                        <path transform="translate(14.64 0)" fill="currentColor" d="M3.70378 13.6132H0V0H3.70378V13.6132ZM11.0623 17.1698H3.70378V13.6132H11.0623V17.1698Z" />
+                        <g fill="#c197ff">
+                          <rect x="27.81" y="2.47" width="3.734" height="3.734" />
+                          <rect x="27.81" y="9.71" width="3.734" height="3.734" />
+                          <rect x="29.68" y="13.44" width="1.867" height="3.734" />
+                        </g>
+                        <path transform="translate(34.81 0)" fill="currentColor" d="M0 17.1698V0H8.95284V3.55661H12.5095V17.1698H0ZM8.80567 3.55661H3.70378V13.6132H8.80567V3.55661Z" />
+                        <path transform="translate(50.05 0)" fill="currentColor" d="M3.70378 8.90378H9.24718V12.4849H3.70378V17.1698H0V0H9.24718V3.55661H3.70378V8.90378ZM12.951 8.90378H9.24718V3.55661H12.951V8.90378ZM12.951 17.1698H9.24718V12.4849H12.951V17.1698Z" />
+                      </svg>
+                    </span>
+                    <span class="mask"><p class="fw-desc">
+                      Co-founder and founding designer. Created brand and
+                      product design and experience from scratch
+                    </p></span>
+                    <div class="fw-line" aria-hidden="true">
+                      <svg class="fw-spark" viewBox="0 0 13.125 13.125" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5625 0C6.26992 6.0293 6.0293 6.26992 0 6.5625C6.0293 6.85508 6.26992 7.0957 6.5625 13.125C6.85508 7.0957 7.0957 6.85508 13.125 6.5625C7.0957 6.26992 6.85508 6.0293 6.5625 0Z" fill="url(#fw-spark-grad)" />
+                        <defs>
+                          <radialGradient id="fw-spark-grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(6.5625 6.5625) rotate(90) scale(6.5625)">
+                            <stop stop-color="white" />
+                            <stop offset="1" stop-color="#999999" />
+                          </radialGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <div class="fw-roles">
+                      <span class="mask"><p class="fw-label">Founding Design Engineer</p></span>
+                      <div class="fw-roles-list">
+                        {fwRoles.map((r) => (
+                          <span class="mask"><p>{r}</p></span>
+                        ))}
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Sections that reveal the fixed background as they scroll over it.
          Text is placed on the macro grid (left columns). -->
     {sections.map((s) => (
@@ -243,6 +336,17 @@ const sections = [
       if (corners.length) {
         tl.from(corners, { opacity: 0, duration: 0.7, ease: "power2.out" }, 0.15);
       }
+      const fades = group.querySelectorAll("[data-fade]");
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: preview loops stay on their poster frame.
+    document.querySelectorAll<HTMLVideoElement>(".fw-video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
     });
   }
 </script>
@@ -487,6 +591,114 @@ const sections = [
     .intro-services { grid-column: 1 / -1; padding-block-start: 0; }
     /* Frame spans all 12 cols here, so the 6-col offset no longer applies. */
     .corner-br { right: 0; }
+  }
+
+  /* ---- Featured Work (Figma 2167:11568) ---- */
+  .section.fw-band {
+    min-height: 0;
+    padding-block: var(--space-8);
+  }
+  .fw-stack {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  /* Same recipe as the hero title (Figma: 52px / -2.08px). */
+  .fw-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .fw-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  /* Each row replicates the macro grid's 12 columns (it spans all of them,
+     so repeat(12,1fr)+gutter yields identical geometry): media 10 cols,
+     meta rail 2. Flip rows mirror the placement; DOM order stays constant. */
+  .fw-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
+  }
+  /* Sharp corners, no stroke (per design direction) — flat placeholder
+     surface shows while video loads / where a study has no media yet. */
+  .fw-media {
+    grid-column: 1 / 11;
+    position: relative;
+    aspect-ratio: 1035 / 576;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .fw-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fw-meta {
+    grid-column: 11 / 13;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2); /* Figma 17 → snapped to scale */
+    color: #fff;
+  }
+  .fw-flip .fw-media { grid-column: 3 / 13; }
+  .fw-flip .fw-meta { grid-column: 1 / 3; grid-row: 1; }
+
+  .fw-logo { display: block; width: 63px; height: 17px; color: #fff; }
+  .fw-desc {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em; /* -0.14px @ 14px */
+    color: rgba(255, 255, 255, 0.65);
+  }
+  /* Connector: gradient hairline that grows to absorb leftover rail height,
+     so the rail always matches the media's height (Figma's fixed 268px,
+     made elastic). Spark marker rides the line just below its midpoint. */
+  .fw-line {
+    position: relative;
+    align-self: flex-start;
+    width: 1px;
+    flex: 1 0 var(--space-7);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.25),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.24) 96%
+    );
+  }
+  .fw-spark {
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 13px;
+    height: 13px;
+    transform: translateX(-50%);
+  }
+  .fw-roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+  .fw-label { margin: 0; line-height: 1.2; color: rgba(255, 255, 255, 0.65); }
+  .fw-roles-list { line-height: 1.48; }
+  .fw-roles-list p { margin: 0; }
+
+  @media (max-width: 640px) {
+    .fw-media, .fw-flip .fw-media { grid-column: 1 / -1; }
+    .fw-meta, .fw-flip .fw-meta { grid-column: 1 / -1; grid-row: auto; }
+    .fw-line { flex-basis: var(--space-6); }
   }
 
   /* ---- Masked line reveals ----

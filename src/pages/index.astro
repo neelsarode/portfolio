@@ -1,6 +1,7 @@
 ---
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
+import DevGrid from "../components/DevGrid.astro";
 // Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
 //   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
 //      fixed scene while at the top; scrolls away to reveal it.
@@ -114,6 +115,9 @@ const sections = [
       </section>
     ))}
   </main>
+
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
+  <DevGrid />
 </FullscreenLayout>
 
 <!-- Unicorn Studio — self-loading vanilla snippet (SDK v2.2.8, loads on demand,

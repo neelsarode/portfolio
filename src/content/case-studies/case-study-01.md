@@ -4,6 +4,8 @@ category: "Product Design"
 year: 2024
 tagline: "Rebuilding a fintech onboarding flow to cut drop-off and set a clearer first impression."
 order: 1
+video: "/tldr-dashboard.mp4"
+videoPoster: "/tldr-dashboard-poster.jpg"
 ---
 
 ## Overview

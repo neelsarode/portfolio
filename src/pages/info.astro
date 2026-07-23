@@ -1,23 +1,43 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import PageShell from "../layouts/PageShell.astro";
+import SiteNav from "../components/SiteNav.astro";
 ---
-<Layout title="Info — Neel Sarode" activePath="/info">
-  <section class="page">
-    <h1>Info</h1>
-    <p>
-      Placeholder about copy. Neel is a product and brand designer focused on
-      early-stage teams — from first identity to shipped interface. This page
-      will hold a longer bio, background, and approach.
+<FullscreenLayout title="Info — Neel Sarode">
+  <header class="page-header"><SiteNav activePath="/info" /></header>
+  <PageShell>
+    <p class="eyebrow lede-top">Info</p>
+    <h1 class="title">About the practice</h1>
+    <p class="lead">
+      Neel is a product and brand designer focused on early-stage teams — from
+      first identity to shipped interface. Placeholder copy; this page will hold
+      a longer bio, background, and approach.
     </p>
-    <p>
-      Currently open to select freelance and full-time opportunities.
-      Replace this with real content later.
+    <p class="body">
+      The work favors measurable clarity over flourish: legible systems, tight
+      typography, and interfaces that get out of the way. Currently open to
+      select freelance and full-time opportunities. Replace this with real
+      content later.
     </p>
-  </section>
-</Layout>
+  </PageShell>
+</FullscreenLayout>
 
 <style>
-  .page { max-width: var(--max-w); }
-  .page h1 { font-size: 20px; font-weight: 600; }
-  .page p { margin-top: var(--space-3); max-width: 60ch; }
+  /* Nav aligns to the page margin; grid owns all content widths. */
+  .page-header { padding: var(--space-3) var(--margin); }
+
+  /* Top offset below the nav (section-level → margin-block-start + --space-*). */
+  .lede-top { margin-block-start: var(--space-7); }
+
+  /* Typography only — no width/max-width (the grid measure handles it),
+     no vertical margins (the grid row-gap handles rhythm). */
+  .title {
+    font-size: clamp(24px, 2.8vw, 34px);
+    line-height: 1.12;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: var(--cream);
+  }
+  .lead { font-size: 16px; line-height: 1.5; color: var(--cream-88); }
+  .body { color: var(--cream-88); }
 </style>

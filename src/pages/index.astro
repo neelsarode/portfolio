@@ -1,60 +1,736 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "../layouts/Layout.astro";
-import CaseStudyPanel from "../components/CaseStudyPanel.astro";
-import GridItem from "../components/GridItem.astro";
+import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import SiteNav from "../components/SiteNav.astro";
+import DevGrid from "../components/DevGrid.astro";
+// Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
+//   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
+//      fixed scene while at the top; scrolls away to reveal it.
+//   2. BG   — pinned as a FIXED, full-viewport background, revealed on scroll.
+// The hero keeps its original edge-hug spacing (Figma). The scroll sections
+// compose on the 12-column .full-composed macro grid (see CLAUDE.md).
+const HERO_PROJECT = "J3nKIyvrA2pTD0nflb6G"; // hero embed (video texture)
+const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background, revealed on scroll
 
-const studies = (await getCollection("case-studies")).sort(
-  (a, b) => a.data.order - b.data.order
-);
+// Featured Work rows (Figma 2167:11568). Row 2 duplicates TL;DR in the Figma
+// as a placeholder until the second study is designed; its media is empty.
+const fwRoles = [
+  "Brand Identity Design",
+  "Product UI/UX",
+  "Website Design",
+  "Website Development",
+  "Product Front-End Code",
+  "Document Design",
+  "Deck Design",
+];
+const fwRows = [
+  { flip: false, video: "/tldr-dashboard.mp4", poster: "/tldr-dashboard-poster.jpg" },
+  { flip: true },
+];
 
-const archive = [
-  "Poster series", "Type study", "Icon set", "Wordmark exploration",
-  "Landing page", "Mobile app concept", "Editorial layout", "Motion study",
-  "Packaging", "Data viz",
+const sections = [
+  {
+    n: "01",
+    title: "First section",
+    body:
+      "You've scrolled past the hero — this scene is now pinned behind the content and reacts to scroll. Placeholder copy; swap for real content later.",
+  },
+  {
+    n: "02",
+    title: "Second section",
+    body:
+      "Another viewport of scroll so you can judge legibility and how the fixed scene resolves as it animates.",
+  },
+  {
+    n: "03",
+    title: "Third section",
+    body:
+      "Final placeholder section. Add or remove sections to give the scroll-driven scene more or less runway.",
+  },
 ];
 ---
-<Layout title="Neel Sarode — Work" activePath="/">
-  <section class="case-studies">
-    {studies.map((s, i) => (
-      <CaseStudyPanel
-        index={i + 1}
-        title={s.data.title}
-        category={s.data.category}
-        year={s.data.year}
-        tagline={s.data.tagline}
-        href={`/work/${s.slug}`}
-      />
+<FullscreenLayout title="Neel Sarode — Founding Design Engineer">
+  <!-- Arm the hero entrance before first paint: html.js gates the CSS that
+       hides hero risers (see the is:global style block), so there's no flash
+       of text before GSAP takes over. Failsafe: if the GSAP bundle never
+       loads, the class is stripped at 4s and the text simply appears. -->
+  <script is:inline>
+    document.documentElement.classList.add("js");
+    window.__heroFailsafe = setTimeout(function () {
+      document.documentElement.classList.remove("js");
+    }, 4000);
+  </script>
+
+  <!-- Fixed background scene: hidden behind the hero, revealed on scroll. -->
+  <div
+    class="us-scene us-fixed"
+    data-us-project={BG_PROJECT}
+    data-us-scale="1"
+    data-us-dpi="1"
+    data-us-fps="30"
+  ></div>
+
+  <main class="content">
+    <!-- Hero: original embed, opaque; scrolls away to reveal the fixed scene.
+         Nav + title/desc are placed on the 12-col macro grid. -->
+    <section class="hero">
+      <div
+        class="us-scene us-hero"
+        data-us-project={HERO_PROJECT}
+        data-us-scale="1"
+        data-us-dpi="1"
+        data-us-fps="30"
+      ></div>
+
+      <div class="hero-overlay">
+        <div class="mask"><SiteNav activePath="/" /></div>
+
+        <div class="hero-bottom">
+          <h1 class="hero-title">
+            <span class="mask"><span class="line">Founding</span></span>
+            <span class="mask"><span class="line">Design Engineer</span></span>
+          </h1>
+          <div class="mask mask-desc">
+            <p class="hero-desc">
+              Specializing in taking companies from 0→ 1 with ownership of all
+              things visual.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Intro (Figma 2155:11374): bracket-framed statement + services list,
+         composed on the 12-col macro grid over the fixed scene. -->
+    <section class="section intro-band">
+      <!-- Section background media (Figma "image 8": bleeds off the left
+           edge). Placeholder still for now — swap the <img> for a
+           <video autoplay muted loop playsinline> webm when it's ready. -->
+      <div class="intro-bg" aria-hidden="true">
+        <img src="/intro-reel.png" alt="" loading="lazy" decoding="async" />
+      </div>
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="intro-frame" data-reveal-group>
+            <svg class="corner corner-tl" viewBox="0 0 29.25 29.75" fill="none" aria-hidden="true">
+              <path d="M0.25 29.75L0.25 0.25L29.25 0.25" stroke="currentColor" stroke-width="0.5" />
+            </svg>
+            <span class="mask"><p class="intro-name">
+              <svg class="intro-logomark" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path fill="currentColor" d="M5.76562 17.6538C5.76562 17.845 5.61065 18 5.41947 18H0.346154C0.154978 18 0 17.845 0 17.6538V12.4467C0 12.2556 0.154978 12.1006 0.346154 12.1006H5.41947C5.61065 12.1006 5.76562 12.2556 5.76562 12.4467V17.6538ZM7.62312 0.0056229C7.64182 0.0132722 7.65667 0.0280943 7.66436 0.046776L9.76617 5.15295C9.85995 5.38077 9.69244 5.63086 9.44607 5.63086H8.46263C8.08345 5.63086 7.98021 6.15272 8.33083 6.29709L10.4926 7.18728C10.578 7.22242 10.6457 7.29019 10.6809 7.37554L11.5701 9.53465C11.7145 9.88525 12.2363 9.782 12.2363 9.40284V8.42126C12.2363 8.17486 12.4865 8.00735 12.7143 8.1012L17.7145 10.161C17.7997 10.1961 17.8674 10.2637 17.9026 10.349L17.9738 10.5215C17.9911 10.5634 18 10.6083 18 10.6536V17.6538C18 17.845 17.845 18 17.6538 18H11.1143C11.0691 18 11.0244 17.9912 10.9826 17.974L10.484 17.7688C10.3986 17.7336 10.3308 17.6658 10.2957 17.5805L8.23588 12.5785C8.14206 12.3507 8.30957 12.1006 8.55596 12.1006H9.53835C9.91752 12.1006 10.0208 11.5787 9.67015 11.4344L7.50839 10.5442C7.42302 10.509 7.35523 10.4412 7.32009 10.3559L6.43188 8.19784C6.28755 7.84717 5.76562 7.95038 5.76562 8.32959V9.30932C5.76562 9.5557 5.51552 9.7232 5.28769 9.62941L0.286826 7.57059C0.201389 7.53541 0.133559 7.46754 0.0984367 7.38209L0.0259862 7.20581C0.00882777 7.16406 0 7.11936 0 7.07422V0.346154C0 0.154978 0.154978 0 0.346154 0H7.59452C7.60433 0 7.61404 0.00190985 7.62312 0.0056229ZM18 5.28471C18 5.47588 17.845 5.63086 17.6538 5.63086H12.5825C12.3913 5.63086 12.2363 5.47588 12.2363 5.28471V0.346154C12.2363 0.154978 12.3913 0 12.5825 0H17.6538C17.845 0 18 0.154978 18 0.346154V5.28471Z" />
+              </svg>
+              <span class="dim">My name is</span> Neel Sarode
+            </p></span>
+            <p class="intro-statement">
+              <span class="mask"><span class="line">I join early stage</span></span>
+              <span class="mask"><span class="line">companies and design &amp;</span></span>
+              <span class="mask"><span class="line">build <span class="u">everything</span> users see.</span></span>
+            </p>
+            <svg class="corner corner-br" viewBox="0 0 29.25 29.75" fill="none" aria-hidden="true">
+              <path d="M0.25 29.75L0.25 0.25L29.25 0.25" stroke="currentColor" stroke-width="0.5" />
+            </svg>
+          </div>
+          <div class="intro-services" data-reveal-group>
+            <div class="intro-col-block">
+              <span class="mask"><p class="intro-blurb">
+                8 years of experience designing for brands from scratch,
+                specializing in taking a company with <span class="hl">0</span>
+                to visually competing with others that are
+                <span class="hl">10x their size.</span>
+              </p></span>
+              <span class="mask"><a class="intro-about" href="/info">About Me →</a></span>
+            </div>
+            <div class="intro-col-block intro-skills">
+              <span class="mask"><p class="skills-label">Skills:</p></span>
+              <div class="skills-list">
+                <span class="mask"><p>Product UI/UX</p></span>
+                <span class="mask"><p>Website Development</p></span>
+                <span class="mask"><p>Product Front-End Code</p></span>
+                <span class="mask"><p>Brand Identity Design</p></span>
+                <span class="mask"><p class="intro-extras">Extras: Documents, print, creative direction</p></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Work (Figma 2167:11568): section title + mirrored case-study
+         rows — media on the macro grid (10 cols) with a TL;DR meta rail
+         (2 cols) beside it; the rail's connector line stretches so the rail
+         always matches the media height. -->
+    <section class="section fw-band">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="fw-stack">
+            <h2 class="fw-title" data-reveal-group>
+              <span class="mask"><span class="line">Featured Work</span></span>
+            </h2>
+
+            <div class="fw-rows">
+              {fwRows.map((row) => (
+                <div class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
+                  <div class="fw-media" data-fade>
+                    {row.video && (
+                      <video
+                        class="fw-video"
+                        src={row.video}
+                        poster={row.poster}
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        tabindex="-1"
+                      ></video>
+                    )}
+                  </div>
+                  <aside class="fw-meta">
+                    <span class="mask">
+                      <!-- TL;DR wordmark (Figma vectors, composed inline) -->
+                      <svg class="fw-logo" viewBox="0 0 63 17.17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="TL;DR">
+                        <path fill="currentColor" d="M0 0H13.1962V3.55661H8.46228V17.1698H4.7585V3.55661H0V0Z" />
+                        <path transform="translate(14.64 0)" fill="currentColor" d="M3.70378 13.6132H0V0H3.70378V13.6132ZM11.0623 17.1698H3.70378V13.6132H11.0623V17.1698Z" />
+                        <g fill="#c197ff">
+                          <rect x="27.81" y="2.47" width="3.734" height="3.734" />
+                          <rect x="27.81" y="9.71" width="3.734" height="3.734" />
+                          <rect x="29.68" y="13.44" width="1.867" height="3.734" />
+                        </g>
+                        <path transform="translate(34.81 0)" fill="currentColor" d="M0 17.1698V0H8.95284V3.55661H12.5095V17.1698H0ZM8.80567 3.55661H3.70378V13.6132H8.80567V3.55661Z" />
+                        <path transform="translate(50.05 0)" fill="currentColor" d="M3.70378 8.90378H9.24718V12.4849H3.70378V17.1698H0V0H9.24718V3.55661H3.70378V8.90378ZM12.951 8.90378H9.24718V3.55661H12.951V8.90378ZM12.951 17.1698H9.24718V12.4849H12.951V17.1698Z" />
+                      </svg>
+                    </span>
+                    <span class="mask"><p class="fw-desc">
+                      Co-founder and founding designer. Created brand and
+                      product design and experience from scratch
+                    </p></span>
+                    <div class="fw-line" aria-hidden="true">
+                      <svg class="fw-spark" viewBox="0 0 13.125 13.125" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5625 0C6.26992 6.0293 6.0293 6.26992 0 6.5625C6.0293 6.85508 6.26992 7.0957 6.5625 13.125C6.85508 7.0957 7.0957 6.85508 13.125 6.5625C7.0957 6.26992 6.85508 6.0293 6.5625 0Z" fill="url(#fw-spark-grad)" />
+                        <defs>
+                          <radialGradient id="fw-spark-grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(6.5625 6.5625) rotate(90) scale(6.5625)">
+                            <stop stop-color="white" />
+                            <stop offset="1" stop-color="#999999" />
+                          </radialGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <div class="fw-roles">
+                      <span class="mask"><p class="fw-label">Founding Design Engineer</p></span>
+                      <div class="fw-roles-list">
+                        {fwRoles.map((r) => (
+                          <span class="mask"><p>{r}</p></span>
+                        ))}
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sections that reveal the fixed background as they scroll over it.
+         Text is placed on the macro grid (left columns). -->
+    {sections.map((s) => (
+      <section class="section">
+        <div class="content-grid">
+          <div class="full-composed">
+            <div class="section-inner" data-reveal-group>
+              <span class="mask"><p class="eyebrow">Section {s.n}</p></span>
+              <span class="mask m-title"><h2 class="section-title">{s.title}</h2></span>
+              <span class="mask m-body"><p class="section-body">{s.body}</p></span>
+            </div>
+          </div>
+        </div>
+      </section>
     ))}
-  </section>
+  </main>
 
-  <div class="section-label">More work</div>
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
+  <DevGrid />
+</FullscreenLayout>
 
-  <section class="grid">
-    {archive.map((label) => <GridItem label={label} />)}
-  </section>
-</Layout>
+<!-- Unicorn Studio — self-loading vanilla snippet (SDK v2.2.8, loads on demand,
+     idempotent). init() picks up every [data-us-project] on the page. -->
+<script is:inline>
+  !(function () {
+    var u = window.UnicornStudio;
+    if (u && u.init) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { u.init(); });
+      } else { u.init(); }
+    } else {
+      window.UnicornStudio = { isInitialized: !1 };
+      var i = document.createElement("script");
+      i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
+      i.onload = function () {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () { UnicornStudio.init(); });
+        } else { UnicornStudio.init(); }
+      };
+      (document.head || document.body).appendChild(i);
+    }
+  })();
+</script>
+
+<!-- GSAP + ScrollTrigger — masked line reveals (sananes.co pattern): each
+     text element sits inside an overflow-clip .mask wrapper and rises from
+     yPercent 110 → 0 with a stagger. Bracket corners fade in alongside.
+     gsap.from() only sets the hidden from-state when this runs, so if the
+     bundle fails to load the text just renders normally. -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // GSAP owns the hero from here — cancel the no-JS failsafe.
+    clearTimeout((window as any).__heroFailsafe);
+
+    // Keep ScrollTrigger in lockstep with Lenis (created in FullscreenLayout;
+    // module order isn't guaranteed, so fall back to the init event).
+    const wireLenis = () => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+    };
+    (window as any).lenis
+      ? wireLenis()
+      : addEventListener("lenis:init", wireLenis, { once: true });
+
+    // Hero entrance at the 5.5s mark — anchored to navigation start (not
+    // script-load time) so it syncs with the Unicorn scene's authored intro.
+    // fromTo (not from): the CSS gate holds risers at translateY(110%), which
+    // computes to a px matrix — from{} restates it as y:0/yPercent:110 so the
+    // tween ends at a true 0. immediateRender hands off from CSS seamlessly.
+    const heroRisers = document.querySelectorAll(".hero-overlay .mask > *");
+    if (heroRisers.length) {
+      gsap.timeline({ delay: Math.max(0, 5.5 - performance.now() / 1000) })
+        .fromTo(
+          heroRisers,
+          { y: 0, yPercent: 110 },
+          {
+            yPercent: 0,
+            duration: 0.9,
+            ease: "power4.out",
+            stagger: 0.09,
+            immediateRender: true,
+          }
+        );
+    }
+
+    gsap.utils.toArray<HTMLElement>(".section [data-reveal-group]").forEach((group) => {
+      const risers = group.querySelectorAll(".mask > *");
+      const corners = group.querySelectorAll(".corner");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+      tl.from(risers.length ? risers : [...group.children], {
+        yPercent: 110,
+        duration: 0.9,
+        ease: "power4.out",
+        stagger: 0.09,
+      });
+      if (corners.length) {
+        tl.from(corners, { opacity: 0, duration: 0.7, ease: "power2.out" }, 0.15);
+      }
+      const fades = group.querySelectorAll("[data-fade]");
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: preview loops stay on their poster frame.
+    document.querySelectorAll<HTMLVideoElement>(".fw-video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+</script>
+
+<style is:global>
+  /* Pre-paint gate for the HERO entrance only (sections handle their own
+     from-state via gsap.from). Global because .mask children include the
+     SiteNav component root, which page-scoped selectors can't reach. Gated
+     on html.js (set by the inline arm script) and reduced-motion so no-JS /
+     reduced-motion visitors always see the text. GSAP's inline transforms
+     take over from this the moment the module runs. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .hero-overlay .mask > * {
+      transform: translateY(110%);
+    }
+  }
+</style>
 
 <style>
-  .case-studies { max-width: var(--max-w); }
-  .section-label {
-    max-width: var(--max-w);
-    margin-top: var(--space-6);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  /* Fixed, full-viewport background — pinned behind everything (z-index 0). */
+  .us-fixed {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* fits the visible area on mobile browser chrome */
+    background: #0a0a0b; /* fallback while the scene loads */
   }
-  .grid {
-    max-width: var(--max-w);
-    margin-top: var(--space-4);
+
+  /* Content stack sits above the fixed scene. */
+  .content { position: relative; z-index: 1; }
+
+  /* Hero: full-screen original embed. Solid background makes it OPAQUE so it
+     covers the fixed scene while at the top, then scrolls away to reveal it. */
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #0a0a0b;
+  }
+  .us-hero { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ---- Hero text overlay (from Figma node 2138:11513) — original edge-hug ---- */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+    color: #fff;
+    font-family: var(--font-geist-sans);
+    font-weight: 400;
+  }
+
+  /* Title (left) + descriptor (right), pinned to the bottom edge */
+  .hero-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+  }
+  .hero-title {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em; /* -2.08px @ 52px */
+    font-weight: 400;
+    color: #fff;
+  }
+  /* Layout lives on the mask (the flex item); typography on the text. */
+  .mask-desc {
+    flex: 0 1 auto;
+    max-width: 293px;
+  }
+  .hero-desc {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em; /* -0.16px @ 16px */
+    color: #fff;
+  }
+
+  /* Stack title over descriptor on narrow screens. */
+  @media (max-width: 640px) {
+    .hero-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+    .mask-desc { max-width: 42ch; }
+  }
+
+  /* Sections: vertically centered; text placed on the macro grid. */
+  .section {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .section-inner { grid-column: 1 / 8; }
+  @media (max-width: 640px) {
+    .section-inner { grid-column: 1 / -1; }
+  }
+
+  /* ---- Intro section (Figma 2155:11374) ---- */
+  /* Band model (per Figma): a compact section whose vertical space is real
+     --space-* padding, not a full-viewport centered block. No overflow
+     clipping — the background media may bleed past the band's bottom edge
+     (the off-left horizontal bleed is contained by the body's overflow-x). */
+  .section.intro-band {
+    position: relative;
+    min-height: 0;
+    padding-block: var(--space-8);
+  }
+
+  /* Background media layer (image now, webm video later — the <img>/<video>
+     swaps 1:1 inside .intro-bg). Figma: 1440-wide media at x -320 in a
+     1440 frame → full section width, offset -22% so it bleeds off-left.
+     Renders at natural aspect, anchored to the band top — never cropped;
+     if taller than the band it bleeds below rather than being cut off. */
+  .intro-bg {
+    position: absolute;
+    top: 0;
+    left: -22%;
+    width: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .intro-bg img,
+  .intro-bg video {
+    width: 100%;
+    height: auto;
+    /* Lift the carousel so its back row sits behind the statement text
+       (Figma comp). The lifted-out top portion is clipped — it must not
+       paint over the hero above — while the bottom bleed stays uncut.
+       The two values must match; tune the lift with this one number. */
+    --bg-lift: 18%;
+    transform: translateY(calc(-1 * var(--bg-lift)));
+    clip-path: inset(var(--bg-lift) 0 0 0);
+  }
+  .intro-band > .content-grid { position: relative; z-index: 1; }
+
+  /* Bracket-framed statement: corners pin to the frame's TL/BR; text insets
+     via --space padding (Figma's 107/64/90 offsets snapped to the scale). */
+  .intro-frame {
+    grid-column: 3 / 9;
+    /* Don't stretch to the (taller) right column's row height — the frame
+       hugs its own content so the bottom-right corner stays anchored just
+       below the statement text, not the bottom of the whole row. */
+    align-self: start;
+    position: relative;
+    padding: var(--space-6) var(--space-7);
+    color: #fff;
+  }
+  .corner {
+    position: absolute;
+    width: 29px;
+    height: 30px;
+    color: #fff;
+  }
+  .corner-tl { top: 0; left: 0; }
+  .corner-br {
+    bottom: 0;
+    /* One column + gutter in from the frame's right edge: the frame spans 6
+       columns (3/9), so this keeps the closing bracket in the column it
+       occupied before the frame shifted right. Grid-derived, not arbitrary. */
+    right: calc((100% - 5 * var(--gutter)) / 6 + var(--gutter));
+    rotate: 180deg;
+  }
+
+  .intro-name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.04em; /* -0.72px @ 18px */
+  }
+  .intro-logomark { width: 18px; height: 18px; flex: 0 0 auto; }
+  .intro-name .dim { color: rgba(255, 255, 255, 0.6); }
+
+  .intro-statement {
+    margin-block-start: var(--space-2);
+    font-size: clamp(28px, 2.5vw, 36px);
+    line-height: 1;
+    letter-spacing: -0.04em; /* -1.44px @ 36px */
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  .intro-statement .u {
+    text-decoration: underline;
+    text-decoration-thickness: from-font;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+
+  /* Right column (Figma 2167:11632): auto-layout column on our tokens —
+     blurb+link block, then Skills block, --space-8 between them. Spans grid
+     cols 9-13 (416px at 1440 ≈ the Figma's 417px container). */
+  .intro-services {
+    grid-column: 9 / 13;
+    padding-block-start: var(--space-7); /* aligns blurb top with the statement */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    font-size: 16px;
+    letter-spacing: -0.01em; /* -0.16px @ 16px */
+    color: #fff;
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  .intro-services p { margin: 0; }
+  .intro-col-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .intro-col-block.intro-skills { gap: var(--space-1); }
+  .intro-blurb {
+    max-width: 303px; /* Figma text measure (same exception class as hero-desc) */
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .intro-blurb .hl { color: #fff; }
+  .intro-about { line-height: 1.2; color: #fff; }
+  .skills-label {
+    font-size: 14px;
+    letter-spacing: -0.01em; /* -0.14px @ 14px */
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .skills-list { line-height: 1.48; }
+  .intro-extras { color: rgba(255, 255, 255, 0.4); }
+
+  @media (max-width: 640px) {
+    .intro-frame { grid-column: 1 / -1; padding: var(--space-5) var(--space-4); }
+    .intro-services { grid-column: 1 / -1; padding-block-start: 0; }
+    /* Frame spans all 12 cols here, so the 6-col offset no longer applies. */
+    .corner-br { right: 0; }
+  }
+
+  /* ---- Featured Work (Figma 2167:11568) ---- */
+  .section.fw-band {
+    min-height: 0;
+    padding-block: var(--space-8);
+  }
+  .fw-stack {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  /* Same recipe as the hero title (Figma: 52px / -2.08px). */
+  .fw-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .fw-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  /* Each row replicates the macro grid's 12 columns (it spans all of them,
+     so repeat(12,1fr)+gutter yields identical geometry): media 10 cols,
+     meta rail 2. Flip rows mirror the placement; DOM order stays constant. */
+  .fw-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
   }
-  @media (max-width: 767px) {
-    .grid { grid-template-columns: repeat(2, 1fr); }
+  /* Sharp corners, no stroke (per design direction) — flat placeholder
+     surface shows while video loads / where a study has no media yet. */
+  .fw-media {
+    grid-column: 1 / 11;
+    position: relative;
+    aspect-ratio: 1035 / 576;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .fw-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fw-meta {
+    grid-column: 11 / 13;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2); /* Figma 17 → snapped to scale */
+    color: #fff;
+  }
+  .fw-flip .fw-media { grid-column: 3 / 13; }
+  .fw-flip .fw-meta { grid-column: 1 / 3; grid-row: 1; }
+
+  .fw-logo { display: block; width: 63px; height: 17px; color: #fff; }
+  .fw-desc {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em; /* -0.14px @ 14px */
+    color: rgba(255, 255, 255, 0.65);
+  }
+  /* Connector: gradient hairline that grows to absorb leftover rail height,
+     so the rail always matches the media's height (Figma's fixed 268px,
+     made elastic). Spark marker rides the line just below its midpoint. */
+  .fw-line {
+    position: relative;
+    align-self: flex-start;
+    width: 1px;
+    flex: 1 0 var(--space-7);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.25),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.24) 96%
+    );
+  }
+  .fw-spark {
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 13px;
+    height: 13px;
+    transform: translateX(-50%);
+  }
+  .fw-roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+  .fw-label { margin: 0; line-height: 1.2; color: rgba(255, 255, 255, 0.65); }
+  .fw-roles-list { line-height: 1.48; }
+  .fw-roles-list p { margin: 0; }
+
+  @media (max-width: 640px) {
+    .fw-media, .fw-flip .fw-media { grid-column: 1 / -1; }
+    .fw-meta, .fw-flip .fw-meta { grid-column: 1 / -1; grid-row: auto; }
+    .fw-line { flex-basis: var(--space-6); }
+  }
+
+  /* ---- Masked line reveals ----
+     .mask clips; its child rises from yPercent 110 → 0 (see GSAP script).
+     The tiny padding/negative-margin pair gives glyph descenders slack so
+     line-height:1 text isn't clipped at rest (net-zero layout impact).
+     Vertical rhythm margins live on the MASKS (m-*), not the clipped text. */
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.14em;
+    margin-block-end: -0.14em;
+  }
+  .line { display: block; }
+  .m-title { margin-block-start: var(--space-2); }
+  .m-body { margin-block-start: var(--space-3); }
+
+  /* Fixed light palette + text-shadow so copy stays legible over the moving
+     scene regardless of theme (the WebGL scene doesn't flip with the theme). */
+  .content .eyebrow { color: rgba(246, 243, 236, 0.72); }
+  .section-title {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.08;
+    font-weight: 500;
+    letter-spacing: -0.6px;
+    color: #f6f3ec;
+    text-shadow: 0 1px 24px rgba(10, 10, 11, 0.55);
+  }
+  .section-body {
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    color: rgba(246, 243, 236, 0.88);
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
   }
 </style>

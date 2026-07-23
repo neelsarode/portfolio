@@ -1,0 +1,95 @@
+---
+// DEV-ONLY grid overlay — a Figma-style visualization of the 12-column macro
+// grid. Renders NOTHING in production builds: markup, script, AND styles all
+// live inside the import.meta.env.DEV conditional (the style is is:inline
+// rather than a component <style>, which Astro would otherwise hoist into the
+// CSS bundle even when the markup never renders).
+//
+// The overlay derives from the SAME tokens as .full-composed (--margin,
+// --gutter, 12 equal columns), so it stays in exact sync with the real grid
+// by definition — if the tokens change, both change together.
+//
+// Toggle: the "Grid" chip (bottom-right) or press `g`. State persists in
+// localStorage across reloads.
+const dev = import.meta.env.DEV;
+---
+{dev && (
+  <>
+    <div class="dev-grid" id="dev-grid" aria-hidden="true">
+      {Array.from({ length: 12 }).map(() => <div class="dev-col"></div>)}
+    </div>
+    <button
+      class="dev-grid-btn mono-label"
+      id="dev-grid-btn"
+      type="button"
+      aria-pressed="false"
+      title="Toggle layout grid (g)"
+    >Grid</button>
+
+    <style is:inline>
+      /* Mirrors .full-composed exactly: 12 cols, gap --gutter, inset --margin. */
+      .dev-grid {
+        position: fixed;
+        inset: 0;
+        z-index: 9990;
+        display: none;
+        grid-template-columns: repeat(12, 1fr);
+        gap: var(--gutter);
+        padding-inline: var(--margin);
+        pointer-events: none;
+      }
+      .dev-grid.on { display: grid; }
+      .dev-col {
+        background: rgba(255, 59, 48, 0.08);
+        box-shadow:
+          inset 1px 0 0 rgba(255, 59, 48, 0.22),
+          inset -1px 0 0 rgba(255, 59, 48, 0.22);
+      }
+
+      .dev-grid-btn {
+        position: fixed;
+        right: var(--space-2);
+        bottom: var(--space-2);
+        z-index: 9991;
+        padding: var(--space-1) var(--space-2);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius);
+        background: rgba(10, 10, 11, 0.72);
+        color: var(--cream-60);
+        cursor: pointer;
+        transition: color var(--dur-color) linear, border-color var(--dur-ui) linear;
+      }
+      .dev-grid-btn:hover { color: var(--cream); border-color: var(--hairline-hover); }
+      .dev-grid-btn[aria-pressed="true"] {
+        color: #ff3b30;
+        border-color: rgba(255, 59, 48, 0.5);
+      }
+    </style>
+
+    <script is:inline>
+      (function () {
+        var grid = document.getElementById("dev-grid");
+        var btn = document.getElementById("dev-grid-btn");
+        if (!grid || !btn) return;
+        function set(on) {
+          grid.classList.toggle("on", on);
+          btn.setAttribute("aria-pressed", String(on));
+          try { localStorage.setItem("dev-grid", on ? "1" : "0"); } catch (e) {}
+        }
+        var on = false;
+        try { on = localStorage.getItem("dev-grid") === "1"; } catch (e) {}
+        set(on);
+        btn.addEventListener("click", function () {
+          set(!grid.classList.contains("on"));
+        });
+        addEventListener("keydown", function (e) {
+          if (e.key !== "g" && e.key !== "G") return;
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          var t = e.target;
+          if (t && t.closest && t.closest("input, textarea, select, [contenteditable]")) return;
+          set(!grid.classList.contains("on"));
+        });
+      })();
+    </script>
+  </>
+)}

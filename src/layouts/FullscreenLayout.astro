@@ -1,0 +1,49 @@
+---
+// Minimal full-bleed layout: same head essentials (fonts, tokens, theme
+// no-flash) as Layout, but NO sidebar and NO shell/padding — the page's
+// content owns the whole viewport. Deliberately omits the entrance-reveal
+// orchestrator, so [data-reveal] gating never applies here.
+import "../styles/global.css";
+interface Props { title: string; }
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@300&display=swap"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<script>
+  // Lenis smooth scroll — site-wide. Uses native window scroll under the
+  // hood, so position:fixed scenes and ScrollTrigger keep working; exposed
+  // on window (+ an event for scripts that load first) so the homepage can
+  // wire ScrollTrigger.update to it. Skipped for reduced-motion users.
+  import Lenis from "lenis";
+  import "lenis/dist/lenis.css";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const lenis = new Lenis({ autoRaf: true });
+    (window as any).lenis = lenis;
+    dispatchEvent(new Event("lenis:init"));
+  }
+</script>
+
+<style>
+  /* Full-bleed. Allow vertical scroll (pages may stack sections over a fixed
+     scene); clip horizontal overflow from 100vw elements. */
+  body { overflow-x: hidden; }
+</style>

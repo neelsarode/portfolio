@@ -36,6 +36,21 @@ const { title } = Astro.props;
   </body>
 </html>
 
+<script>
+  // Lenis smooth scroll — site-wide. Uses native window scroll under the
+  // hood, so position:fixed scenes and ScrollTrigger keep working; exposed
+  // on window (+ an event for scripts that load first) so the homepage can
+  // wire ScrollTrigger.update to it. Skipped for reduced-motion users.
+  import Lenis from "lenis";
+  import "lenis/dist/lenis.css";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const lenis = new Lenis({ autoRaf: true });
+    (window as any).lenis = lenis;
+    dispatchEvent(new Event("lenis:init"));
+  }
+</script>
+
 <style>
   /* Full-bleed. Allow vertical scroll (pages may stack sections over a fixed
      scene); clip horizontal overflow from 100vw elements. */

@@ -1,0 +1,61 @@
+:root {
+  /* Layout tokens — single source of truth, mirrors Figma */
+  --measure: 680px;        /* prose / content zone */
+  --wide: 920px;           /* wide zone (measure + 120px each side) */
+  --margin: clamp(20px, 5vw, 96px);
+  --gutter: 24px;          /* on the 8-based scale (= --space-3) */
+
+  /* Spacing scale — the ONLY spacing values allowed */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 128px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns:
+    [full-start]    minmax(var(--margin), 1fr)
+    [wide-start]    minmax(0, calc((var(--wide) - var(--measure)) / 2))
+    [content-start] min(var(--measure), 100% - 2 * var(--margin))
+    [content-end]   minmax(0, calc((var(--wide) - var(--measure)) / 2))
+    [wide-end]      minmax(var(--margin), 1fr)
+    [full-end];
+  row-gap: var(--space-4);
+}
+
+/* Everything defaults to the reading measure */
+.content-grid > * { grid-column: content; }
+
+/* Opt-in breakouts */
+.content-grid > .wide { grid-column: wide; }
+.content-grid > .full { grid-column: full; }
+
+/* Asymmetric signature move: starts on prose edge, bleeds right */
+.content-grid > .bleed-right { grid-column: content-start / wide-end; }
+.content-grid > .bleed-left  { grid-column: wide-start / content-end; }
+
+/* Full-bleed band whose children re-align to the zones */
+.content-grid > .band {
+  grid-column: full;
+  display: grid;
+  grid-template-columns: subgrid;
+  padding-block: var(--space-6);
+}
+.band > * { grid-column: content; }
+.band > .wide { grid-column: wide; }
+
+/* Full-canvas 12-column composition grid — for hero/homepage sections.
+   Case study prose uses the content zones; this is for editorial layouts
+   placed across the full width. */
+.content-grid > .full-composed {
+  grid-column: full;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gutter);
+  padding-inline: var(--margin);
+}

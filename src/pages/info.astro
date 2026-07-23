@@ -1,57 +1,43 @@
 ---
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import PageShell from "../layouts/PageShell.astro";
 import SiteNav from "../components/SiteNav.astro";
 ---
 <FullscreenLayout title="Info — Neel Sarode">
-  <div class="page-shell">
-    <SiteNav activePath="/info" />
-    <main class="page-main">
-      <p class="eyebrow">Info</p>
-      <h1 class="title">About the practice</h1>
-      <p class="lead">
-        Neel is a product and brand designer focused on early-stage teams — from
-        first identity to shipped interface. Placeholder copy; this page will hold
-        a longer bio, background, and approach.
-      </p>
-      <p class="body">
-        The work favors measurable clarity over flourish: legible systems, tight
-        typography, and interfaces that get out of the way. Currently open to
-        select freelance and full-time opportunities. Replace this with real
-        content later.
-      </p>
-    </main>
-  </div>
+  <header class="page-header"><SiteNav activePath="/info" /></header>
+  <PageShell>
+    <p class="eyebrow lede-top">Info</p>
+    <h1 class="title">About the practice</h1>
+    <p class="lead">
+      Neel is a product and brand designer focused on early-stage teams — from
+      first identity to shipped interface. Placeholder copy; this page will hold
+      a longer bio, background, and approach.
+    </p>
+    <p class="body">
+      The work favors measurable clarity over flourish: legible systems, tight
+      typography, and interfaces that get out of the way. Currently open to
+      select freelance and full-time opportunities. Replace this with real
+      content later.
+    </p>
+  </PageShell>
 </FullscreenLayout>
 
 <style>
-  .page-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(20px, 2.4vw, 40px);
-    background: var(--void);
-  }
-  .page-main {
-    max-width: var(--max-w);
-    margin-top: clamp(64px, 14vh, 180px);
-  }
+  /* Nav aligns to the page margin; grid owns all content widths. */
+  .page-header { padding: var(--space-3) var(--margin); }
+
+  /* Top offset below the nav (section-level → margin-block-start + --space-*). */
+  .lede-top { margin-block-start: var(--space-7); }
+
+  /* Typography only — no width/max-width (the grid measure handles it),
+     no vertical margins (the grid row-gap handles rhythm). */
   .title {
-    margin-top: var(--spacing-16);
     font-size: clamp(24px, 2.8vw, 34px);
     line-height: 1.12;
     font-weight: 500;
     letter-spacing: -0.5px;
     color: var(--cream);
   }
-  .lead {
-    margin-top: var(--spacing-20);
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--cream-88);
-    max-width: 64ch;
-  }
-  .body {
-    margin-top: var(--spacing-16);
-    color: var(--cream-88);
-    max-width: 65ch;
-  }
+  .lead { font-size: 16px; line-height: 1.5; color: var(--cream-88); }
+  .body { color: var(--cream-88); }
 </style>

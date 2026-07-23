@@ -31,13 +31,13 @@ const links = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-24);
+    gap: var(--space-3);
     width: 100%;
     color: #fff;
     font-family: var(--font-geist-sans);
     font-weight: 400;
   }
-  .site-logo { display: inline-flex; align-items: center; gap: 6px; color: #fff; }
+  .site-logo { display: inline-flex; align-items: center; gap: var(--space-1); color: #fff; }
   .site-logo:hover { color: #fff; }
   .site-logomark { display: block; width: 18px; height: 18px; flex: 0 0 auto; }
   .site-name {
@@ -47,7 +47,7 @@ const links = [
     white-space: nowrap;
   }
 
-  .site-links { display: flex; align-items: center; gap: var(--spacing-20); }
+  .site-links { display: flex; align-items: center; gap: var(--space-3); }
   .site-link {
     font-size: 14px;
     line-height: 1;
@@ -59,6 +59,6 @@ const links = [
 
   @media (max-width: 480px) {
     .site-name { display: none; } /* keep just the mark on very small screens */
-    .site-links { gap: var(--spacing-16); }
+    .site-links { gap: var(--space-2); }
   }
 </style>

@@ -1,67 +1,52 @@
 ---
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
+import PageShell from "../layouts/PageShell.astro";
 import SiteNav from "../components/SiteNav.astro";
 ---
 <FullscreenLayout title="Contact — Neel Sarode">
-  <div class="page-shell">
-    <SiteNav activePath="/contact" />
-    <main class="page-main">
-      <p class="eyebrow">Contact</p>
-      <h1 class="title">Start a conversation</h1>
-      <p class="lead">
-        Placeholder contact copy. The best way to reach me is email — I reply
-        within a day or two.
-      </p>
+  <header class="page-header"><SiteNav activePath="/contact" /></header>
+  <PageShell>
+    <p class="eyebrow lede-top">Contact</p>
+    <h1 class="title">Start a conversation</h1>
+    <p class="lead">
+      Placeholder contact copy. The best way to reach me is email — I reply
+      within a day or two.
+    </p>
 
-      <p class="status">
-        <span class="dot" aria-hidden="true"></span>
-        Available for select projects
-      </p>
+    <p class="status">
+      <span class="dot" aria-hidden="true"></span>
+      Available for select projects
+    </p>
 
-      <div class="actions">
-        <a class="btn btn-primary" href="mailto:neel@example.com">Email me ↗</a>
-        <a
-          class="btn btn-secondary"
-          href="https://linkedin.com"
-          target="_blank"
-          rel="noopener"
-        >LinkedIn ↗</a>
-      </div>
-    </main>
-  </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="mailto:neel@example.com">Email me ↗</a>
+      <a
+        class="btn btn-secondary"
+        href="https://linkedin.com"
+        target="_blank"
+        rel="noopener"
+      >LinkedIn ↗</a>
+    </div>
+  </PageShell>
 </FullscreenLayout>
 
 <style>
-  .page-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(20px, 2.4vw, 40px);
-    background: var(--void);
-  }
-  .page-main {
-    max-width: var(--max-w);
-    margin-top: clamp(64px, 14vh, 180px);
-  }
+  .page-header { padding: var(--space-3) var(--margin); }
+  .lede-top { margin-block-start: var(--space-7); }
+
   .title {
-    margin-top: var(--spacing-16);
     font-size: clamp(24px, 2.8vw, 34px);
     line-height: 1.12;
     font-weight: 500;
     letter-spacing: -0.5px;
     color: var(--cream);
   }
-  .lead {
-    margin-top: var(--spacing-20);
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--cream-88);
-    max-width: 64ch;
-  }
+  .lead { font-size: 16px; line-height: 1.5; color: var(--cream-88); }
+
   .status {
     display: flex;
     align-items: center;
-    gap: var(--spacing-8);
-    margin-top: var(--spacing-32);
+    gap: var(--space-1);
     font-family: var(--font-geist-mono);
     font-size: 12px;
     letter-spacing: 0.75px;
@@ -75,10 +60,5 @@ import SiteNav from "../components/SiteNav.astro";
     background: var(--verdant);
     box-shadow: 0 0 0 4px rgba(42, 216, 127, 0.15);
   }
-  .actions {
-    margin-top: var(--spacing-24);
-    display: flex;
-    gap: var(--spacing-12);
-    flex-wrap: wrap;
-  }
+  .actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 </style>

@@ -1,3 +1,7 @@
+/* Site-wide layout system (grid + spacing scale) — must load first so its
+   :root tokens are defined before anything here references them. */
+@import "./grid.css";
+
 /* ============================================================
    Modulabs — dark theme skin for the portfolio shell
    "Modular systems, measurable clarity"
@@ -47,8 +51,9 @@
   --spacing-32: 32px; --spacing-40: 40px;  --spacing-48: 48px;
   --spacing-64: 64px; --spacing-80: 80px;  --spacing-120: 120px;
 
-  /* legacy spacing aliases */
-  --space-2: 8px; --space-3: 16px; --space-4: 24px; --space-5: 48px; --space-6: 64px;
+  /* NOTE: the legacy `--space-2..6` aliases were removed — the canonical
+     `--space-*` scale now lives in grid.css (imported above). Nothing
+     referenced these, so removing them avoids a silent token collision. */
 
   /* — Spark glyph (4-point star) — applied as a mask over
      background: currentColor so it always matches adjacent text — */
@@ -178,7 +183,7 @@ h1, h2, h3, p { margin: 0; }
 .eyebrow {
   display: flex;
   align-items: center;
-  gap: var(--spacing-8);
+  gap: var(--space-1);
   font-family: var(--font-geist-mono);
   font-weight: 300;
   font-size: 12px;
@@ -233,12 +238,12 @@ h1, h2, h3, p { margin: 0; }
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-8);
+  gap: var(--space-1);
   font-family: var(--font-geist-sans);
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  padding: 12px 20px;
+  padding: var(--space-2) var(--space-3); /* was 12px 20px — snapped to scale */
   border-radius: var(--radius);
   border: 1px solid transparent;
   cursor: pointer;

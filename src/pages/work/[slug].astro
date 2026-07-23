@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
+import PageShell from "../../layouts/PageShell.astro";
 import SiteNav from "../../components/SiteNav.astro";
 
 export async function getStaticPaths() {
@@ -15,63 +16,50 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 <FullscreenLayout title={`${entry.data.title} — Neel Sarode`}>
-  <div class="page-shell">
-    <SiteNav activePath="/" />
-    <article class="study">
-      <a class="back mono-label" href="/">← Work</a>
-      <div class="media machined" aria-hidden="true"></div>
-      <header class="head">
-        <p class="eyebrow">{entry.data.category} — {entry.data.year}</p>
-        <h1 class="title">{entry.data.title}</h1>
-        <p class="tagline">{entry.data.tagline}</p>
-      </header>
-      <div class="body">
-        <Content />
-      </div>
-    </article>
-  </div>
+  <header class="page-header"><SiteNav activePath="/" /></header>
+  <PageShell>
+    <a class="back mono-label lede-top" href="/">← Work</a>
+
+    <!-- Case-study image breaks out to the wide (920px) zone. -->
+    <div class="media machined wide" aria-hidden="true"></div>
+
+    <p class="eyebrow">{entry.data.category} — {entry.data.year}</p>
+    <h1 class="title">{entry.data.title}</h1>
+    <p class="tagline">{entry.data.tagline}</p>
+
+    <div class="body">
+      <Content />
+    </div>
+  </PageShell>
 </FullscreenLayout>
 
 <style>
-  .page-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: clamp(20px, 2.4vw, 40px);
-    background: var(--void);
-  }
-  .study {
-    max-width: var(--max-w);
-    margin-top: clamp(48px, 10vh, 120px);
-  }
+  .page-header { padding: var(--space-3) var(--margin); }
+  .lede-top { margin-block-start: var(--space-7); }
+
   .back { color: var(--cream-60); }
   .back:hover { color: var(--ember); }
-  .media {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    margin-top: var(--spacing-24);
-  }
-  .head { margin-top: var(--spacing-32); }
+
+  /* .wide places the media in the wide zone; the grid item stretches to fill,
+     so no width needed — just the ratio. */
+  .media { aspect-ratio: 16 / 9; }
+
   .title {
-    margin-top: var(--spacing-16);
     font-size: clamp(24px, 2.8vw, 34px);
     line-height: 1.12;
     font-weight: 500;
     letter-spacing: -0.5px;
     color: var(--cream);
   }
-  .tagline {
-    margin-top: var(--spacing-12);
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--cream-88);
-    max-width: 56ch;
-  }
-  .body { margin-top: var(--spacing-64); }
+  .tagline { font-size: 16px; line-height: 1.5; color: var(--cream-88); }
+
+  /* Larger break before the long-form body (section-level spacing). */
+  .body { margin-block-start: var(--space-6); }
   .body :global(h2) {
     display: flex;
     align-items: center;
-    gap: var(--spacing-8);
-    margin-top: var(--spacing-48);
+    gap: var(--space-1);
+    margin-block-start: var(--space-5);
     font-family: var(--font-geist-mono);
     font-weight: 300;
     font-size: 12px;
@@ -88,9 +76,5 @@ const { Content } = await entry.render();
     -webkit-mask: var(--icon-spark) no-repeat center / contain;
     mask: var(--icon-spark) no-repeat center / contain;
   }
-  .body :global(p) {
-    margin-top: var(--spacing-16);
-    color: var(--cream-88);
-    max-width: 65ch;
-  }
+  .body :global(p) { margin-block-start: var(--space-2); color: var(--cream-88); }
 </style>

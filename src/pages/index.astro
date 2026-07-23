@@ -64,13 +64,47 @@ const sections = [
       </div>
     </section>
 
+    <!-- Intro (Figma 2155:11374): bracket-framed statement + services list,
+         composed on the 12-col macro grid over the fixed scene. -->
+    <section class="section">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="intro-frame" data-reveal-group>
+            <svg class="corner corner-tl" viewBox="0 0 29.25 29.75" fill="none" aria-hidden="true">
+              <path d="M0.25 29.75L0.25 0.25L29.25 0.25" stroke="currentColor" stroke-width="0.5" />
+            </svg>
+            <p class="intro-name">
+              <svg class="intro-logomark" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path fill="currentColor" d="M5.76562 17.6538C5.76562 17.845 5.61065 18 5.41947 18H0.346154C0.154978 18 0 17.845 0 17.6538V12.4467C0 12.2556 0.154978 12.1006 0.346154 12.1006H5.41947C5.61065 12.1006 5.76562 12.2556 5.76562 12.4467V17.6538ZM7.62312 0.0056229C7.64182 0.0132722 7.65667 0.0280943 7.66436 0.046776L9.76617 5.15295C9.85995 5.38077 9.69244 5.63086 9.44607 5.63086H8.46263C8.08345 5.63086 7.98021 6.15272 8.33083 6.29709L10.4926 7.18728C10.578 7.22242 10.6457 7.29019 10.6809 7.37554L11.5701 9.53465C11.7145 9.88525 12.2363 9.782 12.2363 9.40284V8.42126C12.2363 8.17486 12.4865 8.00735 12.7143 8.1012L17.7145 10.161C17.7997 10.1961 17.8674 10.2637 17.9026 10.349L17.9738 10.5215C17.9911 10.5634 18 10.6083 18 10.6536V17.6538C18 17.845 17.845 18 17.6538 18H11.1143C11.0691 18 11.0244 17.9912 10.9826 17.974L10.484 17.7688C10.3986 17.7336 10.3308 17.6658 10.2957 17.5805L8.23588 12.5785C8.14206 12.3507 8.30957 12.1006 8.55596 12.1006H9.53835C9.91752 12.1006 10.0208 11.5787 9.67015 11.4344L7.50839 10.5442C7.42302 10.509 7.35523 10.4412 7.32009 10.3559L6.43188 8.19784C6.28755 7.84717 5.76562 7.95038 5.76562 8.32959V9.30932C5.76562 9.5557 5.51552 9.7232 5.28769 9.62941L0.286826 7.57059C0.201389 7.53541 0.133559 7.46754 0.0984367 7.38209L0.0259862 7.20581C0.00882777 7.16406 0 7.11936 0 7.07422V0.346154C0 0.154978 0.154978 0 0.346154 0H7.59452C7.60433 0 7.61404 0.00190985 7.62312 0.0056229ZM18 5.28471C18 5.47588 17.845 5.63086 17.6538 5.63086H12.5825C12.3913 5.63086 12.2363 5.47588 12.2363 5.28471V0.346154C12.2363 0.154978 12.3913 0 12.5825 0H17.6538C17.845 0 18 0.154978 18 0.346154V5.28471Z" />
+              </svg>
+              My name is Neel Sarode
+            </p>
+            <p class="intro-statement">
+              I join early stage<br />companies and design &amp;<br />build
+              <span class="u">everything</span> users see.
+            </p>
+            <svg class="corner corner-br" viewBox="0 0 29.25 29.75" fill="none" aria-hidden="true">
+              <path d="M0.25 29.75L0.25 0.25L29.25 0.25" stroke="currentColor" stroke-width="0.5" />
+            </svg>
+          </div>
+          <div class="intro-services" data-reveal-group>
+            <p>Brand Identity</p>
+            <p>Product UI/UX</p>
+            <p>Marketing Site</p>
+            <p>Front-End Code</p>
+            <p class="intro-extras">Extras: Documents, print, creative direction</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Sections that reveal the fixed background as they scroll over it.
          Text is placed on the macro grid (left columns). -->
     {sections.map((s) => (
       <section class="section">
         <div class="content-grid">
           <div class="full-composed">
-            <div class="section-inner">
+            <div class="section-inner" data-reveal-group>
               <p class="eyebrow">Section {s.n}</p>
               <h2 class="section-title">{s.title}</h2>
               <p class="section-body">{s.body}</p>
@@ -116,7 +150,7 @@ const sections = [
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     gsap.registerPlugin(ScrollTrigger);
 
-    gsap.utils.toArray<HTMLElement>(".section .section-inner").forEach((inner) => {
+    gsap.utils.toArray<HTMLElement>(".section [data-reveal-group]").forEach((inner) => {
       gsap.from(inner.children, {
         opacity: 0,
         y: 24,
@@ -221,6 +255,65 @@ const sections = [
   .section-inner { grid-column: 1 / 8; }
   @media (max-width: 640px) {
     .section-inner { grid-column: 1 / -1; }
+  }
+
+  /* ---- Intro section (Figma 2155:11374) ---- */
+  /* Bracket-framed statement: corners pin to the frame's TL/BR; text insets
+     via --space padding (Figma's 107/64/90 offsets snapped to the scale). */
+  .intro-frame {
+    grid-column: 2 / 8;
+    position: relative;
+    padding: var(--space-6) var(--space-7);
+    color: #fff;
+  }
+  .corner {
+    position: absolute;
+    width: 29px;
+    height: 30px;
+    color: #fff;
+  }
+  .corner-tl { top: 0; left: 0; }
+  .corner-br { bottom: 0; right: 0; rotate: 180deg; }
+
+  .intro-name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.04em; /* -0.72px @ 18px */
+  }
+  .intro-logomark { width: 18px; height: 18px; flex: 0 0 auto; }
+
+  .intro-statement {
+    margin-block-start: var(--space-2);
+    font-size: clamp(28px, 2.5vw, 36px);
+    line-height: 1;
+    letter-spacing: -0.04em; /* -1.44px @ 36px */
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  .intro-statement .u {
+    text-decoration: underline;
+    text-decoration-thickness: from-font;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+
+  .intro-services {
+    grid-column: 9 / 13;
+    padding-block-start: var(--space-7); /* aligns list top with the statement */
+    font-size: 16px;
+    line-height: 1.48;
+    letter-spacing: -0.01em; /* -0.16px @ 16px */
+    color: #fff;
+    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  .intro-services p { margin: 0; }
+  .intro-extras { color: rgba(255, 255, 255, 0.4); }
+
+  @media (max-width: 640px) {
+    .intro-frame { grid-column: 1 / -1; padding: var(--space-5) var(--space-4); }
+    .intro-services { grid-column: 1 / -1; padding-block-start: 0; }
   }
 
   /* Fixed light palette + text-shadow so copy stays legible over the moving

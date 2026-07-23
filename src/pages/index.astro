@@ -103,10 +103,19 @@ const sections = [
          composed on the 12-col macro grid over the fixed scene. -->
     <section class="section intro-band">
       <!-- Section background media (Figma "image 8": bleeds off the left
-           edge). Placeholder still for now — swap the <img> for a
-           <video autoplay muted loop playsinline> webm when it's ready. -->
+           edge). VP9 webm re-encoded from the 57MB original (CRF 38 / 30fps
+           → 2.8MB); the old still serves as the poster frame. -->
       <div class="intro-bg" aria-hidden="true">
-        <img src="/intro-reel.png" alt="" loading="lazy" decoding="async" />
+        <video
+          src="/intro-reel.webm"
+          poster="/intro-reel.png"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          tabindex="-1"
+        ></video>
       </div>
       <div class="content-grid">
         <div class="full-composed">
@@ -342,8 +351,8 @@ const sections = [
       }
     });
   } else {
-    // Reduced motion: preview loops stay on their poster frame.
-    document.querySelectorAll<HTMLVideoElement>(".fw-video").forEach((v) => {
+    // Reduced motion: background/preview loops stay on their poster frame.
+    document.querySelectorAll<HTMLVideoElement>(".fw-video, .intro-bg video").forEach((v) => {
       v.removeAttribute("autoplay");
       v.pause();
       v.currentTime = 0;

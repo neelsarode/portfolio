@@ -358,8 +358,8 @@ const sections = [
     // you scroll (playbackRate driven by Lenis velocity), easing back to 1x
     // at rest. Cheap: one property set + a lerp per tick; extra decode only
     // happens in transient bursts during active scrolling.
-    const REEL_MAX_RATE = 2.5;   // top speed multiplier
-    const REEL_VELOCITY_GAIN = 0.05; // |lenis velocity| → rate boost
+    const REEL_MAX_RATE = 4;    // top speed multiplier
+    const REEL_VELOCITY_GAIN = 0.18; // |lenis velocity| → rate boost
     const reel = document.querySelector<HTMLVideoElement>(".intro-bg video");
     let reelTarget = 1;
     const wireLenis = () => {
@@ -379,9 +379,10 @@ const sections = [
 
     if (reel) {
       gsap.ticker.add(() => {
-        // ease the rate toward the target, and decay the target back to 1x
-        reel.playbackRate += (reelTarget - reel.playbackRate) * 0.12;
-        reelTarget += (1 - reelTarget) * 0.04;
+        // snappy spin-up toward the target; slower decay back to 1x so the
+        // boost lingers long enough to register
+        reel.playbackRate += (reelTarget - reel.playbackRate) * 0.2;
+        reelTarget += (1 - reelTarget) * 0.025;
       });
     }
 

@@ -13,15 +13,15 @@ const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background — managed at
 // runtime by the scene-manager script below (default OFF; dev "BG" chip
 // toggles it). Flip DEFAULT_ON in that script when the decision is final.
 
-// Featured Work rows (Figma 2167:11568): TL;DR and Gold Dollar (USDKG).
-// `note` is the company blurb that rides the connector line at the spark.
+// Featured Work rows (Figma 2167:11568): TL;DR, Gold Dollar (USDKG), and
+// Crow Industries. `note` is the company blurb riding the connector's spark.
 const fwRows = [
   {
     flip: false,
     logo: "tldr",
     video: "/tldr-dashboard.mp4",
     poster: "/tldr-dashboard-poster.jpg",
-    desc: "Co-founder and founding designer. Created brand and product design and experience from scratch",
+    desc: "Co-founder and founding designer. Created brand and product design and experience from scratch.",
     note: "TL;DR is a first-of-its-kind clipping software that generates clips of a livestream during the livestream, not after.",
     label: "Founding Design Engineer",
     roles: [
@@ -37,13 +37,28 @@ const fwRows = [
   {
     flip: true,
     logo: "gold",
-    desc: "Founding designer and creative lead at USDKG (Gold Dollar).",
+    desc: "Founding designer and creative lead at USDKG (Gold Dollar). Brand created from scratch.",
     note: "USDKG is a enterprise solution for stablecoin payments with liquidity backed by the gold-reserves of the Ministry of Finance of Kyrgyzstan.",
     label: "Founding Designer",
     roles: [
       "Brand Identity Design",
       "Website Design",
       "Website Development",
+      "Document Design",
+      "Deck Design",
+    ],
+  },
+  {
+    flip: false,
+    logo: "crow",
+    desc: "Early stage designer. Revamped brand and designed and developed new website. Created system for generating AI imagery and video of product.",
+    note: "Crow Industries creates unmanned ground vehicles with applications in defense, mining, and space.",
+    label: "Head of Design",
+    roles: [
+      "Website Design",
+      "Website Development",
+      "AI-Generated Imagery",
+      "AI-Generated Video",
       "Document Design",
       "Deck Design",
     ],
@@ -226,7 +241,7 @@ const sections = [
                           <path transform="translate(34.81 0)" fill="currentColor" d="M0 17.1698V0H8.95284V3.55661H12.5095V17.1698H0ZM8.80567 3.55661H3.70378V13.6132H8.80567V3.55661Z" />
                           <path transform="translate(50.05 0)" fill="currentColor" d="M3.70378 8.90378H9.24718V12.4849H3.70378V17.1698H0V0H9.24718V3.55661H3.70378V8.90378ZM12.951 8.90378H9.24718V3.55661H12.951V8.90378ZM12.951 17.1698H9.24718V12.4849H12.951V17.1698Z" />
                         </svg>
-                      ) : (
+                      ) : row.logo === "gold" ? (
                         <span class="fw-gold">
                           <svg viewBox="0 0 20.8679 20.8679" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <circle cx="10.434" cy="10.434" r="9.78762" fill="#D5A042" stroke="#D5A042" stroke-width="1.2927" />
@@ -235,6 +250,15 @@ const sections = [
                           </svg>
                           Gold Dollar
                         </span>
+                      ) : (
+                        <img
+                          class="fw-crow"
+                          src="/crow-logo.svg"
+                          alt="Crow Industries"
+                          width="74"
+                          height="33"
+                          loading="lazy"
+                        />
                       )}
                     </span>
                     <span class="mask"><p class="fw-desc">{row.desc}</p></span>
@@ -837,6 +861,9 @@ const sections = [
     color: #f5f8ff;
   }
   .fw-gold svg { width: 20px; height: 20px; flex: 0 0 auto; }
+
+  /* Crow Industries logo (SVG asset; orientation corrected in the file). */
+  .fw-crow { display: block; width: 74px; height: 33px; }
   .fw-roles {
     display: flex;
     flex-direction: column;

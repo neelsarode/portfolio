@@ -585,7 +585,12 @@ const sections = [
      (the off-left horizontal bleed is contained by the body's overflow-x). */
   .section.intro-band {
     position: relative;
-    min-height: 0;
+    /* Contain the background video's visible height so its bleed can never
+       overlap the next section on wide viewports: the video is 0.75×width
+       tall (1080/1440) minus the 18% lift → 0.75 × 0.82 = 61.5vw. The video
+       still isn't clipped — the band simply grows to hold it. */
+    min-height: 61.5vw;
+    justify-content: flex-start; /* keep content top-anchored (video is top-anchored) */
     padding-block: var(--space-8);
   }
 

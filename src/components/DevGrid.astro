@@ -18,13 +18,22 @@ const dev = import.meta.env.DEV;
     <div class="dev-grid" id="dev-grid" aria-hidden="true">
       {Array.from({ length: 12 }).map(() => <div class="dev-col"></div>)}
     </div>
-    <button
-      class="dev-grid-btn mono-label"
-      id="dev-grid-btn"
-      type="button"
-      aria-pressed="false"
-      title="Toggle layout grid (g)"
-    >Grid</button>
+    <div class="dev-chips">
+      <button
+        class="dev-chip mono-label"
+        id="dev-bg-btn"
+        type="button"
+        aria-pressed="false"
+        title="Toggle fixed background scene"
+      >BG</button>
+      <button
+        class="dev-chip mono-label"
+        id="dev-grid-btn"
+        type="button"
+        aria-pressed="false"
+        title="Toggle layout grid (g)"
+      >Grid</button>
+    </div>
 
     <style is:inline>
       /* Mirrors .full-composed exactly: 12 cols, gap --gutter, inset --margin. */
@@ -46,11 +55,15 @@ const dev = import.meta.env.DEV;
           inset -1px 0 0 rgba(255, 59, 48, 0.22);
       }
 
-      .dev-grid-btn {
+      .dev-chips {
         position: fixed;
         right: var(--space-2);
         bottom: var(--space-2);
         z-index: 9991;
+        display: flex;
+        gap: var(--space-1);
+      }
+      .dev-chip {
         padding: var(--space-1) var(--space-2);
         border: 1px solid var(--hairline);
         border-radius: var(--radius);
@@ -59,8 +72,8 @@ const dev = import.meta.env.DEV;
         cursor: pointer;
         transition: color var(--dur-color) linear, border-color var(--dur-ui) linear;
       }
-      .dev-grid-btn:hover { color: var(--cream); border-color: var(--hairline-hover); }
-      .dev-grid-btn[aria-pressed="true"] {
+      .dev-chip:hover { color: var(--cream); border-color: var(--hairline-hover); }
+      .dev-chip[aria-pressed="true"] {
         color: #ff3b30;
         border-color: rgba(255, 59, 48, 0.5);
       }
@@ -89,6 +102,26 @@ const dev = import.meta.env.DEV;
           if (t && t.closest && t.closest("input, textarea, select, [contenteditable]")) return;
           set(!grid.classList.contains("on"));
         });
+
+        // BG chip — drives the fixed-scene manager (window.__fixedBg, defined
+        // by the homepage). The manager script runs later in the document, so
+        // reference it lazily and repaint once it's up.
+        var bg = document.getElementById("dev-bg-btn");
+        if (bg) {
+          var paint = function () {
+            var on = window.__fixedBg
+              ? window.__fixedBg.isOn()
+              : (function () { try { return localStorage.getItem("dev-fixed-bg") === "1"; } catch (e) { return false; } })();
+            bg.setAttribute("aria-pressed", String(on));
+          };
+          paint();
+          setTimeout(paint, 400);
+          bg.addEventListener("click", function () {
+            if (!window.__fixedBg) return;
+            window.__fixedBg.set(!window.__fixedBg.isOn());
+            paint();
+          });
+        }
       })();
     </script>
   </>

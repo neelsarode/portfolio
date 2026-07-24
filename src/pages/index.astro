@@ -9,7 +9,9 @@ import DevGrid from "../components/DevGrid.astro";
 // The hero keeps its original edge-hug spacing (Figma). The scroll sections
 // compose on the 12-column .full-composed macro grid (see CLAUDE.md).
 const HERO_PROJECT = "J3nKIyvrA2pTD0nflb6G"; // hero embed (video texture)
-const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background, revealed on scroll
+const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background — managed at
+// runtime by the scene-manager script below (default OFF; dev "BG" chip
+// toggles it). Flip DEFAULT_ON in that script when the decision is final.
 
 // Featured Work rows (Figma 2167:11568). Row 2 duplicates TL;DR in the Figma
 // as a placeholder until the second study is designed; its media is empty.
@@ -60,14 +62,10 @@ const sections = [
     }, 4000);
   </script>
 
-  <!-- Fixed background scene: hidden behind the hero, revealed on scroll. -->
-  <div
-    class="us-scene us-fixed"
-    data-us-project={BG_PROJECT}
-    data-us-scale="1"
-    data-us-dpi="1"
-    data-us-fps="30"
-  ></div>
+  <!-- Fixed background scene container. NO data-us-project on purpose — the
+       auto-init never grabs it; the scene-manager script below creates and
+       destroys the scene here at runtime (dev "BG" chip / DEFAULT_ON). -->
+  <div class="us-scene us-fixed" id="us-fixed-bg" aria-hidden="true"></div>
 
   <main class="content">
     <!-- Hero: original embed, opaque; scrolls away to reveal the fixed scene.
@@ -281,6 +279,61 @@ const sections = [
       };
       (document.head || document.body).appendChild(i);
     }
+  })();
+</script>
+
+<!-- Fixed-background scene manager: creates/destroys the secondary Unicorn
+     scene at runtime so it can be A/B'd for real (destroy frees the WebGL
+     context — not just hidden). Default OFF; the dev BG chip (DevGrid.astro)
+     flips it and persists to localStorage. When the decision is final, set
+     DEFAULT_ON accordingly (or fold the scene back into the auto-init). -->
+<script is:inline define:vars={{ BG_PROJECT }}>
+  (function () {
+    var DEFAULT_ON = false;
+    var scene = null;
+    var pending = false;
+    var want = DEFAULT_ON;
+    try {
+      var saved = localStorage.getItem("dev-fixed-bg");
+      if (saved !== null) want = saved === "1";
+    } catch (e) {}
+
+    function apply() {
+      if (want && !scene && !pending && window.UnicornStudio && window.UnicornStudio.addScene) {
+        pending = true;
+        window.UnicornStudio.addScene({
+          elementId: "us-fixed-bg",
+          projectId: BG_PROJECT,
+          scale: 1,
+          dpi: 1,
+          fps: 30,
+        }).then(function (s) {
+          pending = false;
+          scene = s;
+          if (!want) { s.destroy(); scene = null; } // toggled off mid-flight
+        }).catch(function () { pending = false; });
+      } else if (!want && scene) {
+        scene.destroy();
+        scene = null;
+      }
+    }
+
+    // The SDK loads async — wait for it, then apply the initial state.
+    var poll = setInterval(function () {
+      if (window.UnicornStudio && window.UnicornStudio.addScene) {
+        clearInterval(poll);
+        apply();
+      }
+    }, 250);
+
+    window.__fixedBg = {
+      isOn: function () { return want; },
+      set: function (on) {
+        want = !!on;
+        try { localStorage.setItem("dev-fixed-bg", want ? "1" : "0"); } catch (e) {}
+        apply();
+      },
+    };
   })();
 </script>
 

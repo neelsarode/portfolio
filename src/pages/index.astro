@@ -354,13 +354,36 @@ const sections = [
 
     // Keep ScrollTrigger in lockstep with Lenis (created in FullscreenLayout;
     // module order isn't guaranteed, so fall back to the init event).
+    // Also: scroll-velocity-reactive intro reel — the ring spins faster while
+    // you scroll (playbackRate driven by Lenis velocity), easing back to 1x
+    // at rest. Cheap: one property set + a lerp per tick; extra decode only
+    // happens in transient bursts during active scrolling.
+    const REEL_MAX_RATE = 2.5;   // top speed multiplier
+    const REEL_VELOCITY_GAIN = 0.05; // |lenis velocity| → rate boost
+    const reel = document.querySelector<HTMLVideoElement>(".intro-bg video");
+    let reelTarget = 1;
     const wireLenis = () => {
       const lenis = (window as any).lenis;
-      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+      if (!lenis) return;
+      lenis.on("scroll", (e: any) => {
+        ScrollTrigger.update();
+        if (reel) {
+          const boost = Math.min(REEL_MAX_RATE - 1, Math.abs(e.velocity || 0) * REEL_VELOCITY_GAIN);
+          reelTarget = Math.max(reelTarget, 1 + boost);
+        }
+      });
     };
     (window as any).lenis
       ? wireLenis()
       : addEventListener("lenis:init", wireLenis, { once: true });
+
+    if (reel) {
+      gsap.ticker.add(() => {
+        // ease the rate toward the target, and decay the target back to 1x
+        reel.playbackRate += (reelTarget - reel.playbackRate) * 0.12;
+        reelTarget += (1 - reelTarget) * 0.04;
+      });
+    }
 
     // Hero entrance at the 5.5s mark — anchored to navigation start (not
     // script-load time) so it syncs with the Unicorn scene's authored intro.

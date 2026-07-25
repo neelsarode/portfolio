@@ -1100,7 +1100,10 @@ const sections = [
   }
   .wd-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* trial: 3-up (was repeat(2, 1fr)). minmax(0,1fr) stops the nowrap
+       captions from blowing tracks past the margins; at 3-up widths the
+       full tag list cannot fit, so captions run name + category only. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4) var(--gutter); /* Figma: 32 row / 24 column */
   }
   .wd-tile {
@@ -1128,15 +1131,20 @@ const sections = [
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    font-size: 14px;
+    font-size: 13px; /* 14px at 2-up — one step down for the narrower 3-up tiles */
     line-height: 1.3;
     letter-spacing: -0.01em;
   }
-  .wd-left { display: flex; align-items: center; gap: var(--space-2); }
+  .wd-left { display: flex; align-items: center; gap: var(--space-2); min-width: 0; flex: 1; }
   .wd-name { margin: 0; color: #fff; white-space: nowrap; }
-  .wd-tags { display: flex; align-items: center; gap: var(--space-1); }
+  /* 3-up: tags ride the right edge, replacing the category (which cannot
+     also fit at 416px tiles). */
+  .wd-tags { display: flex; align-items: center; gap: var(--space-1); margin-inline-start: auto; }
   .wd-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
   .wd-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
+  /* Category replaced by the right-aligned tag list (3-up): hide its mask
+     wrapper too, or the empty flex child still costs the caption gap. */
+  .wd-caption > .mask:last-child { display: none; }
   .wd-cat { margin: 0; color: #fff; text-align: right; white-space: nowrap; }
 
   @media (max-width: 900px) {

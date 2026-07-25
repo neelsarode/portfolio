@@ -27,6 +27,7 @@
   --hairline: rgba(246, 243, 236, 0.16);   /* 16% cream border */
   --hairline-soft: rgba(246, 243, 236, 0.08);
   --hairline-hover: rgba(246, 243, 236, 0.30);
+  --gridline: rgba(246, 243, 236, 0.035);  /* structural page grid lines */
 
   /* legacy aliases (keep any remaining var() references resolving) */
   --bg: var(--void);

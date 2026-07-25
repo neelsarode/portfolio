@@ -2,6 +2,7 @@
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
+import GridLines from "../components/GridLines.astro";
 // Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
 //   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
 //      fixed scene while at the top; scrolls away to reveal it.
@@ -103,6 +104,10 @@ const sections = [
        destroys the scene here at runtime (dev "BG" chip / DEFAULT_ON). -->
   <div class="us-scene us-fixed" id="us-fixed-bg" aria-hidden="true"></div>
 
+  <!-- Structural grid lines: above the scene, below content (opaque hero
+       covers them; they emerge on scroll into the sections). -->
+  <GridLines />
+
   <main class="content">
     <!-- Hero: original embed, opaque; scrolls away to reveal the fixed scene.
          Nav + title/desc are placed on the 12-col macro grid. -->
@@ -182,6 +187,9 @@ const sections = [
               </p></span>
               <span class="mask"><a class="intro-about" href="/info">About Me →</a></span>
             </div>
+            <div class="rail-rule" aria-hidden="true">
+              <div class="hseg h-r1"></div><div class="hseg h-r2 hseg-end"></div>
+            </div>
             <div class="intro-col-block intro-skills">
               <span class="mask"><p class="skills-label">Skills:</p></span>
               <div class="skills-list">
@@ -202,6 +210,12 @@ const sections = [
          (2 cols) beside it; the rail's connector line stretches so the rail
          always matches the media height. -->
     <section class="section fw-band">
+      <div class="section-rule section-rule-top" aria-hidden="true">
+        <div class="hseg h-a"></div><div class="hseg h-b"></div><div class="hseg h-c"></div><div class="hseg h-d hseg-end"></div>
+      </div>
+      <div class="section-rule section-rule-bottom" aria-hidden="true">
+        <div class="hseg h-a"></div><div class="hseg h-b"></div><div class="hseg h-c"></div><div class="hseg h-d hseg-end"></div>
+      </div>
       <div class="content-grid">
         <div class="full-composed">
           <div class="fw-stack">
@@ -708,11 +722,25 @@ const sections = [
     padding-block-start: var(--space-7); /* aligns blurb top with the statement */
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    /* Block separation now comes from .rail-rule's margins (64 + 1 + 64
+       ≈ the old 128 gap), so the divider sits centered in the same space. */
+    gap: 0;
     font-size: 16px;
     letter-spacing: -0.01em; /* -0.16px @ 16px */
     color: #fff;
     text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  /* Divider between the About block and Skills block — spans the rail
+     (macro cols 9-13 = 4 local tracks, same track width), notched at the
+     col-9, col-11, and right-margin crossings via the shared .hseg system. */
+  .rail-rule {
+    width: 100%;
+    height: 1px;
+    margin-block: var(--space-6);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gutter);
+    pointer-events: none;
   }
   .intro-services p { margin: 0; }
   .intro-col-block {
@@ -746,8 +774,68 @@ const sections = [
 
   /* ---- Featured Work (Figma 2167:11568) ---- */
   .section.fw-band {
+    position: relative; /* anchors the section boundary rules */
     min-height: 0;
     padding-block: var(--space-8);
+  }
+
+  /* Horizontal structure rules — same 3.5% register as the vertical grid
+     lines, margin-to-margin, replicating the macro grid's columns so each
+     crossing with a vertical line is NOTCHED: segments stop --space-1 short
+     of every column line, and a small void-colored eraser (::before/::after)
+     breaks the vertical line above/below the rule. Erasers travel with the
+     rules, so the notch tracks the crossing at any scroll position. */
+  .section-rule {
+    position: absolute;
+    left: var(--margin);
+    right: var(--margin);
+    height: 1px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
+    pointer-events: none;
+  }
+  .section-rule-top { top: 0; }
+  .section-rule-bottom { bottom: 0; }
+
+  .hseg {
+    position: relative;
+    height: 1px;
+    /* reach across the gutter so the segment's edges sit ON the column lines */
+    margin-inline-end: calc(-1 * var(--gutter));
+    background: linear-gradient(
+      to right,
+      transparent 0 var(--space-1),
+      var(--gridline) var(--space-1) calc(100% - var(--space-1)),
+      transparent calc(100% - var(--space-1))
+    );
+  }
+  .hseg-end { margin-inline-end: 0; }
+  .h-a { grid-column: 1 / 3; }
+  .h-b { grid-column: 3 / 9; }
+  .h-c { grid-column: 9 / 11; }
+  .h-d { grid-column: 11 / 13; }
+  .h-r1 { grid-column: 1 / 3; }
+  .h-r2 { grid-column: 3 / 5; }
+
+  /* Erasers: notch the vertical gridline around each crossing. */
+  .hseg::before,
+  .hseg-end::after {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--space-1));
+    width: 3px;
+    height: calc(2 * var(--space-1) + 1px);
+    background: var(--void);
+  }
+  .hseg::before { left: -1px; }
+  .hseg-end::after { right: -1px; }
+
+  /* Small screens: only the margin verticals exist — run the rules solid
+     (interior notches would read as broken dashes). */
+  @media (max-width: 640px) {
+    .hseg { background: var(--gridline); }
+    .hseg::before, .hseg-end::after { display: none; }
   }
   .fw-stack {
     grid-column: 1 / -1;

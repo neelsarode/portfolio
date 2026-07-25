@@ -76,7 +76,9 @@ const dumpItems = [
     title: "Nickel Garden",
     tags: ["Brand Identity", "Website Design", "Product Design"],
     category: "Mobile App",
-    image: "/dump-nickelgarden.jpg",
+    video: "/dump-nickelgarden-loop.webm",
+    poster: "/dump-nickelgarden-poster.png",
+    contain: true, // transparent square loop — no crop, floats on the panel
   },
   {
     title: "Nickel Garden",
@@ -356,7 +358,7 @@ const sections = [
                   <div class="wd-media" data-fade>
                     {item.video ? (
                       <video
-                        class="wd-video"
+                        class:list={["wd-video", { "wd-contain": item.contain }]}
                         src={item.video}
                         poster={item.poster}
                         muted
@@ -1126,6 +1128,8 @@ const sections = [
     height: 100%;
     object-fit: cover;
   }
+  /* Transparent loops: show the full composition floating on the panel. */
+  .wd-media .wd-video.wd-contain { object-fit: contain; }
   .wd-caption {
     display: flex;
     align-items: center;

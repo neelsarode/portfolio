@@ -20,6 +20,7 @@ const fwRows = [
   {
     flip: false,
     logo: "tldr",
+    href: "/work/tldr",
     video: "/tldr-dashboard.mp4",
     poster: "/tldr-dashboard-poster.jpg",
     desc: "Co-founder and founding designer. Created brand and product design and experience from scratch.",
@@ -265,8 +266,10 @@ const sections = [
             </h2>
 
             <div class="fw-rows">
-              {fwRows.map((row) => (
-                <div class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
+              {fwRows.map((row) => {
+                const RowTag = row.href ? "a" : "div";
+                return (
+                <RowTag href={row.href} class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
                   <div class="fw-media" data-fade>
                     {row.video && (
                       <video
@@ -352,8 +355,9 @@ const sections = [
                       </div>
                     </div>
                   </aside>
-                </div>
-              ))}
+                </RowTag>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -990,6 +994,9 @@ const sections = [
     grid-template-columns: repeat(12, 1fr);
     gap: var(--gutter);
   }
+  /* Linked rows: defeat the global ember link hover — the rail keeps its own
+     text colors; the row's affordance is the cursor + media itself. */
+  a.fw-row, a.fw-row:hover { color: inherit; }
   /* Sharp corners, no stroke (per design direction) — flat placeholder
      surface shows while video loads / where a study has no media yet. */
   .fw-media {

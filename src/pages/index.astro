@@ -64,6 +64,20 @@ const fwRows = [
       "Deck Design",
     ],
   },
+  {
+    flip: true,
+    logo: "solarshare",
+    desc: "Designed product and revamped brand for SolarShare",
+    note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
+    label: "Founding Designer",
+    roles: [
+      "Brand Identity Design",
+      "Product Design",
+      "Website Design",
+      "Website Development",
+      "Document Design",
+    ],
+  },
 ];
 
 // Work Dump grid (Figma 2186:11689). Media is optional per tile: `video`
@@ -291,13 +305,22 @@ const sections = [
                           </svg>
                           Gold Dollar
                         </span>
-                      ) : (
+                      ) : row.logo === "crow" ? (
                         <img
                           class="fw-crow"
                           src="/crow-logo.svg"
                           alt="Crow Industries"
                           width="74"
                           height="33"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <img
+                          class="fw-solarshare"
+                          src="/solarshare-logo.svg"
+                          alt="SolarShare"
+                          width="91"
+                          height="14"
                           loading="lazy"
                         />
                       )}
@@ -1056,6 +1079,9 @@ const sections = [
 
   /* Crow Industries logo (SVG asset; orientation corrected in the file). */
   .fw-crow { display: block; width: 74px; height: 33px; }
+
+  /* SolarShare wordmark (white-fill SVG from Figma). */
+  .fw-solarshare { display: block; width: 91px; height: 14px; }
   .fw-roles {
     display: flex;
     flex-direction: column;

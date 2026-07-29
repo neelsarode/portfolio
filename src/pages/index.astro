@@ -2,6 +2,7 @@
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
+import GridLines from "../components/GridLines.astro";
 // Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
 //   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
 //      fixed scene while at the top; scrolls away to reveal it.
@@ -19,6 +20,7 @@ const fwRows = [
   {
     flip: false,
     logo: "tldr",
+    href: "/work/tldr",
     video: "/tldr-dashboard.mp4",
     poster: "/tldr-dashboard-poster.jpg",
     desc: "Co-founder and founding designer. Created brand and product design and experience from scratch.",
@@ -37,6 +39,8 @@ const fwRows = [
   {
     flip: true,
     logo: "gold",
+    video: "/gold-dollar-cover-2.mp4",
+    poster: "/gold-dollar-poster-2.jpg",
     desc: "Founding designer and creative lead at USDKG (Gold Dollar). Brand created from scratch.",
     note: "USDKG is a enterprise solution for stablecoin payments with liquidity backed by the gold-reserves of the Ministry of Finance of Kyrgyzstan.",
     label: "Founding Designer",
@@ -63,6 +67,46 @@ const fwRows = [
       "Deck Design",
     ],
   },
+  {
+    flip: true,
+    logo: "solarshare",
+    desc: "Designed product and revamped brand for SolarShare",
+    note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
+    label: "Founding Designer",
+    roles: [
+      "Brand Identity Design",
+      "Product Design",
+      "Website Design",
+      "Website Development",
+      "Document Design",
+    ],
+  },
+];
+
+// Work Dump grid (Figma 2186:11689). Media is optional per tile: `video`
+// gets lazy viewport-gated playback (preload=none + IntersectionObserver);
+// `image` is a plain lazy img; neither = flat placeholder. Tile 2's video is
+// a stand-in loop to prove the machinery — swap when real clips are encoded
+// (scripts/encode-loops.sh produces to-spec files).
+const dumpItems = [
+  {
+    title: "Nickel Garden",
+    tags: ["Brand Identity", "Website Design", "Product Design"],
+    category: "Mobile App",
+    video: "/dump-nickelgarden-loop.webm",
+    poster: "/dump-nickelgarden-poster.jpg",
+  },
+  {
+    title: "Nickel Garden",
+    tags: ["Brand Identity", "Website Design", "Product Design"],
+    category: "Personal Brand",
+    video: "/tldr-dashboard.mp4",
+    poster: "/tldr-dashboard-poster.jpg",
+  },
+  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
+  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
+  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
+  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
 ];
 
 const sections = [
@@ -102,6 +146,10 @@ const sections = [
        auto-init never grabs it; the scene-manager script below creates and
        destroys the scene here at runtime (dev "BG" chip / DEFAULT_ON). -->
   <div class="us-scene us-fixed" id="us-fixed-bg" aria-hidden="true"></div>
+
+  <!-- Structural grid lines: above the scene, below content (opaque hero
+       covers them; they emerge on scroll into the sections). -->
+  <GridLines />
 
   <main class="content">
     <!-- Hero: original embed, opaque; scrolls away to reveal the fixed scene.
@@ -182,6 +230,9 @@ const sections = [
               </p></span>
               <span class="mask"><a class="intro-about" href="/info">About Me →</a></span>
             </div>
+            <div class="rail-rule" aria-hidden="true">
+              <div class="hseg h-r1"></div><div class="hseg h-r2 hseg-end"></div>
+            </div>
             <div class="intro-col-block intro-skills">
               <span class="mask"><p class="skills-label">Skills:</p></span>
               <div class="skills-list">
@@ -202,16 +253,25 @@ const sections = [
          (2 cols) beside it; the rail's connector line stretches so the rail
          always matches the media height. -->
     <section class="section fw-band">
+      <div class="section-rule section-rule-top" aria-hidden="true">
+        <div class="hseg h-a"></div><div class="hseg h-b"></div><div class="hseg h-c"></div><div class="hseg h-d hseg-end"></div>
+      </div>
+      <div class="section-rule section-rule-bottom" aria-hidden="true">
+        <div class="hseg h-a"></div><div class="hseg h-b"></div><div class="hseg h-c"></div><div class="hseg h-d hseg-end"></div>
+      </div>
       <div class="content-grid">
         <div class="full-composed">
           <div class="fw-stack">
             <h2 class="fw-title" data-reveal-group>
-              <span class="mask"><span class="line">Featured Work</span></span>
+              <span class="mask"><span class="line">Featured</span></span>
+              <span class="mask"><span class="line">Work</span></span>
             </h2>
 
             <div class="fw-rows">
-              {fwRows.map((row) => (
-                <div class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
+              {fwRows.map((row) => {
+                const RowTag = row.href ? "a" : "div";
+                return (
+                <RowTag href={row.href} class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
                   <div class="fw-media" data-fade>
                     {row.video && (
                       <video
@@ -250,13 +310,22 @@ const sections = [
                           </svg>
                           Gold Dollar
                         </span>
-                      ) : (
+                      ) : row.logo === "crow" ? (
                         <img
                           class="fw-crow"
                           src="/crow-logo.svg"
                           alt="Crow Industries"
                           width="74"
                           height="33"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <img
+                          class="fw-solarshare"
+                          src="/solarshare-logo.svg"
+                          alt="SolarShare"
+                          width="91"
+                          height="14"
                           loading="lazy"
                         />
                       )}
@@ -288,7 +357,64 @@ const sections = [
                       </div>
                     </div>
                   </aside>
-                </div>
+                </RowTag>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Work Dump (Figma 2186:11689): header + 2-up grid of project tiles.
+         Video tiles are lazy (preload=none) and viewport-gated — they only
+         play while on screen, so the grid can hold 15-20 loops without
+         touching initial page load or piling up hot decoders. -->
+    <section class="section wd-band">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="wd-stack">
+            <div class="wd-head" data-reveal-group>
+              <h2 class="fw-title">
+                <span class="mask"><span class="line">Work Dump</span></span>
+              </h2>
+              <span class="mask"><p class="wd-blurb">Put your seatbelt on, this will take a while</p></span>
+            </div>
+            <div class="wd-grid">
+              {dumpItems.map((item) => (
+                <article class="wd-tile" data-reveal-group>
+                  <div class="wd-media" data-fade>
+                    {item.video ? (
+                      <video
+                        class:list={["wd-video", { "wd-contain": item.contain }]}
+                        src={item.video}
+                        poster={item.poster}
+                        muted
+                        loop
+                        playsinline
+                        preload="none"
+                        tabindex="-1"
+                        aria-hidden="true"
+                      ></video>
+                    ) : item.image ? (
+                      <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
+                    ) : null}
+                  </div>
+                  <div class="wd-caption">
+                    <div class="wd-left">
+                      <span class="mask"><p class="wd-name">{item.title}</p></span>
+                      <div class="wd-tags">
+                        {item.tags.map((t, i) => (
+                          <>
+                            {i > 0 && <span class="wd-sep" aria-hidden="true"></span>}
+                            <span class="mask"><p class="wd-tag">{t}</p></span>
+                          </>
+                        ))}
+                      </div>
+                    </div>
+                    <span class="mask"><p class="wd-cat">{item.category}</p></span>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -463,6 +589,25 @@ const sections = [
             immediateRender: true,
           }
         );
+    }
+
+    // Work Dump loops: viewport-gated playback. preload="none" means a video
+    // costs zero bytes until it approaches the viewport; play only while on
+    // screen, pause when scrolled away — so even 15-20 tiles never stack up
+    // hot decoders (only the visible few run at once).
+    const wdVideos = document.querySelectorAll<HTMLVideoElement>(".wd-video");
+    if (wdVideos.length) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            const v = e.target as HTMLVideoElement;
+            if (e.isIntersecting) v.play().catch(() => {});
+            else v.pause();
+          }
+        },
+        { rootMargin: "160px 0px" } // start loading/playing just before entry
+      );
+      wdVideos.forEach((v) => io.observe(v));
     }
 
     gsap.utils.toArray<HTMLElement>(".section [data-reveal-group]").forEach((group) => {
@@ -708,11 +853,25 @@ const sections = [
     padding-block-start: var(--space-7); /* aligns blurb top with the statement */
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    /* Block separation now comes from .rail-rule's margins (64 + 1 + 64
+       ≈ the old 128 gap), so the divider sits centered in the same space. */
+    gap: 0;
     font-size: 16px;
     letter-spacing: -0.01em; /* -0.16px @ 16px */
     color: #fff;
     text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
+  }
+  /* Divider between the About block and Skills block — spans the rail
+     (macro cols 9-13 = 4 local tracks, same track width), notched at the
+     col-9, col-11, and right-margin crossings via the shared .hseg system. */
+  .rail-rule {
+    width: 100%;
+    height: 1px;
+    margin-block: var(--space-6);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gutter);
+    pointer-events: none;
   }
   .intro-services p { margin: 0; }
   .intro-col-block {
@@ -746,8 +905,68 @@ const sections = [
 
   /* ---- Featured Work (Figma 2167:11568) ---- */
   .section.fw-band {
+    position: relative; /* anchors the section boundary rules */
     min-height: 0;
     padding-block: var(--space-8);
+  }
+
+  /* Horizontal structure rules — same 3.5% register as the vertical grid
+     lines, margin-to-margin, replicating the macro grid's columns so each
+     crossing with a vertical line is NOTCHED: segments stop --space-1 short
+     of every column line, and a small void-colored eraser (::before/::after)
+     breaks the vertical line above/below the rule. Erasers travel with the
+     rules, so the notch tracks the crossing at any scroll position. */
+  .section-rule {
+    position: absolute;
+    left: var(--margin);
+    right: var(--margin);
+    height: 1px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
+    pointer-events: none;
+  }
+  .section-rule-top { top: 0; }
+  .section-rule-bottom { bottom: 0; }
+
+  .hseg {
+    position: relative;
+    height: 1px;
+    /* reach across the gutter so the segment's edges sit ON the column lines */
+    margin-inline-end: calc(-1 * var(--gutter));
+    background: linear-gradient(
+      to right,
+      transparent 0 var(--space-1),
+      var(--gridline) var(--space-1) calc(100% - var(--space-1)),
+      transparent calc(100% - var(--space-1))
+    );
+  }
+  .hseg-end { margin-inline-end: 0; }
+  .h-a { grid-column: 1 / 3; }
+  .h-b { grid-column: 3 / 9; }
+  .h-c { grid-column: 9 / 11; }
+  .h-d { grid-column: 11 / 13; }
+  .h-r1 { grid-column: 1 / 3; }
+  .h-r2 { grid-column: 3 / 5; }
+
+  /* Erasers: notch the vertical gridline around each crossing. */
+  .hseg::before,
+  .hseg-end::after {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--space-1));
+    width: 3px;
+    height: calc(2 * var(--space-1) + 1px);
+    background: var(--void);
+  }
+  .hseg::before { left: -1px; }
+  .hseg-end::after { right: -1px; }
+
+  /* Small screens: only the margin verticals exist — run the rules solid
+     (interior notches would read as broken dashes). */
+  @media (max-width: 640px) {
+    .hseg { background: var(--gridline); }
+    .hseg::before, .hseg-end::after { display: none; }
   }
   .fw-stack {
     grid-column: 1 / -1;
@@ -777,6 +996,9 @@ const sections = [
     grid-template-columns: repeat(12, 1fr);
     gap: var(--gutter);
   }
+  /* Linked rows: defeat the global ember link hover — the rail keeps its own
+     text colors; the row's affordance is the cursor + media itself. */
+  a.fw-row, a.fw-row:hover { color: inherit; }
   /* Sharp corners, no stroke (per design direction) — flat placeholder
      surface shows while video loads / where a study has no media yet. */
   .fw-media {
@@ -866,6 +1088,9 @@ const sections = [
 
   /* Crow Industries logo (SVG asset; orientation corrected in the file). */
   .fw-crow { display: block; width: 74px; height: 33px; }
+
+  /* SolarShare wordmark (white-fill SVG from Figma). */
+  .fw-solarshare { display: block; width: 91px; height: 14px; }
   .fw-roles {
     display: flex;
     flex-direction: column;
@@ -881,6 +1106,88 @@ const sections = [
     .fw-media, .fw-flip .fw-media { grid-column: 1 / -1; }
     .fw-meta, .fw-flip .fw-meta { grid-column: 1 / -1; grid-row: auto; }
     .fw-line { flex-basis: var(--space-6); }
+  }
+
+  /* ---- Work Dump (Figma 2186:11689) ---- */
+  .wd-band {
+    position: relative;
+    min-height: 0;
+    padding-block: 0 var(--space-8); /* fw-band's bottom rule is the divider above */
+  }
+  .wd-stack {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .wd-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .wd-blurb {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: right;
+  }
+  .wd-grid {
+    display: grid;
+    /* trial: 3-up (was repeat(2, 1fr)). minmax(0,1fr) stops the nowrap
+       captions from blowing tracks past the margins; at 3-up widths the
+       full tag list cannot fit, so captions run name + category only. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4) var(--gutter); /* Figma: 32 row / 24 column */
+  }
+  .wd-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  /* Sharp corners, no stroke — same media language as Featured Work. */
+  .wd-media {
+    position: relative;
+    aspect-ratio: 632 / 598;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .wd-media img,
+  .wd-media .wd-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Transparent loops: show the full composition floating on the panel. */
+  .wd-media .wd-video.wd-contain { object-fit: contain; }
+  .wd-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 13px; /* 14px at 2-up — one step down for the narrower 3-up tiles */
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .wd-left { display: flex; align-items: center; gap: var(--space-2); min-width: 0; flex: 1; }
+  .wd-name { margin: 0; color: #fff; white-space: nowrap; }
+  /* 3-up: tags ride the right edge, replacing the category (which cannot
+     also fit at 416px tiles). */
+  .wd-tags { display: flex; align-items: center; gap: var(--space-1); margin-inline-start: auto; }
+  .wd-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+  .wd-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
+  /* Category replaced by the right-aligned tag list (3-up): hide its mask
+     wrapper too, or the empty flex child still costs the caption gap. */
+  .wd-caption > .mask:last-child { display: none; }
+  .wd-cat { margin: 0; color: #fff; text-align: right; white-space: nowrap; }
+
+  @media (max-width: 900px) {
+    .wd-grid { grid-template-columns: 1fr; }
+    .wd-tags { display: none; } /* keep captions to name + category on small screens */
   }
 
   /* ---- Masked line reveals ----

@@ -1,0 +1,486 @@
+---
+import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
+import SiteNav from "../../components/SiteNav.astro";
+import GridLines from "../../components/GridLines.astro";
+// Case-study page template (reached from Featured Work row 1). Structure and
+// content follow the CMS-page reference (Livingless example content, CDN
+// images) — every style is adapted to the site system: Geist type recipes,
+// the 12-col macro grid + --space-* scale, void canvas throughout (no
+// light/dark section alternation), sharp media corners, masked GSAP reveals,
+// structural grid lines, Lenis via FullscreenLayout. Swap the example
+// content for the real TL;DR study later — the shell is the deliverable.
+
+const info = [
+  { label: "Things we did", values: ["Sora consulting", "Webflow development", "AI Prompting"] },
+  { label: "Client", values: ["Livingless, Inc."] },
+  { label: "Year", values: ["2028"] },
+  { label: "Live website", values: [], link: { text: "Visit website", href: "#" } },
+];
+
+const bands = [
+  {
+    kind: "pair",
+    imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c5f2b47284901fd2454b2_67c82db8e5707cb06cd7436f1d0ca312f2014463.png",
+    imgB: "https://byqsupply-components.netlify.app/humanmachine/images/ContactImage2.webp",
+    overlayLabel: "Adaptable brand frameworks",
+    label: "Brand Systems",
+    body:
+      "We design adaptable brand frameworks built to scale across every touchpoint, from visual identity to communication guidelines. Our approach is rooted in clarity and consistency — making sure every color, font, and element speaks the same language while leaving room for organic growth. Whether it's launching a fresh brand or refreshing an existing one, we focus on building systems that last, adapt, and tell your story with precision.",
+  },
+  {
+    kind: "single",
+    imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c6102da3e1062d7ccd574_Frame%201321315842.png",
+    label: "Digital Experiences",
+    body:
+      "We craft immersive digital platforms — websites, product pages, and interactive campaigns — that merge seamless functionality with refined aesthetics. Each project is a balance of speed, usability, and storytelling, designed to work perfectly across all devices and user contexts. By combining human-centered design with machine-driven optimization, we create digital experiences that feel effortless yet unforgettable.",
+  },
+];
+
+const designBand = {
+  imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c610347d4be22e5ad7fec_adf44daa9a315a74c2468e3e1d36bf8c5f49a285.png",
+  imgB: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c610368f529584d37f07b_fd101586589bb01d54cfa309fe61040f61b74907.png",
+  overlayLabel: "Subtle micro-interactions",
+  label: "Motion & AI Design",
+  body:
+    "From subtle micro-interactions to full-scale motion graphics, we use animation to bring depth, emotion, and flow to every brand experience. Paired with AI-driven design elements, our motion systems are both intelligent and engaging, helping brands communicate more dynamically without sacrificing clarity. We believe in motion as a storytelling tool — one that highlights the essentials, guides the user, and builds a sense of living, breathing design.",
+};
+
+const moreWork = [
+  {
+    href: "/",
+    img: "https://byqsupply-components.netlify.app/humanmachine/images/CMS_Grid_Image2.webp",
+    title: "Nomad Vision™",
+    tags: ["Branding", "Web Design", "AI Prompting"],
+  },
+  {
+    href: "/work/tldr",
+    img: "https://byqsupply-components.netlify.app/humanmachine/images/CMS_Grid_Image3.png",
+    title: "Livingless",
+    tags: ["Sora Consulting", "Webflow Development", "AI Prompting"],
+  },
+];
+---
+<FullscreenLayout title="Livingless — Case Study — Neel Sarode">
+  <GridLines />
+
+  <main class="content">
+    <!-- 1 · Hero: full-viewport image, nav overlaid top, title bottom-left
+         on the grid margin. Sharp, full-bleed — the site's media language. -->
+    <section class="cs-hero" data-reveal-group>
+      <video
+        class="cs-hero-img"
+        src="/tldr-dashboard.mp4"
+        poster="/tldr-dashboard-poster.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        tabindex="-1"
+        data-fade
+      ></video>
+      <div class="cs-hero-scrim" aria-hidden="true"></div>
+      <div class="cs-hero-overlay">
+        <header class="cs-nav"><SiteNav activePath="/" /></header>
+        <h1 class="cs-title">
+          <span class="mask"><span class="line">Livingless</span></span>
+        </h1>
+      </div>
+    </section>
+
+    <!-- 2 · About: info tiles (cols 1-6) + standfirst (cols 7-13). -->
+    <section class="cs-band cs-about">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="cs-info" data-reveal-group>
+            {info.map((tile) => (
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-label">{tile.label}</p></span>
+                {tile.values.map((v) => (
+                  <span class="mask"><p class="cs-value">{v}</p></span>
+                ))}
+                {tile.link && (
+                  <span class="mask"><a class="cs-value cs-link" href={tile.link.href}>{tile.link.text}</a></span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div class="cs-standfirst" data-reveal-group>
+            <h2 class="cs-statement">
+              <span class="mask"><span class="line">
+                Livingless is a curated brand concept — built to show how human
+                intuition and machine precision can create design that feels
+                effortless, timeless, and alive. This is not just a showcase.
+              </span></span>
+            </h2>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3-4 · Brand / Experiences: image grid + label/body row. -->
+    {bands.map((band) => (
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            {band.kind === "pair" ? (
+              <>
+                <div class="cs-img cs-img-a" data-fade>
+                  <img src={band.imgA} alt="" loading="lazy" decoding="async" />
+                </div>
+                <div class="cs-img cs-img-b" data-fade>
+                  <img src={band.imgB} alt="" loading="lazy" decoding="async" />
+                  <p class="cs-img-caption">{band.overlayLabel}</p>
+                </div>
+              </>
+            ) : (
+              <div class="cs-img cs-img-wide" data-fade>
+                <img src={band.imgA} alt="" loading="lazy" decoding="async" />
+              </div>
+            )}
+            <span class="mask cs-rowlabel"><p class="cs-label">{band.label}</p></span>
+            <span class="mask cs-rowbody"><p class="cs-body">{band.body}</p></span>
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <!-- 5 · Quote -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-quote">
+            <span class="mask"><svg class="cs-quote-mark" viewBox="0 0 48 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M9.96923 44C6.89231 44 4.49231 42.841 2.76923 40.523C0.923077 38.2051 0 35.0501 0 31.058C0 25.1343 1.23077 19.7257 3.69231 14.8322C6.27692 9.93875 10.4 5.3672 16.0615 1.11759C17.5385 -0.0413917 18.7077 -0.298944 19.5692 0.344935C20.0615 0.731266 20.3077 1.31076 20.3077 2.08341C20.3077 2.72729 19.8769 3.37117 19.0154 4.01505C14.8308 7.74956 12.1231 10.647 10.8923 12.7074C9.78462 14.6391 9.23077 16.6995 9.23077 18.8887C9.23077 21.2066 9.72308 23.0095 10.7077 24.2973C11.6923 25.4563 12.8 26.4865 14.0308 27.3879C15.2615 28.1606 16.3692 29.1264 17.3538 30.2854C18.3385 31.4443 18.8308 33.1828 18.8308 35.5008C18.8308 37.8188 18.0308 39.8148 16.4308 41.4889C14.9538 43.163 12.8 44 9.96923 44ZM37.6615 44C34.5846 44 32.1231 42.841 30.2769 40.523C28.5538 38.2051 27.6923 35.0501 27.6923 31.058C27.6923 25.1343 28.9231 19.7257 31.3846 14.8322C33.9692 9.93875 38.0923 5.3672 43.7538 1.11759C45.2308 -0.0413917 46.4 -0.298944 47.2615 0.344935C47.7538 0.731266 48 1.31076 48 2.08341C48 2.72729 47.5692 3.37117 46.7077 4.01505C42.5231 7.74956 39.8154 10.647 38.5846 12.7074C37.4769 14.6391 36.9231 16.6995 36.9231 18.8887C36.9231 21.2066 37.4154 23.0095 38.4 24.2973C39.3846 25.4563 40.4923 26.4865 41.7231 27.3879C42.9538 28.1606 44.0615 29.1264 45.0462 30.2854C46.0308 31.4443 46.5231 33.1828 46.5231 35.5008C46.5231 37.8188 45.7231 39.8148 44.1231 41.4889C42.6462 43.163 40.4923 44 37.6615 44Z" fill="currentColor" />
+            </svg></span>
+            <blockquote class="cs-quote-text">
+              <span class="mask"><span class="line">"Design isn't about decoration — it's about</span></span>
+              <span class="mask"><span class="line">systems that breathe with purpose. Human +</span></span>
+              <span class="mask"><span class="line">Machine© is where clarity and boldness converge."</span></span>
+            </blockquote>
+            <div class="cs-quote-attr">
+              <span class="mask"><p class="cs-value">Juno Cypher</p></span>
+              <span class="mask"><p class="cs-label">Founder & Director of Digital Realms</p></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Design: pair grid + label/body (same shape as brand band). -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-a" data-fade>
+            <img src={designBand.imgA} alt="" loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-img-b" data-fade>
+            <img src={designBand.imgB} alt="" loading="lazy" decoding="async" />
+            <p class="cs-img-caption">{designBand.overlayLabel}</p>
+          </div>
+          <span class="mask cs-rowlabel"><p class="cs-label">{designBand.label}</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">{designBand.body}</p></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · More work: stacked title + 2-up cards (work-dump caption language). -->
+    <section class="cs-band cs-more">
+      <div class="content-grid">
+        <div class="full-composed">
+          <h2 class="cs-more-title" data-reveal-group>
+            <span class="mask"><span class="line">More</span></span>
+            <span class="mask"><span class="line">work</span></span>
+          </h2>
+          <div class="cs-cards">
+            {moreWork.map((card) => (
+              <a class="cs-card" href={card.href} data-reveal-group>
+                <div class="cs-card-media" data-fade>
+                  <img src={card.img} alt="" loading="lazy" decoding="async" />
+                  <div class="cs-card-veil" aria-hidden="true"></div>
+                </div>
+                <div class="cs-card-caption">
+                  <span class="mask"><p class="cs-card-name">{card.title}</p></span>
+                  <div class="cs-card-tags">
+                    {card.tags.map((t, i) => (
+                      <>
+                        {i > 0 && <span class="cs-card-sep" aria-hidden="true"></span>}
+                        <span class="mask"><p class="cs-card-tag">{t}</p></span>
+                      </>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</FullscreenLayout>
+
+<!-- Same reveal system as the homepage: masked line rises + media fades per
+     [data-reveal-group], wired to Lenis. gsap.from only — no-JS/reduced-motion
+     visitors simply see the content. -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const wireLenis = () => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+    };
+    (window as any).lenis
+      ? wireLenis()
+      : addEventListener("lenis:init", wireLenis, { once: true });
+
+    gsap.utils.toArray<HTMLElement>("[data-reveal-group]").forEach((group) => {
+      const risers = group.querySelectorAll(".mask > *");
+      const fades = group.querySelectorAll("[data-fade]");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+      if (risers.length) {
+        tl.from(risers, {
+          yPercent: 110,
+          duration: 0.9,
+          ease: "power4.out",
+          stagger: 0.09,
+        });
+      }
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: hero loop stays on its poster frame.
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+</script>
+
+<style>
+  .content { position: relative; z-index: 1; }
+
+  /* ---- Masked line reveals (same recipe as the homepage) ---- */
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.14em;
+    margin-block-end: -0.14em;
+  }
+  .line { display: block; }
+
+  /* ---- Shared type recipes (site system, Geist only) ---- */
+  .cs-label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-value {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-link { text-decoration: underline; text-underline-offset: 3px; }
+  .cs-body {
+    margin: 0;
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  /* ---- 1 · Hero ---- */
+  .cs-hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .cs-hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Legibility scrim: bottom-weighted, like the homepage hero treatment. */
+  .cs-hero-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 10, 11, 0.25) 0%, rgba(10, 10, 11, 0) 30%, rgba(10, 10, 11, 0) 55%, rgba(10, 10, 11, 0.55) 100%);
+  }
+  /* Edge-hug overlay — the homepage hero's exact padding recipe. */
+  .cs-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+  }
+  .cs-nav { padding: 0; }
+  .cs-title {
+    margin: 0;
+    padding: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  /* ---- Section bands: --space-8 rhythm on the void canvas ---- */
+  .cs-band { padding-block: 0 var(--space-8); }
+  .cs-about { padding-block: var(--space-7) var(--space-8); }
+  .cs-band .full-composed { row-gap: var(--space-6); }
+
+  /* ---- 2 · About ---- */
+  .cs-info {
+    grid-column: 1 / 6;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--gutter);
+    align-content: start;
+  }
+  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-standfirst { grid-column: 7 / 13; }
+  .cs-statement {
+    margin: 0;
+    font-size: clamp(24px, 2.5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-statement .line { white-space: normal; }
+
+  /* ---- 3-6 · Media bands ---- */
+  /* Pair: 7/5 columns (the reference's 1.5fr/1fr on our macro grid). */
+  .cs-img {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05); /* sharp corners, no stroke */
+  }
+  .cs-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .cs-img-a { grid-column: 1 / 8; height: clamp(380px, 45vw, 680px); }
+  .cs-img-b { grid-column: 8 / 13; height: clamp(380px, 45vw, 680px); }
+  .cs-img-wide { grid-column: 1 / 13; height: clamp(480px, 56vw, 880px); }
+  /* Overlay caption: plain quiet label, bottom-left (no glass pills here). */
+  .cs-img-caption {
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.88);
+    text-shadow: 0 1px 16px rgba(10, 10, 11, 0.8);
+  }
+  /* Label/body row beneath the media: label cols 1-8, body cols 8-13. */
+  .cs-rowlabel { grid-column: 1 / 8; align-self: start; }
+  .cs-rowbody { grid-column: 8 / 13; }
+
+  /* ---- 5 · Quote ---- */
+  .cs-quote {
+    grid-column: 2 / 12;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .cs-quote-mark { width: 48px; height: 44px; color: rgba(255, 255, 255, 0.4); }
+  .cs-quote-text {
+    margin: 0;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-quote-attr { display: flex; flex-direction: column; gap: var(--space-1); }
+
+  /* ---- 7 · More work ---- */
+  .cs-more { padding-block-end: var(--space-8); }
+  .cs-more-title {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-cards {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--gutter);
+  }
+  .cs-card { display: flex; flex-direction: column; gap: var(--space-2); color: #fff; }
+  .cs-card:hover { color: #fff; }
+  .cs-card-media {
+    position: relative;
+    aspect-ratio: 632 / 548;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .cs-card-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Hover: quiet dim (the reference's overlay, minus the GIF). */
+  .cs-card-veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 11, 0.32);
+    opacity: 0;
+    transition: opacity var(--dur-ui) linear;
+  }
+  .cs-card:hover .cs-card-veil { opacity: 1; }
+  .cs-card-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 14px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .cs-card-name { margin: 0; color: #fff; white-space: nowrap; }
+  .cs-card-tags { display: flex; align-items: center; gap: var(--space-1); }
+  .cs-card-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+  .cs-card-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
+
+  /* ---- Responsive: collapse to single column under 900px ---- */
+  @media (max-width: 900px) {
+    .cs-info, .cs-standfirst, .cs-quote,
+    .cs-img-a, .cs-img-b, .cs-img-wide,
+    .cs-rowlabel, .cs-rowbody { grid-column: 1 / -1; }
+    .cs-img-a, .cs-img-b { height: clamp(300px, 60vw, 480px); }
+    .cs-img-wide { height: clamp(320px, 64vw, 520px); }
+    .cs-cards { grid-template-columns: 1fr; }
+    .cs-card-tags { display: none; }
+  }
+</style>

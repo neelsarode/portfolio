@@ -67,7 +67,9 @@ const experience = [
           </div>
         </article>
       ))}
-      <div class="exp-ruler" aria-hidden="true"></div>
+      <div class="exp-ruler" aria-hidden="true">
+        <div class="exp-ruler-fill"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -92,6 +94,17 @@ const experience = [
       // baking in a stale width.
       const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
+      // The playhead is viewport centre. In track coordinates that is the
+      // distance scrolled plus half a screen — which is exactly how far the
+      // white fill should reach. Set on the track so both ruler layers inherit
+      // it, and so the value is in the same coordinate space their percentages
+      // resolve against.
+      const setPlayhead = (progress: number) => {
+        const playhead = progress * dist() + window.innerWidth / 2;
+        track.style.setProperty("--exp-fill", playhead + "px");
+        track.style.setProperty("--exp-glow", playhead + "px");
+      };
+
       const horiz = gsap.to(track, {
         x: () => -dist(),
         ease: "none",
@@ -108,8 +121,16 @@ const experience = [
           scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => setPlayhead(self.progress),
+          // onUpdate only fires once progress CHANGES, so without this the
+          // ruler would show no fill at all until the first scroll — when
+          // everything left of centre should already read as travelled.
+          // onRefresh also covers resize, where dist() changes underneath us.
+          onRefresh: (self) => setPlayhead(self.progress),
         },
       });
+
+      setPlayhead(0);
 
       const entries = gsap.utils.toArray<HTMLElement>(".exp-entry");
 
@@ -308,6 +329,45 @@ const experience = [
     );
   }
 
+  /* White ticks in the same phase as the base strip, revealed left-to-right by
+     a clip-path driven from scroll progress. --exp-fill is written by the
+     script in the track's own coordinate space, which is the space this
+     element's percentages resolve against. */
+  .exp-ruler-fill {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to right,
+      #fff 0 2px,
+      transparent 2px var(--space-2)
+    );
+    clip-path: inset(0 calc(100% - var(--exp-fill, 0px)) 0 0);
+  }
+
+  /* Soft window riding the playhead. Sits above the fill so ticks brighten as
+     they pass through it, then settle to the flat white of the fill behind. */
+  .exp-ruler::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to right,
+      #fff 0 2px,
+      transparent 2px var(--space-2)
+    );
+    -webkit-mask-image: radial-gradient(
+      circle at var(--exp-glow, 0px) 50%,
+      #000 0,
+      transparent var(--space-8)
+    );
+    mask-image: radial-gradient(
+      circle at var(--exp-glow, 0px) 50%,
+      #000 0,
+      transparent var(--space-8)
+    );
+    pointer-events: none;
+  }
+
   /* Below 900px, and for reduced motion, no JS runs (see the matchMedia query
      in the script) — so the section must be a plain vertical stack on its own.
      The fallback is an absence of behaviour, not a branch that undoes things. */
@@ -344,5 +404,7 @@ const experience = [
     .exp-head { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
     .exp-blurb { text-align: left; }
     .exp-ruler { display: none; }
+    .exp-ruler-fill { display: none; }
+    .exp-ruler::after { display: none; }
   }
 </style>

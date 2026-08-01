@@ -204,4 +204,42 @@ const experience = [
       transparent 2px var(--space-2)
     );
   }
+
+  /* Below 900px, and for reduced motion, no JS runs (see the matchMedia query
+     in the script) — so the section must be a plain vertical stack on its own.
+     The fallback is an absence of behaviour, not a branch that undoes things. */
+  @media (max-width: 899px), (prefers-reduced-motion: reduce) {
+    .exp-band {
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+    .exp-viewport { overflow: visible; }
+    .exp-track {
+      flex-direction: column;
+      /* Undo the desktop max-content sizing — stacked entries want full width. */
+      width: 100%;
+      align-self: stretch;
+      gap: var(--space-7);
+      padding-inline: var(--margin);
+      padding-block-end: var(--space-6);
+      will-change: auto;
+    }
+    .exp-entry {
+      flex: 0 0 auto;
+      width: 100%;
+      padding-inline-start: var(--space-4);
+    }
+    /* Stacked entries have no fixed height, so the media must take a ratio
+       again — flexing would collapse it to nothing. */
+    .exp-media {
+      flex: 0 0 auto;
+      aspect-ratio: 1028 / 630;
+    }
+    /* Rules read as timeline markers when stacked, so show them at rest. */
+    .exp-divider { transform: scaleY(1); background: rgba(255, 255, 255, 0.25); }
+    .exp-head { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+    .exp-blurb { text-align: left; }
+    .exp-ruler { display: none; }
+  }
 </style>

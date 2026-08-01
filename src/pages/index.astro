@@ -684,7 +684,11 @@ const sections = [
       gatedVideos.forEach((v) => io.observe(v));
     }
 
-    gsap.utils.toArray<HTMLElement>(".section [data-reveal-group]").forEach((group) => {
+    // :not(.exp-band) — the Experience timeline reveals its entries from their
+    // own HORIZONTAL triggers (containerAnimation). Left unscoped, this would
+    // catch them on vertical position and fire every entry at once as the
+    // section enters. Defensive: its entries carry no data-reveal-group today.
+    gsap.utils.toArray<HTMLElement>(".section:not(.exp-band) [data-reveal-group]").forEach((group) => {
       const risers = group.querySelectorAll(".mask > *");
       const corners = group.querySelectorAll(".corner");
       const tl = gsap.timeline({

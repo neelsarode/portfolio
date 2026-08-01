@@ -1,0 +1,73 @@
+---
+// Experience (Figma 2462:22611) — vertical scroll drives a horizontal timeline.
+// The section pins; .exp-track translates in X beneath a fixed header. A ruler
+// runs edge to edge, and each entry's divider grows to full height as it reaches
+// the playhead. Motion is desktop-only: below 900px (and for reduced motion) no
+// JS runs and the entries stack vertically via CSS alone.
+const experience = [
+  {
+    year: "2018",
+    role: "Lead Designer",
+    org: "Bank Account Builders",
+    body: "Hired as lead designer at the marketing agency Bank Account Builders. Handled delivery of all client projects including sales funnel design and development and necessary branding assets. Handled back and forth communication with clients ensuring successful project delivery.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2020",
+    role: "Founder",
+    org: "Conversion Designer (Freelancing)",
+    body: "Begin my own personal freelancing business designing and building sales funnels and websites for clients. I've continued freelancing from 2020 till today.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2020",
+    role: "Founder",
+    org: "Conversion Designer (Design Program)",
+    body: "Created a program teaching beginner and intermediate designers how to design and build high-end sales funnels on the platform ClickFunnels through video courses and live trainings. Sold over $500,000 of revenue of the program and taught over 500 students. Owned a Facebook group giving free instructional content with 12k+ members. Created a software called “Template Builder” using Bubble.io that allowed ClickFunnels users to generate prebuilt layout templates from a massive library of templated sections I created.",
+    image: null,
+    alt: "",
+  },
+];
+---
+
+<section class="section exp-band">
+  <div class="exp-viewport">
+    <div class="content-grid exp-head-grid">
+      <header class="full exp-head">
+        <h2 class="fw-title">
+          <span class="mask"><span class="line">Experience</span></span>
+        </h2>
+        <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
+      </header>
+    </div>
+
+    <div class="exp-track">
+      {experience.map((item) => (
+        <article class="exp-entry">
+          <span class="exp-divider" aria-hidden="true"></span>
+          <div class="exp-copy">
+            <span class="mask"><p class="exp-year">{item.year}</p></span>
+            <span class="mask"><p class="exp-role">{item.role}</p></span>
+            <span class="mask"><p class="exp-org">{item.org}</p></span>
+            <span class="mask"><p class="exp-body">{item.body}</p></span>
+          </div>
+          <div class="exp-media">
+            {item.image && (
+              <img
+                src={item.image}
+                alt={item.alt}
+                width="1028"
+                height="630"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+          </div>
+        </article>
+      ))}
+      <div class="exp-ruler" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>

@@ -3,6 +3,7 @@ import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
 import GridLines from "../components/GridLines.astro";
+import ExperienceTimeline from "../components/ExperienceTimeline.astro";
 // Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
 //   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
 //      fixed scene while at the top; scrolls away to reveal it.
@@ -490,6 +491,8 @@ const sections = [
         </div>
       </div>
     </section>
+
+    <ExperienceTimeline />
 
     <!-- Sections that reveal the fixed background as they scroll over it.
          Text is placed on the macro grid (left columns). -->

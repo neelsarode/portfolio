@@ -39,8 +39,8 @@ const fwRows = [
   {
     flip: true,
     logo: "gold",
-    video: "/gold-dollar-cover-2.mp4",
-    poster: "/gold-dollar-poster-2.jpg",
+    video: "/gold-dollar-cover.mp4",
+    poster: "/gold-dollar-poster.jpg",
     desc: "Founding designer and creative lead at USDKG (Gold Dollar). Brand created from scratch.",
     note: "USDKG is a enterprise solution for stablecoin payments with liquidity backed by the gold-reserves of the Ministry of Finance of Kyrgyzstan.",
     label: "Founding Designer",
@@ -55,8 +55,8 @@ const fwRows = [
   {
     flip: false,
     logo: "crow",
-    video: "/crow-cover-2.mp4",
-    poster: "/crow-poster-2.jpg",
+    video: "/crow-cover.mp4",
+    poster: "/crow-poster.jpg",
     desc: "Early stage designer. Revamped brand and designed and developed new website. Created system for generating AI imagery and video of product.",
     note: "Crow Industries creates unmanned ground vehicles with applications in defense, mining, and space.",
     label: "Head of Design",
@@ -72,6 +72,8 @@ const fwRows = [
   {
     flip: true,
     logo: "solarshare",
+    video: "/solarshare-cover.mp4",
+    poster: "/solarshare-poster.jpg",
     desc: "Designed product and revamped brand for SolarShare",
     note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
     label: "Founding Designer",
@@ -87,9 +89,9 @@ const fwRows = [
 
 // Work Dump grid (Figma 2186:11689). Media is optional per tile: `video`
 // gets lazy viewport-gated playback (preload=none + IntersectionObserver);
-// `image` is a plain lazy img; neither = flat placeholder. Tile 2's video is
-// a stand-in loop to prove the machinery — swap when real clips are encoded
-// (scripts/encode-loops.sh produces to-spec files).
+// `image` is a plain lazy img; neither = flat placeholder. Loops are 1080²
+// VP9 webm at 60fps, muted, named dump-<project>-loop.webm with a matching
+// -poster.jpg (Braces by Britt is 720² — that's all its master had).
 const dumpItems = [
   {
     title: "Nickel Garden",
@@ -99,16 +101,75 @@ const dumpItems = [
     poster: "/dump-nickelgarden-poster.jpg",
   },
   {
-    title: "Nickel Garden",
+    title: "Luke Infinger Personal Brand",
+    tags: ["Brand Identity", "Website Design"],
+    category: "Personal Brand",
+    video: "/dump-lukeinfinger-loop.webm",
+    poster: "/dump-lukeinfinger-poster.jpg",
+  },
+  {
+    title: "Braces by Britt",
+    tags: ["Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-bracesbybritt-loop.webm",
+    poster: "/dump-bracesbybritt-poster.jpg",
+  },
+  {
+    title: "Perfect Checkout",
+    tags: ["Brand Identity", "Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-perfectcheckout-loop.webm",
+    poster: "/dump-perfectcheckout-poster.jpg",
+  },
+  {
+    title: "Infinite Dodos",
+    tags: ["Brand Identity", "Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-infinitedodos-loop.webm",
+    poster: "/dump-infinitedodos-poster.jpg",
+  },
+  {
+    title: "Winter",
+    tags: ["Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-winter-loop.webm",
+    poster: "/dump-winter-poster.jpg",
+  },
+  {
+    title: "Aavid Wallet",
+    tags: ["Brand Identity", "Exploration", "Website Design"],
+    category: "Personal Brand",
+    video: "/dump-aavidwallet-loop.webm",
+    poster: "/dump-aavidwallet-poster.jpg",
+  },
+  {
+    title: "FlareLink",
     tags: ["Brand Identity", "Website Design", "Product Design"],
     category: "Personal Brand",
-    video: "/tldr-dashboard.mp4",
-    poster: "/tldr-dashboard-poster.jpg",
+    video: "/dump-flarelink-loop.webm",
+    poster: "/dump-flarelink-poster.jpg",
   },
-  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
-  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
-  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
-  { title: "Nickel Garden", tags: ["Brand Identity", "Website Design", "Product Design"], category: "Personal Brand" },
+  {
+    title: "Reed's Island",
+    tags: ["Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-reedsisland-loop.webm",
+    poster: "/dump-reedsisland-poster.jpg",
+  },
+  {
+    title: "Inova",
+    tags: ["Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-inova-loop.webm",
+    poster: "/dump-inova-poster.jpg",
+  },
+  {
+    title: "Project Kepler",
+    tags: ["Website Design", "Website Development"],
+    category: "Personal Brand",
+    video: "/dump-projectkepler-loop.webm",
+    poster: "/dump-projectkepler-poster.jpg",
+  },
 ];
 
 const sections = [
@@ -280,11 +341,10 @@ const sections = [
                         class="fw-video"
                         src={row.video}
                         poster={row.poster}
-                        autoplay
                         muted
                         loop
                         playsinline
-                        preload="metadata"
+                        preload="none"
                         tabindex="-1"
                       ></video>
                     )}
@@ -368,7 +428,7 @@ const sections = [
       </div>
     </section>
 
-    <!-- Work Dump (Figma 2186:11689): header + 2-up grid of project tiles.
+    <!-- More Work (Figma 2186:11689): header + 3-up grid of project tiles.
          Video tiles are lazy (preload=none) and viewport-gated — they only
          play while on screen, so the grid can hold 15-20 loops without
          touching initial page load or piling up hot decoders. -->
@@ -378,9 +438,9 @@ const sections = [
           <div class="wd-stack">
             <div class="wd-head" data-reveal-group>
               <h2 class="fw-title">
-                <span class="mask"><span class="line">Work Dump</span></span>
+                <span class="mask"><span class="line">More Work</span></span>
               </h2>
-              <span class="mask"><p class="wd-blurb">Put your seatbelt on, this will take a while</p></span>
+              <span class="mask"><p class="wd-blurb">Freelancing since 2018 with work across <span class="wd-hi">130+ projects</span></p></span>
             </div>
             <div class="wd-grid">
               {dumpItems.map((item) => (
@@ -593,12 +653,14 @@ const sections = [
         );
     }
 
-    // Work Dump loops: viewport-gated playback. preload="none" means a video
-    // costs zero bytes until it approaches the viewport; play only while on
-    // screen, pause when scrolled away — so even 15-20 tiles never stack up
-    // hot decoders (only the visible few run at once).
-    const wdVideos = document.querySelectorAll<HTMLVideoElement>(".wd-video");
-    if (wdVideos.length) {
+    // Viewport-gated playback for every preview loop — Featured Work covers
+    // AND More Work tiles. preload="none" means a video costs zero bytes until
+    // it approaches the viewport; play only while on screen, pause when
+    // scrolled away. Without this the covers alone (5-7MB each, autoplaying
+    // from page load regardless of position) put ~8MB on first paint, and
+    // 15-20 tiles would stack up hot decoders.
+    const gatedVideos = document.querySelectorAll<HTMLVideoElement>(".fw-video, .wd-video");
+    if (gatedVideos.length) {
       const io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
@@ -609,7 +671,7 @@ const sections = [
         },
         { rootMargin: "160px 0px" } // start loading/playing just before entry
       );
-      wdVideos.forEach((v) => io.observe(v));
+      gatedVideos.forEach((v) => io.observe(v));
     }
 
     gsap.utils.toArray<HTMLElement>(".section [data-reveal-group]").forEach((group) => {
@@ -1136,6 +1198,8 @@ const sections = [
     color: rgba(255, 255, 255, 0.65);
     text-align: right;
   }
+  /* Lift the headline stat out of the muted blurb. */
+  .wd-hi { color: #fff; }
   .wd-grid {
     display: grid;
     /* trial: 3-up (was repeat(2, 1fr)). minmax(0,1fr) stops the nowrap

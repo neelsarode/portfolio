@@ -72,6 +72,54 @@ const experience = [
   </div>
 </section>
 
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const band = document.querySelector<HTMLElement>(".exp-band");
+  const track = document.querySelector<HTMLElement>(".exp-track");
+
+  if (band && track) {
+    // Desktop, motion-friendly only. matchMedia creates the triggers on entry
+    // and reverts them on exit, so crossing the breakpoint leaves no orphaned
+    // pin-spacer behind.
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+      // Function-based so invalidateOnRefresh recomputes on resize instead of
+      // baking in a stale width.
+      const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
+
+      const horiz = gsap.to(track, {
+        x: () => -dist(),
+        ease: "none",
+        scrollTrigger: {
+          // The <section> is the pin target on purpose: GSAP wraps a pinned
+          // element in a .pin-spacer that replaces it as its parent's child,
+          // so pinning anything inside .content-grid would break the
+          // ".content-grid > .full" placement. main.content is a plain block,
+          // so a spacer inserted there is harmless.
+          trigger: band,
+          pin: band,
+          start: "top top",
+          end: () => "+=" + dist(),
+          scrub: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      return () => {
+        horiz.scrollTrigger?.kill();
+        horiz.kill();
+        gsap.set(track, { clearProps: "transform" });
+      };
+    });
+  }
+</script>
+
 <style>
   /* Pinned viewport. Height is exactly one screen — GSAP adds the scroll
      distance via its pin-spacer, so .section's min-height must be neutralised

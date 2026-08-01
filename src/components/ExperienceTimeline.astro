@@ -71,6 +71,10 @@ const experience = [
       ))}
       <div class="exp-ruler" aria-hidden="true">
         <div class="exp-ruler-fill"></div>
+        <!-- Real tick elements are injected here on desktop only; the gradient
+             layers above stay as the cheap fallback for mobile / reduced
+             motion. See buildTicks() in the script. -->
+        <div class="exp-ticks"></div>
       </div>
     </div>
   </div>
@@ -84,6 +88,24 @@ const experience = [
 
   const band = document.querySelector<HTMLElement>(".exp-band");
   const track = document.querySelector<HTMLElement>(".exp-track");
+
+  // ---------------------------------------------------------------------
+  // Tick magnification, ported from a React/framer-motion "chapter scrubber".
+  // Only the maths carried over: a raised-cosine bump giving every tick its
+  // rise from ONE shared value. There it was a pointer position on a vertical
+  // rail; here it is the scroll playhead on a horizontal one, so the wave is
+  // driven by scrub progress rather than a cursor and needs no springs — the
+  // scrub is already eased by Lenis.
+  // ---------------------------------------------------------------------
+  const WAVE_RADIUS = 6;   // ticks either side of the playhead
+  const REST_SCALE = 0.34; // resting tick height as a fraction of the band
+  const OPACITY_AHEAD = 0.18;
+  const OPACITY_TRAVELLED = 0.55;
+
+  // 1 at the crest, 0 beyond the radius, zero slope at both ends — so the wave
+  // has no seams. This is the whole trick.
+  const bump = (distance: number, radius: number) =>
+    distance >= radius ? 0 : 0.5 * (1 + Math.cos(Math.PI * (distance / radius)));
 
   if (band && track) {
     // Desktop, motion-friendly only. matchMedia creates the triggers on entry
@@ -101,10 +123,80 @@ const experience = [
       // white fill should reach. Set on the track so both ruler layers inherit
       // it, and so the value is in the same coordinate space their percentages
       // resolve against.
+      // --- real ticks + magnification wave -----------------------------
+      const ticksHost = track.querySelector<HTMLElement>(".exp-ticks")!;
+      const styles = getComputedStyle(band);
+      const TICK = parseFloat(styles.getPropertyValue("--exp-tick")) || 16;
+      const margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
+      let ticks: HTMLElement[] = [];
+      const buildTicks = () => {
+        ticksHost.textContent = "";
+        const count = Math.floor((track.scrollWidth - margin) / TICK) + 1;
+        const frag = document.createDocumentFragment();
+        ticks = Array.from({ length: count }, (_, i) => {
+          const el = document.createElement("span");
+          el.className = "exp-tick";
+          el.style.left = margin + i * TICK + "px";
+          frag.appendChild(el);
+          return el;
+        });
+        ticksHost.appendChild(frag);
+        band.classList.add("has-ticks");
+        // Reset the wave bookkeeping so the first paint after a rebuild does
+        // not try to clear indices from the previous tick array.
+        waveLo = 0;
+        waveHi = -1;
+        boundary = -1;
+      };
+
+      // Only ticks near the playhead, plus any that just crossed it, are
+      // touched per frame — about a dozen writes, not one per tick.
+      let waveLo = 0;
+      let waveHi = -1;
+      let boundary = -1;
+      buildTicks();
+
+      const baseOpacity = (i: number) =>
+        i <= boundary ? OPACITY_TRAVELLED : OPACITY_AHEAD;
+      const paintTick = (i: number, rise: number) => {
+        const b = baseOpacity(i);
+        const el = ticks[i];
+        if (!el) return;
+        el.style.opacity = String(b + rise * (1 - b));
+        el.style.transform = `scaleY(${REST_SCALE + rise * (1 - REST_SCALE)})`;
+      };
+
+      const paintWave = (playhead: number) => {
+        if (!ticks.length) return;
+        const centre = (playhead - margin) / TICK;
+
+        // Repaint only the ticks the playhead just swept past.
+        const nextBoundary = Math.min(ticks.length - 1, Math.floor(centre));
+        if (nextBoundary !== boundary) {
+          const from = Math.max(0, Math.min(boundary, nextBoundary));
+          const to = Math.max(boundary, nextBoundary);
+          boundary = nextBoundary;
+          for (let i = from; i <= to; i++) paintTick(i, 0);
+        }
+
+        const lo = Math.max(0, Math.floor(centre - WAVE_RADIUS));
+        const hi = Math.min(ticks.length - 1, Math.ceil(centre + WAVE_RADIUS));
+        for (let i = waveLo; i <= waveHi; i++) {
+          if (i < lo || i > hi) paintTick(i, 0);
+        }
+        for (let i = lo; i <= hi; i++) {
+          paintTick(i, bump(Math.abs(i - centre), WAVE_RADIUS));
+        }
+        waveLo = lo;
+        waveHi = hi;
+      };
+
       const setPlayhead = (progress: number) => {
         const playhead = progress * dist() + window.innerWidth / 2;
         track.style.setProperty("--exp-fill", playhead + "px");
         track.style.setProperty("--exp-glow", playhead + "px");
+        paintWave(playhead);
       };
 
       const horiz = gsap.to(track, {
@@ -193,6 +285,9 @@ const experience = [
         horiz.scrollTrigger?.kill();
         horiz.kill();
         gsap.set(track, { clearProps: "transform" });
+        ticksHost.textContent = "";
+        band.classList.remove("has-ticks");
+        ticks = [];
       };
     });
   }
@@ -436,6 +531,31 @@ const experience = [
     );
     pointer-events: none;
   }
+
+  /* Real ticks — injected on desktop only. Each is a full-height bar scaled
+     down at rest; the wave raises scaleY and opacity together. Both are
+     compositor properties, so ~13 writes a frame stay off the layout path. */
+  .exp-ticks { position: absolute; inset: 0; }
+  /* :global() is required — these spans are created by document.createElement
+     and so never receive Astro's data-astro-cid-* scope attribute, which means
+     a plain scoped selector cannot match them and they render unstyled.
+     Nested under the scoped .exp-ticks so it does not leak site-wide. */
+  .exp-ticks :global(.exp-tick) {
+    position: absolute;
+    inset-block-end: 0;
+    width: var(--exp-rule);
+    height: 100%;
+    background: #fff;
+    transform: scaleY(0.34);
+    transform-origin: bottom;
+    opacity: 0.18;
+  }
+
+  /* With real ticks live, the gradient layers would double-draw. They stay in
+     the markup as the mobile / reduced-motion fallback. */
+  .exp-band.has-ticks .exp-ruler { background-image: none; }
+  .exp-band.has-ticks .exp-ruler-fill,
+  .exp-band.has-ticks .exp-ruler::after { display: none; }
 
   /* Below 900px, and for reduced motion, no JS runs (see the matchMedia query
      in the script) — so the section must be a plain vertical stack on its own.

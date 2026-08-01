@@ -142,18 +142,25 @@ const experience = [
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
-      // The run ends when the LAST divider reaches the "Experience" title's
-      // left edge — one --margin in — rather than when the last entry's right
-      // edge hits the screen's right edge. That leaves a beat of travel after
-      // the final entry instead of cutting the horizontal motion dead the
-      // instant it arrives. Function-based so invalidateOnRefresh recomputes
-      // on resize rather than baking in a stale width.
+      // The run ends with the last entry's right edge on the right-hand grid
+      // line — GridLines' .gl-d border, which sits at the right page margin,
+      // so the target is (100vw - --margin). That gives a beat of travel past
+      // the final entry without leaving it stranded beside empty canvas.
+      // Function-based so invalidateOnRefresh recomputes on resize rather than
+      // baking in a stale width.
+      // Reads the margin live rather than the cached copy: --margin is a
+      // clamp() of vw, and ScrollTrigger computes the pin's end from dist()
+      // during a refresh, before any of our resize bookkeeping runs. Using the
+      // stale value ended the run short by exactly the margin's delta.
+      const marginNow = () =>
+        parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
       const dist = () => {
         const els = track.querySelectorAll<HTMLElement>(".exp-entry");
         const last = els[els.length - 1];
-        return last
-          ? Math.max(0, last.offsetLeft - margin)
-          : Math.max(0, track.scrollWidth - window.innerWidth);
+        if (!last) return Math.max(0, track.scrollWidth - window.innerWidth);
+        const rightEdge = last.offsetLeft + last.offsetWidth;
+        return Math.max(0, rightEdge - window.innerWidth + marginNow());
       };
 
       // The playhead is viewport centre. In track coordinates that is the
@@ -191,7 +198,7 @@ const experience = [
       };
 
       const buildTicks = () => {
-        margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+        margin = marginNow();
         ticksHost.textContent = "";
         const count = Math.floor((track.scrollWidth - margin) / TICK) + 1;
         const frag = document.createDocumentFragment();
@@ -269,7 +276,13 @@ const experience = [
           // ruler would show no fill at all until the first scroll — when
           // everything left of centre should already read as travelled.
           // onRefresh also covers resize, where dist() changes underneath us.
-          onRefresh: (self) => setPlayhead(self.progress),
+          onRefresh: (self) => {
+            // Resize changes both --margin and the track width, so the ticks
+            // need re-laying out and their rises recomputing before the
+            // playhead is repainted against them.
+            buildTicks();
+            setPlayhead(self.progress);
+          },
         },
       });
 
@@ -423,11 +436,12 @@ const experience = [
     gap: var(--exp-gap);
     padding-block: var(--space-6) var(--exp-track-pad-b);
     padding-inline-start: var(--margin);
-    /* The run now ends with the last divider at the title's left edge, which
-       carries the track further left than its own content width. Without this
-       trailing space the ruler would stop mid-screen with blank canvas beside
-       it; exactly this much keeps the track's right edge on the viewport's. */
-    padding-inline-end: max(0px, calc(100vw - var(--margin) - var(--wide)));
+    /* The run overshoots the track's own content width by exactly --margin
+       (it ends with the last entry on the right grid line, not on the screen
+       edge). Matching that here keeps the ruler running to the viewport edge
+       instead of stopping short with blank canvas beside it — and it makes the
+       track's inline padding symmetric. */
+    padding-inline-end: var(--margin);
     will-change: transform;
   }
 

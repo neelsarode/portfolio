@@ -142,9 +142,19 @@ const experience = [
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
-      // Function-based so invalidateOnRefresh recomputes on resize instead of
-      // baking in a stale width.
-      const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
+      // The run ends when the LAST divider reaches the "Experience" title's
+      // left edge — one --margin in — rather than when the last entry's right
+      // edge hits the screen's right edge. That leaves a beat of travel after
+      // the final entry instead of cutting the horizontal motion dead the
+      // instant it arrives. Function-based so invalidateOnRefresh recomputes
+      // on resize rather than baking in a stale width.
+      const dist = () => {
+        const els = track.querySelectorAll<HTMLElement>(".exp-entry");
+        const last = els[els.length - 1];
+        return last
+          ? Math.max(0, last.offsetLeft - margin)
+          : Math.max(0, track.scrollWidth - window.innerWidth);
+      };
 
       // The playhead is viewport centre. In track coordinates that is the
       // distance scrolled plus half a screen — which is exactly how far the
@@ -155,7 +165,9 @@ const experience = [
       const ticksHost = track.querySelector<HTMLElement>(".exp-ticks")!;
       const styles = getComputedStyle(band);
       const TICK = parseFloat(styles.getPropertyValue("--exp-tick")) || 16;
-      const margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+      // Mutable: --margin is a clamp() of vw, so it changes on resize. Re-read
+      // whenever the ticks are rebuilt.
+      let margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
 
       let ticks: HTMLElement[] = [];
       // Each tick's rise is fixed in TRACK space, centred on the entry
@@ -179,6 +191,7 @@ const experience = [
       };
 
       const buildTicks = () => {
+        margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
         ticksHost.textContent = "";
         const count = Math.floor((track.scrollWidth - margin) / TICK) + 1;
         const frag = document.createDocumentFragment();
@@ -410,6 +423,11 @@ const experience = [
     gap: var(--exp-gap);
     padding-block: var(--space-6) var(--exp-track-pad-b);
     padding-inline-start: var(--margin);
+    /* The run now ends with the last divider at the title's left edge, which
+       carries the track further left than its own content width. Without this
+       trailing space the ruler would stop mid-screen with blank canvas beside
+       it; exactly this much keeps the track's right edge on the viewport's. */
+    padding-inline-end: max(0px, calc(100vw - var(--margin) - var(--wide)));
     will-change: transform;
   }
 

@@ -4,6 +4,14 @@
 // runs edge to edge, and each entry's divider grows to full height as it reaches
 // the playhead. Motion is desktop-only: below 900px (and for reduced motion) no
 // JS runs and the entries stack vertically via CSS alone.
+// Target line count for an entry's body copy. Each column is sized from its
+// own character count to land near this, then text-wrap:balance evens the
+// ragged edge out.
+const BODY_LINES = 4;
+// Average glyph advance as a fraction of the font size, used to turn a
+// character count into a column width. Measured against the rendered copy.
+const AVG_ADVANCE_EM = 0.5;
+
 const experience = [
   {
     year: "2018",
@@ -81,7 +89,19 @@ const experience = [
               <span class="mask"><p class="exp-role">{item.role}</p></span>
               <span class="mask"><p class="exp-org">{item.org}</p></span>
             </div>
-            <span class="mask exp-body-mask"><p class="exp-body">{item.body}</p></span>
+            <span class="mask exp-body-mask">
+              {/* Column sized from the copy's own length so it settles at
+                  BODY_LINES lines: (chars per line) x (average glyph advance).
+                  em, not ch — ch is the width of "0", which in Geist runs ~30%
+                  wider than the real average and pushed every column into the
+                  cap. 0.5em is the usual average advance for proportional
+                  Latin sans and measured within 0.1px here. Capped in CSS, so
+                  an unusually long entry just runs to the cap and wraps on. */}
+              <p
+                class="exp-body"
+                style={`--exp-body-w: ${((item.body.length / BODY_LINES) * AVG_ADVANCE_EM).toFixed(2)}em`}
+              >{item.body}</p>
+            </span>
           </div>
           <div class="exp-media">
             {item.image && (
@@ -504,13 +524,20 @@ const experience = [
   .exp-body {
     margin: 0;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.2;
     letter-spacing: -0.01em;
-    /* Figma runs 470px on the short entry and 576px on the long ones; this
-       lands near the wider figure. Narrower than this and the longest entry
-       wraps far enough to push the track past the band and take the ruler
-       off-screen with it. */
-    max-width: calc(var(--measure) - var(--space-7));
+    /* --exp-body-w is set per entry from its own length (see the template) so
+       short and long copy both settle around BODY_LINES lines instead of every
+       column being one fixed width. The cap is the old fixed measure: past it
+       the column stops widening and the copy simply wraps further, which is
+       what the longest entry does. */
+    max-width: min(
+      var(--exp-body-w, 34em),
+      calc(var(--measure) - var(--space-7))
+    );
+    /* Evens out the ragged edge so the block reads as a tidy paragraph rather
+       than one long line and one orphan. */
+    text-wrap: balance;
     color: rgba(255, 255, 255, 0.65);
   }
 

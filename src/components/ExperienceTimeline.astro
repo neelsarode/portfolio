@@ -48,10 +48,12 @@ const experience = [
         <article class="exp-entry">
           <span class="exp-divider" aria-hidden="true"></span>
           <div class="exp-copy">
-            <span class="mask"><p class="exp-year">{item.year}</p></span>
-            <span class="mask"><p class="exp-role">{item.role}</p></span>
-            <span class="mask"><p class="exp-org">{item.org}</p></span>
-            <span class="mask"><p class="exp-body">{item.body}</p></span>
+            <div class="exp-meta">
+              <span class="mask"><p class="exp-year">{item.year}</p></span>
+              <span class="mask"><p class="exp-role">{item.role}</p></span>
+              <span class="mask"><p class="exp-org">{item.org}</p></span>
+            </div>
+            <span class="mask exp-body-mask"><p class="exp-body">{item.body}</p></span>
           </div>
           <div class="exp-media">
             {item.image && (
@@ -217,6 +219,10 @@ const experience = [
     --exp-tick: var(--space-2);                          /* 16px pitch */
     --exp-tick-h: var(--space-3);                        /* 24px tall  */
     --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
+    --exp-rule: 1px;                                     /* hairline   */
+    /* Track's bottom padding: the ruler occupies --exp-tick-h of it, and the
+       remainder is clear space so the media panel never touches the timeline. */
+    --exp-track-pad-b: calc(var(--exp-tick-h) + var(--space-5));
 
     display: flex;
     flex-direction: column;
@@ -263,12 +269,15 @@ const experience = [
   .exp-track {
     position: relative;
     flex: 1;
+    /* Without this the flex item's auto min-height lets tall content grow the
+       track past the band, which drags the ruler below the fold. */
+    min-height: 0;
     align-self: flex-start;
     width: max-content;
     display: flex;
     align-items: stretch;
     gap: var(--exp-gap);
-    padding-block: var(--space-6) var(--exp-tick-h);
+    padding-block: var(--space-6) var(--exp-track-pad-b);
     padding-inline-start: var(--margin);
     will-change: transform;
   }
@@ -277,7 +286,7 @@ const experience = [
     position: relative;
     flex: 0 0 var(--wide);
     width: var(--wide);
-    padding-inline-start: var(--space-5);
+    padding-inline-start: var(--space-4);
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
@@ -291,22 +300,54 @@ const experience = [
      disconnected line floating above the track. */
   .exp-divider {
     position: absolute;
-    inset-block: 0 calc(-1 * var(--exp-tick-h));
+    inset-block: 0 calc(-1 * var(--exp-track-pad-b));
     inset-inline-start: 0;
-    width: 2px;
+    width: var(--exp-rule);
     background: #fff;
     transform: scaleY(0);
     transform-origin: bottom;
   }
 
-  .exp-copy { display: flex; flex-direction: column; gap: var(--space-1); }
+  /* Figma 2462:22902 — meta stack on the left, body paragraph pushed to the
+     entry's right edge (there: a 470px column at x=558 of 1028). The paragraph
+     block is right-aligned; its text stays ragged-right. */
+  .exp-copy {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+  .exp-meta {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .exp-body-mask {
+    flex: 0 1 auto;
+    margin-inline-start: auto;
+  }
+  /* 14px/1.35 gives the Figma's 19px line boxes and 27px stack pitch. */
   .exp-year,
-  .exp-role { margin: 0; color: rgba(255, 255, 255, 0.65); }
-  .exp-org { margin: 0; color: #fff; }
+  .exp-role,
+  .exp-org {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .exp-year,
+  .exp-role { color: rgba(255, 255, 255, 0.65); }
+  .exp-org { color: #fff; }
   .exp-body {
-    margin-block-start: var(--space-2);
-    margin-inline: 0;
-    max-width: var(--measure);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    /* Figma runs 470px on the short entry and 576px on the long ones; this
+       lands near the wider figure. Narrower than this and the longest entry
+       wraps far enough to push the track past the band and take the ruler
+       off-screen with it. */
+    max-width: calc(var(--measure) - var(--space-7));
     color: rgba(255, 255, 255, 0.65);
   }
 
@@ -315,10 +356,17 @@ const experience = [
      1028/630 box at 920 wide (564px) would push the ruler off-screen. Letting
      it flex keeps the whole entry inside the pin at any viewport height.
      min-height:0 is required or the flex item refuses to shrink. */
+  /* 16:9 rather than the Figma's 1028/630 — a shorter panel that leaves clear
+     air above the timeline. The entry still stretches to the full track height
+     (so the divider spans it); the panel simply does not fill it. */
+  /* flex-shrink stays enabled as a safety valve: 16:9 on every entry that
+     fits, and on an unusually long one the panel gives up a little height
+     rather than pushing the ruler out of the band. */
   .exp-media {
     position: relative;
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
+    aspect-ratio: 16 / 9;
     background: rgba(255, 255, 255, 0.05);
     overflow: hidden;
   }
@@ -340,8 +388,8 @@ const experience = [
     height: var(--exp-tick-h);
     background: repeating-linear-gradient(
       to right,
-      rgba(255, 255, 255, 0.25) 0 2px,
-      transparent 2px var(--exp-tick)
+      rgba(255, 255, 255, 0.25) 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
     );
     /* Phase-shift so the first tick sits under the first divider, which is
        inset by the track's --margin padding. */
@@ -357,8 +405,8 @@ const experience = [
     inset: 0;
     background: repeating-linear-gradient(
       to right,
-      #fff 0 2px,
-      transparent 2px var(--exp-tick)
+      #fff 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
     );
     background-position-x: var(--margin);
     clip-path: inset(0 calc(100% - var(--exp-fill, 0px)) 0 0);
@@ -372,8 +420,8 @@ const experience = [
     inset: 0;
     background: repeating-linear-gradient(
       to right,
-      #fff 0 2px,
-      transparent 2px var(--exp-tick)
+      #fff 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
     );
     background-position-x: var(--margin);
     -webkit-mask-image: radial-gradient(
@@ -414,12 +462,15 @@ const experience = [
       width: 100%;
       padding-inline-start: var(--space-4);
     }
-    /* Stacked entries have no fixed height, so the media must take a ratio
-       again — flexing would collapse it to nothing. */
+    /* Stacked entries have no fixed height, so the media must not shrink. */
     .exp-media {
       flex: 0 0 auto;
-      aspect-ratio: 1028 / 630;
+      aspect-ratio: 16 / 9;
     }
+    /* The desktop meta-left / body-right split has no room on a phone. */
+    .exp-copy { flex-direction: column; gap: var(--space-3); }
+    .exp-body-mask { margin-inline-start: 0; }
+    .exp-body { max-width: none; }
     /* Rules read as timeline markers when stacked, so show them at rest. The
        desktop overhang into the tick band is undone — there is no ruler here,
        so it would just dangle past each card. */

@@ -71,3 +71,137 @@ const experience = [
     </div>
   </div>
 </section>
+
+<style>
+  /* Pinned viewport. Height is exactly one screen — GSAP adds the scroll
+     distance via its pin-spacer, so .section's min-height must be neutralised
+     or the band would be taller than the pin and the track would sit low. */
+  /* Declares its own column layout rather than inheriting .section's. Astro
+     scopes styles per file, so index.astro's ".section { display:flex }" never
+     reaches this element — it carries this component's scope hash, not that
+     one's. The .section class is kept for semantics and for the DOM-wide
+     reveal selector, but its layout must be restated here. */
+  .exp-band {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .exp-viewport {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .exp-head-grid { padding-block-start: var(--space-6); }
+  /* .full spans the grid edge to edge, margins included — inset it to the page
+     margin so the title lines up with the track's first entry. */
+  .exp-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-inline: var(--margin);
+  }
+  .exp-blurb {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: right;
+  }
+
+  /* The translating element. position:relative so the ruler can pin to its
+     bottom edge and span the whole track rather than one screen.
+
+     width:max-content + align-self:flex-start are load-bearing: .exp-viewport
+     is a flex column, so the default align-self:stretch would size the track to
+     the viewport and let its entries overflow. The ruler is absolutely
+     positioned with inset-inline:0, so it would then span one screen instead of
+     the whole timeline. max-content makes the track's own box equal its
+     content, which is also what makes track.scrollWidth meaningful. */
+  .exp-track {
+    position: relative;
+    flex: 1;
+    align-self: flex-start;
+    width: max-content;
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-8);
+    padding-block: var(--space-6) var(--space-3);
+    padding-inline-start: var(--margin);
+    will-change: transform;
+  }
+
+  .exp-entry {
+    position: relative;
+    flex: 0 0 var(--wide);
+    width: var(--wide);
+    padding-inline-start: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  /* Rests invisible — the ruler's own tick is what you see at this position.
+     Task 5 grows it to full height and whitens it as it reaches the playhead. */
+  .exp-divider {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    background: #fff;
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+
+  .exp-copy { display: flex; flex-direction: column; gap: var(--space-1); }
+  .exp-year,
+  .exp-role { margin: 0; color: rgba(255, 255, 255, 0.65); }
+  .exp-org { margin: 0; color: #fff; }
+  .exp-body {
+    margin-block-start: var(--space-2);
+    margin-inline: 0;
+    max-width: var(--measure);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  /* Fills the height left over after the copy rather than taking a fixed
+     ratio. The Figma frame is 1182 tall; a real viewport is ~900, so a
+     1028/630 box at 920 wide (564px) would push the ruler off-screen. Letting
+     it flex keeps the whole entry inside the pin at any viewport height.
+     min-height:0 is required or the flex item refuses to shrink. */
+  .exp-media {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .exp-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Ruler spans the full track, sitting on the track's bottom edge. Ticks are
+     a single repeating gradient — one element regardless of track length,
+     instead of the ~525 rectangles the Figma draws. */
+  .exp-ruler {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: var(--space-3);
+    background: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.25) 0 2px,
+      transparent 2px var(--space-2)
+    );
+  }
+</style>

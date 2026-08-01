@@ -131,6 +131,19 @@ h1, h2, h3, p { margin: 0; }
   }
 }
 
+/* ---- Section headline — Featured Work / More Work / Experience ----
+   Global rather than page-scoped because Experience renders from a component
+   (ExperienceTimeline.astro); Astro scopes styles per file, so a copy living
+   in index.astro's <style> block would never reach it. */
+.fw-title {
+  margin: 0;
+  font-size: clamp(34px, 5.4vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+  color: #fff;
+}
+
 /* ---- Mono micro-label without the ember square (footer legal links) ---- */
 .mono-label {
   font-family: var(--font-geist-mono);

@@ -205,7 +205,19 @@ const experience = [
      reaches this element — it carries this component's scope hash, not that
      one's. The .section class is kept for semantics and for the DOM-wide
      reveal selector, but its layout must be restated here. */
+  /* The ruler's tick pitch is the unit this timeline is built on: a divider
+     must land ON a tick, not between two. That forces the divider-to-divider
+     pitch to be a whole number of ticks. --wide (920px) is not a multiple of
+     the 16px tick, so the gap carries the 8px correction:
+       920 + 136 = 1056 = 66 ticks exactly.
+     The ruler's gradient is then phase-shifted by --margin so its first tick
+     sits under the first divider. Both parts are needed — without the pitch
+     fix, dividers alternate on/off the grid by 8px. */
   .exp-band {
+    --exp-tick: var(--space-2);                          /* 16px pitch */
+    --exp-tick-h: var(--space-3);                        /* 24px tall  */
+    --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
+
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -255,8 +267,8 @@ const experience = [
     width: max-content;
     display: flex;
     align-items: stretch;
-    gap: var(--space-8);
-    padding-block: var(--space-6) var(--space-3);
+    gap: var(--exp-gap);
+    padding-block: var(--space-6) var(--exp-tick-h);
     padding-inline-start: var(--margin);
     will-change: transform;
   }
@@ -273,9 +285,13 @@ const experience = [
 
   /* Rests invisible — the ruler's own tick is what you see at this position.
      Task 5 grows it to full height and whitens it as it reaches the playhead. */
+  /* Extends past the entry's bottom edge and THROUGH the tick band to the
+     track's bottom, matching the Figma where the divider spans the full 938px
+     including the 27px ruler. Stopping at the ruler's top edge reads as a
+     disconnected line floating above the track. */
   .exp-divider {
     position: absolute;
-    inset-block: 0;
+    inset-block: 0 calc(-1 * var(--exp-tick-h));
     inset-inline-start: 0;
     width: 2px;
     background: #fff;
@@ -321,12 +337,15 @@ const experience = [
     position: absolute;
     inset-inline: 0;
     inset-block-end: 0;
-    height: var(--space-3);
+    height: var(--exp-tick-h);
     background: repeating-linear-gradient(
       to right,
       rgba(255, 255, 255, 0.25) 0 2px,
-      transparent 2px var(--space-2)
+      transparent 2px var(--exp-tick)
     );
+    /* Phase-shift so the first tick sits under the first divider, which is
+       inset by the track's --margin padding. */
+    background-position-x: var(--margin);
   }
 
   /* White ticks in the same phase as the base strip, revealed left-to-right by
@@ -339,8 +358,9 @@ const experience = [
     background: repeating-linear-gradient(
       to right,
       #fff 0 2px,
-      transparent 2px var(--space-2)
+      transparent 2px var(--exp-tick)
     );
+    background-position-x: var(--margin);
     clip-path: inset(0 calc(100% - var(--exp-fill, 0px)) 0 0);
   }
 
@@ -353,8 +373,9 @@ const experience = [
     background: repeating-linear-gradient(
       to right,
       #fff 0 2px,
-      transparent 2px var(--space-2)
+      transparent 2px var(--exp-tick)
     );
+    background-position-x: var(--margin);
     -webkit-mask-image: radial-gradient(
       circle at var(--exp-glow, 0px) 50%,
       #000 0,
@@ -399,8 +420,14 @@ const experience = [
       flex: 0 0 auto;
       aspect-ratio: 1028 / 630;
     }
-    /* Rules read as timeline markers when stacked, so show them at rest. */
-    .exp-divider { transform: scaleY(1); background: rgba(255, 255, 255, 0.25); }
+    /* Rules read as timeline markers when stacked, so show them at rest. The
+       desktop overhang into the tick band is undone — there is no ruler here,
+       so it would just dangle past each card. */
+    .exp-divider {
+      inset-block: 0;
+      transform: scaleY(1);
+      background: rgba(255, 255, 255, 0.25);
+    }
     .exp-head { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
     .exp-blurb { text-align: left; }
     .exp-ruler { display: none; }

@@ -130,6 +130,26 @@ const experience = [
       const margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
 
       let ticks: HTMLElement[] = [];
+      // Each tick's rise is fixed in TRACK space, centred on the entry
+      // dividers — so the swell travels left with its entry instead of sitting
+      // still at viewport centre. Computed once per build, not per frame.
+      let riseOf: number[] = [];
+
+      const computeRises = () => {
+        const centres = Array.from(
+          track.querySelectorAll<HTMLElement>(".exp-entry"),
+          (e) => (e.offsetLeft - margin) / TICK,
+        );
+        riseOf = ticks.map((_, i) => {
+          let peak = 0;
+          for (const c of centres) {
+            const r = bump(Math.abs(i - c), WAVE_RADIUS);
+            if (r > peak) peak = r;
+          }
+          return peak;
+        });
+      };
+
       const buildTicks = () => {
         ticksHost.textContent = "";
         const count = Math.floor((track.scrollWidth - margin) / TICK) + 1;
@@ -143,54 +163,42 @@ const experience = [
         });
         ticksHost.appendChild(frag);
         band.classList.add("has-ticks");
-        // Reset the wave bookkeeping so the first paint after a rebuild does
-        // not try to clear indices from the previous tick array.
-        waveLo = 0;
-        waveHi = -1;
+        computeRises();
         boundary = -1;
+        // One full pass so every tick starts at its resting swell; after this
+        // only ticks crossing the playhead need repainting.
+        for (let i = 0; i < ticks.length; i++) paintTick(i);
       };
 
-      // Only ticks near the playhead, plus any that just crossed it, are
-      // touched per frame — about a dozen writes, not one per tick.
-      let waveLo = 0;
-      let waveHi = -1;
+      // The swell is static in track space, so the only per-frame work is
+      // restyling ticks the playhead has just swept past — usually one.
       let boundary = -1;
-      buildTicks();
 
       const baseOpacity = (i: number) =>
         i <= boundary ? OPACITY_TRAVELLED : OPACITY_AHEAD;
-      const paintTick = (i: number, rise: number) => {
-        const b = baseOpacity(i);
+      const paintTick = (i: number) => {
         const el = ticks[i];
         if (!el) return;
+        const rise = riseOf[i] ?? 0;
+        const b = baseOpacity(i);
         el.style.opacity = String(b + rise * (1 - b));
         el.style.transform = `scaleY(${REST_SCALE + rise * (1 - REST_SCALE)})`;
       };
 
       const paintWave = (playhead: number) => {
         if (!ticks.length) return;
-        const centre = (playhead - margin) / TICK;
-
-        // Repaint only the ticks the playhead just swept past.
-        const nextBoundary = Math.min(ticks.length - 1, Math.floor(centre));
-        if (nextBoundary !== boundary) {
-          const from = Math.max(0, Math.min(boundary, nextBoundary));
-          const to = Math.max(boundary, nextBoundary);
-          boundary = nextBoundary;
-          for (let i = from; i <= to; i++) paintTick(i, 0);
-        }
-
-        const lo = Math.max(0, Math.floor(centre - WAVE_RADIUS));
-        const hi = Math.min(ticks.length - 1, Math.ceil(centre + WAVE_RADIUS));
-        for (let i = waveLo; i <= waveHi; i++) {
-          if (i < lo || i > hi) paintTick(i, 0);
-        }
-        for (let i = lo; i <= hi; i++) {
-          paintTick(i, bump(Math.abs(i - centre), WAVE_RADIUS));
-        }
-        waveLo = lo;
-        waveHi = hi;
+        const nextBoundary = Math.min(
+          ticks.length - 1,
+          Math.floor((playhead - margin) / TICK),
+        );
+        if (nextBoundary === boundary) return;
+        const from = Math.max(0, Math.min(boundary, nextBoundary));
+        const to = Math.max(boundary, nextBoundary);
+        boundary = nextBoundary;
+        for (let i = from; i <= to; i++) paintTick(i);
       };
+
+      buildTicks();
 
       const setPlayhead = (progress: number) => {
         const playhead = progress * dist() + window.innerWidth / 2;

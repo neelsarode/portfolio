@@ -38,7 +38,8 @@ const experience = [
   {
     year: "2020 → 2022",
     role: "Founder",
-    org: "Conversion Designer Masterclass (Design Program)",
+    // \n breaks the qualifier onto its own line — .exp-org is pre-line.
+    org: "Conversion Designer Masterclass\n(Design Program)",
     body: "Created a program teaching beginner and intermediate designers how to design and build high-end sales funnels on the platform ClickFunnels through video courses and live trainings. Sold over $500,000 of revenue of the program and taught over 500 students. Owned a Facebook group giving free instructional content with 12k+ members. Created a software called “Template Builder” using Bubble.io that allowed ClickFunnels users to generate prebuilt layout templates from a massive library of templated sections I created.",
     image: null,
     alt: "",
@@ -574,7 +575,9 @@ const experience = [
   }
   .exp-year,
   .exp-role { color: rgba(255, 255, 255, 0.65); }
-  .exp-org { color: #fff; }
+  /* pre-line so an org can carry an explicit \n to break a long qualifier onto
+     its own line, without needing markup in the data. */
+  .exp-org { color: #fff; white-space: pre-line; }
   .exp-body {
     margin: 0;
     font-size: 14px;

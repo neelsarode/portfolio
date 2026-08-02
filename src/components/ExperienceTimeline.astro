@@ -410,6 +410,11 @@ const experience = [
     --exp-tick-h: var(--space-3);                        /* 24px tall  */
     --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
     --exp-rule: 1px;                                     /* hairline   */
+    /* Meta type metrics, hoisted so the divider can start at the year's
+       optical centre without restating them. */
+    --exp-meta-size: 14px;
+    --exp-meta-lh: 1.35;
+    --exp-meta-half: calc(var(--exp-meta-size) * var(--exp-meta-lh) / 2);
     /* Track's bottom padding: the ruler occupies --exp-tick-h of it, and the
        remainder is clear space so the media panel never touches the timeline. */
     --exp-track-pad-b: calc(var(--exp-tick-h) + var(--space-5));
@@ -494,9 +499,13 @@ const experience = [
      track's bottom, matching the Figma where the divider spans the full 938px
      including the 27px ruler. Stopping at the ruler's top edge reads as a
      disconnected line floating above the track. */
+  /* Starts at the year's line-box centre, not the entry's top, so the dot that
+     caps it reads as level with "2018" rather than floating half a line above.
+     The meta stack begins at the entry top in both alignment modes, so half a
+     meta line is exactly the offset needed. */
   .exp-divider {
     position: absolute;
-    inset-block: 0 calc(-1 * var(--exp-track-pad-b));
+    inset-block: var(--exp-meta-half) calc(-1 * var(--exp-track-pad-b));
     inset-inline-start: 0;
     width: var(--exp-rule);
     background: #fff;
@@ -525,7 +534,7 @@ const experience = [
      runs about the dot's own centre. */
   .exp-dot {
     position: absolute;
-    inset-block-start: calc(var(--space-1) / -2);
+    inset-block-start: calc(var(--exp-meta-half) - var(--space-1) / 2);
     inset-inline-start: calc(var(--exp-rule) / 2 - var(--space-1) / 2);
     width: var(--space-1);
     height: var(--space-1);
@@ -556,13 +565,15 @@ const experience = [
     flex: 0 1 auto;
     margin-inline-start: auto;
   }
-  /* 14px/1.35 gives the Figma's 19px line boxes and 27px stack pitch. */
+  /* 14px/1.35 gives the Figma's 19px line boxes and 27px stack pitch. Driven
+     from the same variables the divider's start offset uses, so the line and
+     the year cannot drift apart. */
   .exp-year,
   .exp-role,
   .exp-org {
     margin: 0;
-    font-size: 14px;
-    line-height: 1.35;
+    font-size: var(--exp-meta-size);
+    line-height: var(--exp-meta-lh);
     letter-spacing: -0.01em;
   }
   .exp-year,
@@ -743,7 +754,7 @@ const experience = [
        desktop overhang into the tick band is undone — there is no ruler here,
        so it would just dangle past each card. */
     .exp-divider {
-      inset-block: 0;
+      inset-block: var(--exp-meta-half) 0;
       transform: scaleY(1);
       background: rgba(255, 255, 255, 0.25);
     }

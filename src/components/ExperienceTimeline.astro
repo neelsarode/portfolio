@@ -94,6 +94,7 @@ const experience = [
         return (
         <article class="exp-entry">
           <span class="exp-divider" aria-hidden="true"></span>
+          <span class="exp-dot" aria-hidden="true"></span>
           <div class:list={["exp-copy", { "exp-copy-long": runsLong }]}>
             <div class="exp-meta">
               <span class="mask"><p class="exp-year">{item.year}</p></span>
@@ -357,11 +358,10 @@ const experience = [
 
         // Beat 2 — the divider locks in at the playhead (viewport centre), so a
         // line is white only once it is behind the playhead, matching the ruler.
+        // The dot lands just as the line finishes drawing up to meet it.
         if (divider) {
-          gsap.to(divider, {
-            scaleY: 1,
-            duration: 0.7,
-            ease: "power3.out",
+          const dot = entry.querySelector<HTMLElement>(".exp-dot");
+          const tl = gsap.timeline({
             scrollTrigger: {
               trigger: entry,
               containerAnimation: horiz,
@@ -369,6 +369,10 @@ const experience = [
               toggleActions: "play none none reverse",
             },
           });
+          tl.to(divider, { scaleY: 1, duration: 0.7, ease: "power3.out" });
+          if (dot) {
+            tl.to(dot, { scale: 1, duration: 0.4, ease: "back.out(2)" }, 0.3);
+          }
         }
       });
 
@@ -509,6 +513,27 @@ const experience = [
      element's baseline its own bottom edge, so `last baseline` would collapse
      to this anyway. Both sides end in a .mask carrying the same
      padding/negative-margin pair, so the box edges track the text. */
+  /* Cap on the divider. A sibling rather than a ::before on the line itself,
+     because the line is scaleY-animated and would squash the circle into an
+     ellipse as it grows.
+
+     Centred with box offsets rather than a translate. GSAP's CSSPlugin
+     consolidates everything into `transform` and sets the standalone
+     translate/rotate/scale properties to `none`, so a `translate:` used for
+     centring is wiped the moment the dot animates — it drifted 3.5px right and
+     4px low. Negative insets leave `transform` free for the scale, which then
+     runs about the dot's own centre. */
+  .exp-dot {
+    position: absolute;
+    inset-block-start: calc(var(--space-1) / -2);
+    inset-inline-start: calc(var(--exp-rule) / 2 - var(--space-1) / 2);
+    width: var(--space-1);
+    height: var(--space-1);
+    border-radius: 50%;
+    background: #fff;
+    transform: scale(0);
+  }
+
   .exp-copy {
     display: flex;
     align-items: flex-end;
@@ -720,6 +745,11 @@ const experience = [
     .exp-divider {
       inset-block: 0;
       transform: scaleY(1);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    /* No JS here to animate it in, so it rests visible and matches the rule. */
+    .exp-dot {
+      transform: scale(1);
       background: rgba(255, 255, 255, 0.25);
     }
     .exp-head { flex-direction: column; align-items: flex-start; gap: var(--space-2); }

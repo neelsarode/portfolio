@@ -11,6 +11,12 @@ const BODY_LINES = 4;
 // Average glyph advance as a fraction of the font size, used to turn a
 // character count into a column width. Measured against the rendered copy.
 const AVG_ADVANCE_EM = 0.5;
+// The CSS cap on the body column, in em at the body's own 14px size:
+// calc(var(--measure) - var(--space-7)) = 680 - 96 = 584px -> 41.7em.
+// Copy that exceeds it cannot fit BODY_LINES lines and wraps further, and
+// those entries align to the top instead of the bottom. Hand-synced with the
+// max-width in the stylesheet — change one and change the other.
+const BODY_MAX_EM = (680 - 96) / 14;
 
 const experience = [
   {
@@ -80,10 +86,15 @@ const experience = [
     </div>
 
     <div class="exp-track">
-      {experience.map((item) => (
+      {experience.map((item) => {
+        const bodyEm = (item.body.length / BODY_LINES) * AVG_ADVANCE_EM;
+        // Longer than BODY_LINES lines once capped — top-align those instead,
+        // since there is no short paragraph to sit level with the org name.
+        const runsLong = bodyEm > BODY_MAX_EM;
+        return (
         <article class="exp-entry">
           <span class="exp-divider" aria-hidden="true"></span>
-          <div class="exp-copy">
+          <div class:list={["exp-copy", { "exp-copy-long": runsLong }]}>
             <div class="exp-meta">
               <span class="mask"><p class="exp-year">{item.year}</p></span>
               <span class="mask"><p class="exp-role">{item.role}</p></span>
@@ -97,10 +108,7 @@ const experience = [
                   cap. 0.5em is the usual average advance for proportional
                   Latin sans and measured within 0.1px here. Capped in CSS, so
                   an unusually long entry just runs to the cap and wraps on. */}
-              <p
-                class="exp-body"
-                style={`--exp-body-w: ${((item.body.length / BODY_LINES) * AVG_ADVANCE_EM).toFixed(2)}em`}
-              >{item.body}</p>
+              <p class="exp-body" style={`--exp-body-w: ${bodyEm.toFixed(2)}em`}>{item.body}</p>
             </span>
           </div>
           <div class="exp-media">
@@ -116,7 +124,8 @@ const experience = [
             )}
           </div>
         </article>
-      ))}
+        );
+      })}
       <div class="exp-ruler" aria-hidden="true">
         <div class="exp-ruler-fill"></div>
         <!-- Real tick elements are injected here on desktop only; the gradient
@@ -504,6 +513,13 @@ const experience = [
     display: flex;
     align-items: flex-end;
     gap: var(--space-4);
+  }
+  /* Copy that runs past BODY_LINES lines has no short paragraph to sit level
+     with the org name — and because it is the taller of the two blocks,
+     flex-end would push the meta stack DOWN rather than lift the paragraph.
+     Top-align those so both blocks start level instead. */
+  .exp-copy.exp-copy-long {
+    align-items: flex-start;
   }
   .exp-meta {
     flex: 0 0 auto;

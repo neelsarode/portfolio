@@ -1,0 +1,771 @@
+---
+// Experience (Figma 2462:22611) — vertical scroll drives a horizontal timeline.
+// The section pins; .exp-track translates in X beneath a fixed header. A ruler
+// runs edge to edge, and each entry's divider grows to full height as it reaches
+// the playhead. Motion is desktop-only: below 900px (and for reduced motion) no
+// JS runs and the entries stack vertically via CSS alone.
+// Target line count for an entry's body copy. Each column is sized from its
+// own character count to land near this, then text-wrap:balance evens the
+// ragged edge out.
+const BODY_LINES = 4;
+// Average glyph advance as a fraction of the font size, used to turn a
+// character count into a column width. Measured against the rendered copy.
+const AVG_ADVANCE_EM = 0.5;
+// The CSS cap on the body column, in em at the body's own 14px size:
+// calc(var(--measure) - var(--space-7)) = 680 - 96 = 584px -> 41.7em.
+// Copy that exceeds it cannot fit BODY_LINES lines and wraps further, and
+// those entries align to the top instead of the bottom. Hand-synced with the
+// max-width in the stylesheet — change one and change the other.
+const BODY_MAX_EM = (680 - 96) / 14;
+
+const experience = [
+  {
+    year: "2018 → 2020",
+    role: "Lead Designer",
+    org: "Bank Account Builders",
+    body: "Hired as lead designer at the marketing agency Bank Account Builders. Handled delivery of all client projects including sales funnel design and development and necessary branding assets. Handled back and forth communication with clients ensuring successful project delivery.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2020 → Present",
+    role: "Founder",
+    org: "Conversion Designer (Freelancing)",
+    body: "Begin my own personal freelancing business designing and building sales funnels and websites for clients. I’ve continued freelancing from 2020 till today.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2020 → 2022",
+    role: "Founder",
+    // \n breaks the qualifier onto its own line — .exp-org is pre-line.
+    org: "Conversion Designer Masterclass\n(Design Program)",
+    body: "Created a program teaching beginner and intermediate designers how to design and build high-end sales funnels on the platform ClickFunnels through video courses and live trainings. Sold over $500,000 of revenue of the program and taught over 500 students. Owned a Facebook group giving free instructional content with 12k+ members. Created a software called “Template Builder” using Bubble.io that allowed ClickFunnels users to generate prebuilt layout templates from a massive library of templated sections I created.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2021 → 2022",
+    role: "Co-Founder",
+    org: "InterstellarX",
+    body: "Co-founded a marketing and design agency serving Web3 and Crypto projects during the Web3 boom. We employed 5 employees and I oversaw client relations and delivered on all design-related projects for the agency.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2023 → Present",
+    role: "Creative Lead",
+    org: "USDKG",
+    body: "Founding designer for USDKG, a stablecoin whose gold reserves are backed by the Ministry of Finance of Kyrgyzstan. Ideated and created brand from scratch and handled all things visual for the company, including brand creation, website design and development, document and deck design, social media direction and design, and more.",
+    image: null,
+    alt: "",
+  },
+  {
+    year: "2023 → Present",
+    role: "Co-Founder & Creative Director",
+    org: "TL;DR",
+    body: "Co-founded TL;DR, a first-of-its kind livestreaming software that generates highlight clips of a Twitch or Kick livestream during the livestream, not after. I handle all things visual and user-focused - including brand creation, website design & development, product direction, feature exploration, product design, front end agentic development, B2B decks and presentations, event design, clothing, and more. Till date we have over 35,000+ installs on our TL;DR Twitch Extension.",
+    image: null,
+    alt: "",
+  },
+];
+---
+
+<section class="section exp-band">
+  <div class="exp-viewport">
+    <div class="content-grid exp-head-grid">
+      <header class="full exp-head">
+        <h2 class="fw-title">
+          <span class="mask"><span class="line">Experience</span></span>
+        </h2>
+        <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
+      </header>
+    </div>
+
+    <div class="exp-track">
+      {experience.map((item) => {
+        const bodyEm = (item.body.length / BODY_LINES) * AVG_ADVANCE_EM;
+        // Longer than BODY_LINES lines once capped — top-align those instead,
+        // since there is no short paragraph to sit level with the org name.
+        const runsLong = bodyEm > BODY_MAX_EM;
+        return (
+        <article class="exp-entry">
+          <span class="exp-divider" aria-hidden="true"></span>
+          <span class="exp-dot" aria-hidden="true"></span>
+          <div class:list={["exp-copy", { "exp-copy-long": runsLong }]}>
+            <div class="exp-meta">
+              <span class="mask"><p class="exp-year">{item.year}</p></span>
+              <span class="mask"><p class="exp-role">{item.role}</p></span>
+              <span class="mask"><p class="exp-org">{item.org}</p></span>
+            </div>
+            <span class="mask exp-body-mask">
+              {/* Column sized from the copy's own length so it settles at
+                  BODY_LINES lines: (chars per line) x (average glyph advance).
+                  em, not ch — ch is the width of "0", which in Geist runs ~30%
+                  wider than the real average and pushed every column into the
+                  cap. 0.5em is the usual average advance for proportional
+                  Latin sans and measured within 0.1px here. Capped in CSS, so
+                  an unusually long entry just runs to the cap and wraps on. */}
+              <p class="exp-body" style={`--exp-body-w: ${bodyEm.toFixed(2)}em`}>{item.body}</p>
+            </span>
+          </div>
+          <div class="exp-media">
+            {item.image && (
+              <img
+                src={item.image}
+                alt={item.alt}
+                width="1028"
+                height="630"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+          </div>
+        </article>
+        );
+      })}
+      <div class="exp-ruler" aria-hidden="true">
+        <div class="exp-ruler-fill"></div>
+        <!-- Real tick elements are injected here on desktop only; the gradient
+             layers above stay as the cheap fallback for mobile / reduced
+             motion. See buildTicks() in the script. -->
+        <div class="exp-ticks"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const band = document.querySelector<HTMLElement>(".exp-band");
+  const track = document.querySelector<HTMLElement>(".exp-track");
+
+  // ---------------------------------------------------------------------
+  // Tick magnification, ported from a React/framer-motion "chapter scrubber".
+  // Only the maths carried over: a raised-cosine bump giving every tick its
+  // rise from ONE shared value. There it was a pointer position on a vertical
+  // rail; here it is the scroll playhead on a horizontal one, so the wave is
+  // driven by scrub progress rather than a cursor and needs no springs — the
+  // scrub is already eased by Lenis.
+  // ---------------------------------------------------------------------
+  const WAVE_RADIUS = 6;   // ticks either side of the playhead
+  const REST_SCALE = 0.34; // resting tick height as a fraction of the band
+  const OPACITY_AHEAD = 0.18;
+  const OPACITY_TRAVELLED = 0.55;
+
+  // 1 at the crest, 0 beyond the radius, zero slope at both ends — so the wave
+  // has no seams. This is the whole trick.
+  const bump = (distance: number, radius: number) =>
+    distance >= radius ? 0 : 0.5 * (1 + Math.cos(Math.PI * (distance / radius)));
+
+  if (band && track) {
+    // Desktop, motion-friendly only. matchMedia creates the triggers on entry
+    // and reverts them on exit, so crossing the breakpoint leaves no orphaned
+    // pin-spacer behind.
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+      // The run ends with the last entry's right edge on the right-hand grid
+      // line — GridLines' .gl-d border, which sits at the right page margin,
+      // so the target is (100vw - --margin). That gives a beat of travel past
+      // the final entry without leaving it stranded beside empty canvas.
+      // Function-based so invalidateOnRefresh recomputes on resize rather than
+      // baking in a stale width.
+      // Reads the margin live rather than the cached copy: --margin is a
+      // clamp() of vw, and ScrollTrigger computes the pin's end from dist()
+      // during a refresh, before any of our resize bookkeeping runs. Using the
+      // stale value ended the run short by exactly the margin's delta.
+      const marginNow = () =>
+        parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
+      const dist = () => {
+        const els = track.querySelectorAll<HTMLElement>(".exp-entry");
+        const last = els[els.length - 1];
+        if (!last) return Math.max(0, track.scrollWidth - window.innerWidth);
+        const rightEdge = last.offsetLeft + last.offsetWidth;
+        return Math.max(0, rightEdge - window.innerWidth + marginNow());
+      };
+
+      // The playhead is viewport centre. In track coordinates that is the
+      // distance scrolled plus half a screen — which is exactly how far the
+      // white fill should reach. Set on the track so both ruler layers inherit
+      // it, and so the value is in the same coordinate space their percentages
+      // resolve against.
+      // --- real ticks + magnification wave -----------------------------
+      const ticksHost = track.querySelector<HTMLElement>(".exp-ticks")!;
+      const styles = getComputedStyle(band);
+      const TICK = parseFloat(styles.getPropertyValue("--exp-tick")) || 16;
+      // Mutable: --margin is a clamp() of vw, so it changes on resize. Re-read
+      // whenever the ticks are rebuilt.
+      let margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
+      let ticks: HTMLElement[] = [];
+      // Each tick's rise is fixed in TRACK space, centred on the entry
+      // dividers — so the swell travels left with its entry instead of sitting
+      // still at viewport centre. Computed once per build, not per frame.
+      let riseOf: number[] = [];
+
+      const computeRises = () => {
+        const centres = Array.from(
+          track.querySelectorAll<HTMLElement>(".exp-entry"),
+          (e) => (e.offsetLeft - margin) / TICK,
+        );
+        riseOf = ticks.map((_, i) => {
+          let peak = 0;
+          for (const c of centres) {
+            const r = bump(Math.abs(i - c), WAVE_RADIUS);
+            if (r > peak) peak = r;
+          }
+          return peak;
+        });
+      };
+
+      const buildTicks = () => {
+        margin = marginNow();
+        ticksHost.textContent = "";
+        const count = Math.floor((track.scrollWidth - margin) / TICK) + 1;
+        const frag = document.createDocumentFragment();
+        ticks = Array.from({ length: count }, (_, i) => {
+          const el = document.createElement("span");
+          el.className = "exp-tick";
+          el.style.left = margin + i * TICK + "px";
+          frag.appendChild(el);
+          return el;
+        });
+        ticksHost.appendChild(frag);
+        band.classList.add("has-ticks");
+        computeRises();
+        boundary = -1;
+        // One full pass so every tick starts at its resting swell; after this
+        // only ticks crossing the playhead need repainting.
+        for (let i = 0; i < ticks.length; i++) paintTick(i);
+      };
+
+      // The swell is static in track space, so the only per-frame work is
+      // restyling ticks the playhead has just swept past — usually one.
+      let boundary = -1;
+
+      const baseOpacity = (i: number) =>
+        i <= boundary ? OPACITY_TRAVELLED : OPACITY_AHEAD;
+      const paintTick = (i: number) => {
+        const el = ticks[i];
+        if (!el) return;
+        const rise = riseOf[i] ?? 0;
+        const b = baseOpacity(i);
+        el.style.opacity = String(b + rise * (1 - b));
+        el.style.transform = `scaleY(${REST_SCALE + rise * (1 - REST_SCALE)})`;
+      };
+
+      const paintWave = (playhead: number) => {
+        if (!ticks.length) return;
+        const nextBoundary = Math.min(
+          ticks.length - 1,
+          Math.floor((playhead - margin) / TICK),
+        );
+        if (nextBoundary === boundary) return;
+        const from = Math.max(0, Math.min(boundary, nextBoundary));
+        const to = Math.max(boundary, nextBoundary);
+        boundary = nextBoundary;
+        for (let i = from; i <= to; i++) paintTick(i);
+      };
+
+      buildTicks();
+
+      const setPlayhead = (progress: number) => {
+        const playhead = progress * dist() + window.innerWidth / 2;
+        track.style.setProperty("--exp-fill", playhead + "px");
+        track.style.setProperty("--exp-glow", playhead + "px");
+        paintWave(playhead);
+      };
+
+      const horiz = gsap.to(track, {
+        x: () => -dist(),
+        ease: "none",
+        scrollTrigger: {
+          // The <section> is the pin target on purpose: GSAP wraps a pinned
+          // element in a .pin-spacer that replaces it as its parent's child,
+          // so pinning anything inside .content-grid would break the
+          // ".content-grid > .full" placement. main.content is a plain block,
+          // so a spacer inserted there is harmless.
+          trigger: band,
+          pin: band,
+          start: "top top",
+          end: () => "+=" + dist(),
+          scrub: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => setPlayhead(self.progress),
+          // onUpdate only fires once progress CHANGES, so without this the
+          // ruler would show no fill at all until the first scroll — when
+          // everything left of centre should already read as travelled.
+          // onRefresh also covers resize, where dist() changes underneath us.
+          onRefresh: (self) => {
+            // Resize changes both --margin and the track width, so the ticks
+            // need re-laying out and their rises recomputing before the
+            // playhead is repainted against them.
+            buildTicks();
+            setPlayhead(self.progress);
+          },
+        },
+      });
+
+      setPlayhead(0);
+
+      const entries = gsap.utils.toArray<HTMLElement>(".exp-entry");
+
+      entries.forEach((entry) => {
+        const risers = entry.querySelectorAll<HTMLElement>(".mask > *");
+        const media = entry.querySelector<HTMLElement>(".exp-media");
+        const divider = entry.querySelector<HTMLElement>(".exp-divider");
+
+        // Beat 1 — as the entry slides in from the right. Same riser language
+        // as every other section on the page.
+        if (risers.length) {
+          gsap.from(risers, {
+            yPercent: 110,
+            duration: 0.9,
+            ease: "power4.out",
+            stagger: 0.09,
+            scrollTrigger: {
+              trigger: entry,
+              containerAnimation: horiz,
+              start: "left 85%",
+              once: true,
+            },
+          });
+        }
+
+        if (media) {
+          gsap.from(media, {
+            opacity: 0,
+            duration: 0.9,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: entry,
+              containerAnimation: horiz,
+              start: "left 85%",
+              once: true,
+            },
+          });
+        }
+
+        // Beat 2 — the divider locks in at the playhead (viewport centre), so a
+        // line is white only once it is behind the playhead, matching the ruler.
+        // The dot lands just as the line finishes drawing up to meet it.
+        if (divider) {
+          const dot = entry.querySelector<HTMLElement>(".exp-dot");
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: entry,
+              containerAnimation: horiz,
+              start: "left 50%",
+              toggleActions: "play none none reverse",
+            },
+          });
+          tl.to(divider, { scaleY: 1, duration: 0.7, ease: "power3.out" });
+          if (dot) {
+            tl.to(dot, { scale: 1, duration: 0.4, ease: "back.out(2)" }, 0.3);
+          }
+        }
+      });
+
+      return () => {
+        horiz.scrollTrigger?.kill();
+        horiz.kill();
+        gsap.set(track, { clearProps: "transform" });
+        ticksHost.textContent = "";
+        band.classList.remove("has-ticks");
+        ticks = [];
+      };
+    });
+  }
+</script>
+
+<style>
+  /* Pinned viewport. Height is exactly one screen — GSAP adds the scroll
+     distance via its pin-spacer, so .section's min-height must be neutralised
+     or the band would be taller than the pin and the track would sit low. */
+  /* Declares its own column layout rather than inheriting .section's. Astro
+     scopes styles per file, so index.astro's ".section { display:flex }" never
+     reaches this element — it carries this component's scope hash, not that
+     one's. The .section class is kept for semantics and for the DOM-wide
+     reveal selector, but its layout must be restated here. */
+  /* The ruler's tick pitch is the unit this timeline is built on: a divider
+     must land ON a tick, not between two. That forces the divider-to-divider
+     pitch to be a whole number of ticks. --wide (920px) is not a multiple of
+     the 16px tick, so the gap carries the 8px correction:
+       920 + 136 = 1056 = 66 ticks exactly.
+     The ruler's gradient is then phase-shifted by --margin so its first tick
+     sits under the first divider. Both parts are needed — without the pitch
+     fix, dividers alternate on/off the grid by 8px. */
+  .exp-band {
+    --exp-tick: var(--space-2);                          /* 16px pitch */
+    --exp-tick-h: var(--space-3);                        /* 24px tall  */
+    --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
+    --exp-rule: 1px;                                     /* hairline   */
+    /* Meta type metrics, hoisted so the divider can start at the year's
+       optical centre without restating them. */
+    --exp-meta-size: 14px;
+    --exp-meta-lh: 1.35;
+    --exp-meta-half: calc(var(--exp-meta-size) * var(--exp-meta-lh) / 2);
+    /* Track's bottom padding: the ruler occupies --exp-tick-h of it, and the
+       remainder is clear space so the media panel never touches the timeline. */
+    --exp-track-pad-b: calc(var(--exp-tick-h) + var(--space-5));
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .exp-viewport {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .exp-head-grid { padding-block-start: var(--space-6); }
+  /* .full spans the grid edge to edge, margins included — inset it to the page
+     margin so the title lines up with the track's first entry. */
+  .exp-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-inline: var(--margin);
+  }
+  .exp-blurb {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: right;
+  }
+
+  /* The translating element. position:relative so the ruler can pin to its
+     bottom edge and span the whole track rather than one screen.
+
+     width:max-content + align-self:flex-start are load-bearing: .exp-viewport
+     is a flex column, so the default align-self:stretch would size the track to
+     the viewport and let its entries overflow. The ruler is absolutely
+     positioned with inset-inline:0, so it would then span one screen instead of
+     the whole timeline. max-content makes the track's own box equal its
+     content, which is also what makes track.scrollWidth meaningful. */
+  .exp-track {
+    position: relative;
+    flex: 1;
+    /* Without this the flex item's auto min-height lets tall content grow the
+       track past the band, which drags the ruler below the fold. */
+    min-height: 0;
+    align-self: flex-start;
+    width: max-content;
+    display: flex;
+    align-items: stretch;
+    gap: var(--exp-gap);
+    padding-block: var(--space-6) var(--exp-track-pad-b);
+    padding-inline-start: var(--margin);
+    /* The run overshoots the track's own content width by exactly --margin
+       (it ends with the last entry on the right grid line, not on the screen
+       edge). Matching that here keeps the ruler running to the viewport edge
+       instead of stopping short with blank canvas beside it — and it makes the
+       track's inline padding symmetric. */
+    padding-inline-end: var(--margin);
+    will-change: transform;
+  }
+
+  .exp-entry {
+    position: relative;
+    flex: 0 0 var(--wide);
+    width: var(--wide);
+    padding-inline-start: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  /* Rests invisible — the ruler's own tick is what you see at this position.
+     Task 5 grows it to full height and whitens it as it reaches the playhead. */
+  /* Extends past the entry's bottom edge and THROUGH the tick band to the
+     track's bottom, matching the Figma where the divider spans the full 938px
+     including the 27px ruler. Stopping at the ruler's top edge reads as a
+     disconnected line floating above the track. */
+  /* Starts at the year's line-box centre, not the entry's top, so the dot that
+     caps it reads as level with "2018" rather than floating half a line above.
+     The meta stack begins at the entry top in both alignment modes, so half a
+     meta line is exactly the offset needed. */
+  .exp-divider {
+    position: absolute;
+    inset-block: var(--exp-meta-half) calc(-1 * var(--exp-track-pad-b));
+    inset-inline-start: 0;
+    width: var(--exp-rule);
+    background: #fff;
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+
+  /* Figma 2462:22902 — meta stack on the left, body paragraph pushed to the
+     entry's right edge (there: a 470px column at x=558 of 1028). The paragraph
+     block is right-aligned; its text stays ragged-right. */
+  /* flex-end so the paragraph's LAST line sits on the same line as the org
+     name, rather than both blocks starting level at the top. True baseline
+     alignment is not available here: .mask uses overflow:clip, which makes an
+     element's baseline its own bottom edge, so `last baseline` would collapse
+     to this anyway. Both sides end in a .mask carrying the same
+     padding/negative-margin pair, so the box edges track the text. */
+  /* Cap on the divider. A sibling rather than a ::before on the line itself,
+     because the line is scaleY-animated and would squash the circle into an
+     ellipse as it grows.
+
+     Centred with box offsets rather than a translate. GSAP's CSSPlugin
+     consolidates everything into `transform` and sets the standalone
+     translate/rotate/scale properties to `none`, so a `translate:` used for
+     centring is wiped the moment the dot animates — it drifted 3.5px right and
+     4px low. Negative insets leave `transform` free for the scale, which then
+     runs about the dot's own centre. */
+  .exp-dot {
+    position: absolute;
+    inset-block-start: calc(var(--exp-meta-half) - var(--space-1) / 2);
+    inset-inline-start: calc(var(--exp-rule) / 2 - var(--space-1) / 2);
+    width: var(--space-1);
+    height: var(--space-1);
+    border-radius: 50%;
+    background: #fff;
+    transform: scale(0);
+  }
+
+  .exp-copy {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+  }
+  /* Copy that runs past BODY_LINES lines has no short paragraph to sit level
+     with the org name — and because it is the taller of the two blocks,
+     flex-end would push the meta stack DOWN rather than lift the paragraph.
+     Top-align those so both blocks start level instead. */
+  .exp-copy.exp-copy-long {
+    align-items: flex-start;
+  }
+  .exp-meta {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .exp-body-mask {
+    flex: 0 1 auto;
+    margin-inline-start: auto;
+  }
+  /* 14px/1.35 gives the Figma's 19px line boxes and 27px stack pitch. Driven
+     from the same variables the divider's start offset uses, so the line and
+     the year cannot drift apart. */
+  .exp-year,
+  .exp-role,
+  .exp-org {
+    margin: 0;
+    font-size: var(--exp-meta-size);
+    line-height: var(--exp-meta-lh);
+    letter-spacing: -0.01em;
+  }
+  .exp-year,
+  .exp-role { color: rgba(255, 255, 255, 0.65); }
+  /* pre-line so an org can carry an explicit \n to break a long qualifier onto
+     its own line, without needing markup in the data. */
+  .exp-org { color: #fff; white-space: pre-line; }
+  .exp-body {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    /* --exp-body-w is set per entry from its own length (see the template) so
+       short and long copy both settle around BODY_LINES lines instead of every
+       column being one fixed width. The cap is the old fixed measure: past it
+       the column stops widening and the copy simply wraps further, which is
+       what the longest entry does. */
+    max-width: min(
+      var(--exp-body-w, 34em),
+      calc(var(--measure) - var(--space-7))
+    );
+    /* Evens out the ragged edge so the block reads as a tidy paragraph rather
+       than one long line and one orphan. */
+    text-wrap: balance;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  /* Fills the height left over after the copy rather than taking a fixed
+     ratio. The Figma frame is 1182 tall; a real viewport is ~900, so a
+     1028/630 box at 920 wide (564px) would push the ruler off-screen. Letting
+     it flex keeps the whole entry inside the pin at any viewport height.
+     min-height:0 is required or the flex item refuses to shrink. */
+  /* 16:9 rather than the Figma's 1028/630 — a shorter panel that leaves clear
+     air above the timeline. The entry still stretches to the full track height
+     (so the divider spans it); the panel simply does not fill it. */
+  /* flex-shrink stays enabled as a safety valve: 16:9 on every entry that
+     fits, and on an unusually long one the panel gives up a little height
+     rather than pushing the ruler out of the band. */
+  .exp-media {
+    position: relative;
+    flex: 0 1 auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+  }
+  .exp-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Ruler spans the full track, sitting on the track's bottom edge. Ticks are
+     a single repeating gradient — one element regardless of track length,
+     instead of the ~525 rectangles the Figma draws. */
+  .exp-ruler {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: var(--exp-tick-h);
+    background: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.25) 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
+    );
+    /* Phase-shift so the first tick sits under the first divider, which is
+       inset by the track's --margin padding. */
+    background-position-x: var(--margin);
+  }
+
+  /* White ticks in the same phase as the base strip, revealed left-to-right by
+     a clip-path driven from scroll progress. --exp-fill is written by the
+     script in the track's own coordinate space, which is the space this
+     element's percentages resolve against. */
+  .exp-ruler-fill {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to right,
+      #fff 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
+    );
+    background-position-x: var(--margin);
+    clip-path: inset(0 calc(100% - var(--exp-fill, 0px)) 0 0);
+  }
+
+  /* Soft window riding the playhead. Sits above the fill so ticks brighten as
+     they pass through it, then settle to the flat white of the fill behind. */
+  .exp-ruler::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to right,
+      #fff 0 var(--exp-rule),
+      transparent var(--exp-rule) var(--exp-tick)
+    );
+    background-position-x: var(--margin);
+    -webkit-mask-image: radial-gradient(
+      circle at var(--exp-glow, 0px) 50%,
+      #000 0,
+      transparent var(--space-8)
+    );
+    mask-image: radial-gradient(
+      circle at var(--exp-glow, 0px) 50%,
+      #000 0,
+      transparent var(--space-8)
+    );
+    pointer-events: none;
+  }
+
+  /* Real ticks — injected on desktop only. Each is a full-height bar scaled
+     down at rest; the wave raises scaleY and opacity together. Both are
+     compositor properties, so ~13 writes a frame stay off the layout path. */
+  .exp-ticks { position: absolute; inset: 0; }
+  /* :global() is required — these spans are created by document.createElement
+     and so never receive Astro's data-astro-cid-* scope attribute, which means
+     a plain scoped selector cannot match them and they render unstyled.
+     Nested under the scoped .exp-ticks so it does not leak site-wide. */
+  .exp-ticks :global(.exp-tick) {
+    position: absolute;
+    inset-block-end: 0;
+    width: var(--exp-rule);
+    height: 100%;
+    background: #fff;
+    transform: scaleY(0.34);
+    transform-origin: bottom;
+    opacity: 0.18;
+  }
+
+  /* With real ticks live, the gradient layers would double-draw. They stay in
+     the markup as the mobile / reduced-motion fallback. */
+  .exp-band.has-ticks .exp-ruler { background-image: none; }
+  .exp-band.has-ticks .exp-ruler-fill,
+  .exp-band.has-ticks .exp-ruler::after { display: none; }
+
+  /* Below 900px, and for reduced motion, no JS runs (see the matchMedia query
+     in the script) — so the section must be a plain vertical stack on its own.
+     The fallback is an absence of behaviour, not a branch that undoes things. */
+  @media (max-width: 899px), (prefers-reduced-motion: reduce) {
+    .exp-band {
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+    .exp-viewport { overflow: visible; }
+    .exp-track {
+      flex-direction: column;
+      /* Undo the desktop max-content sizing — stacked entries want full width. */
+      width: 100%;
+      align-self: stretch;
+      gap: var(--space-7);
+      padding-inline: var(--margin);
+      padding-block-end: var(--space-6);
+      will-change: auto;
+    }
+    .exp-entry {
+      flex: 0 0 auto;
+      width: 100%;
+      padding-inline-start: var(--space-4);
+    }
+    /* Stacked entries have no fixed height, so the media must not shrink. */
+    .exp-media {
+      flex: 0 0 auto;
+      aspect-ratio: 16 / 9;
+    }
+    /* The desktop meta-left / body-right split has no room on a phone.
+       align-items must go back to the start or the desktop's flex-end would
+       right-align the stacked blocks once the axis flips to a column. */
+    .exp-copy {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+    .exp-body-mask { margin-inline-start: 0; }
+    .exp-body { max-width: none; }
+    /* Rules read as timeline markers when stacked, so show them at rest. The
+       desktop overhang into the tick band is undone — there is no ruler here,
+       so it would just dangle past each card. */
+    .exp-divider {
+      inset-block: var(--exp-meta-half) 0;
+      transform: scaleY(1);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    /* No JS here to animate it in, so it rests visible and matches the rule. */
+    .exp-dot {
+      transform: scale(1);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .exp-head { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+    .exp-blurb { text-align: left; }
+    .exp-ruler { display: none; }
+    .exp-ruler-fill { display: none; }
+    .exp-ruler::after { display: none; }
+  }
+</style>

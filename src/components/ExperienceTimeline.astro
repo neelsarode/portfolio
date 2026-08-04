@@ -24,7 +24,10 @@ const experience = [
     role: "Lead Designer",
     org: "Bank Account Builders",
     body: "Hired as lead designer at the marketing agency Bank Account Builders. Handled delivery of all client projects including sales funnel design and development and necessary branding assets. Handled back and forth communication with clients ensuring successful project delivery.",
-    image: "/exp-bank-account-builders.jpg",
+    // ?v= bumps the cache key without renaming the file. Media is served with
+    // max-age=86400, so re-encoding under the same URL would leave returning
+    // visitors on the previous image for up to a day.
+    image: "/exp-bank-account-builders.jpg?v=2",
     alt: "Client work from the Bank Account Builders era: sales funnel and landing page designs, before-and-after redesigns of two course funnels, and a photo of the team at the agency house in Scottsdale.",
   },
   {
@@ -264,19 +267,12 @@ const experience = [
       ScrollTrigger.addEventListener("refreshInit", sizeEntries);
       sizeEntries();
 
-      // refreshInit alone did not re-run on a live window resize — the entry
-      // stayed at its load-time width and the panel went back out of ratio.
-      // Drive it from the resize event directly and refresh afterwards, so the
-      // pin distance and ticks follow the new width.
-      let resizeTimer: number | undefined;
-      const onResize = () => {
-        window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(() => {
-          sizeEntries();
-          ScrollTrigger.refresh();
-        }, 150);
-      };
-      window.addEventListener("resize", onResize);
+      // No separate resize listener here on purpose. ScrollTrigger already
+      // refreshes on resize and fires refreshInit first, which is exactly what
+      // sizeEntries needs. An earlier version added its own listener that
+      // called ScrollTrigger.refresh(), and because refreshInit mutates layout
+      // that recursed — refresh triggering refresh until it threw
+      // "Cannot read properties of undefined (reading 'end')".
 
       let ticks: HTMLElement[] = [];
       // Each tick's rise is fixed in TRACK space, centred on the entry
@@ -450,8 +446,6 @@ const experience = [
 
       return () => {
         ScrollTrigger.removeEventListener("refreshInit", sizeEntries);
-        window.removeEventListener("resize", onResize);
-        window.clearTimeout(resizeTimer);
         band.style.removeProperty("--exp-entry-w");
         horiz.scrollTrigger?.kill();
         horiz.kill();

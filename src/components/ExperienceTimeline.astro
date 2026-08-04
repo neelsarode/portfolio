@@ -24,8 +24,8 @@ const experience = [
     role: "Lead Designer",
     org: "Bank Account Builders",
     body: "Hired as lead designer at the marketing agency Bank Account Builders. Handled delivery of all client projects including sales funnel design and development and necessary branding assets. Handled back and forth communication with clients ensuring successful project delivery.",
-    image: null,
-    alt: "",
+    image: "/exp-bank-account-builders.jpg",
+    alt: "Client work from the Bank Account Builders era: sales funnel and landing page designs, before-and-after redesigns of two course funnels, and a photo of the team at the agency house in Scottsdale.",
   },
   {
     year: "2020 → Present",
@@ -72,16 +72,20 @@ const experience = [
 ---
 
 <section class="section exp-band">
-  <div class="exp-viewport">
-    <div class="content-grid exp-head-grid">
-      <header class="full exp-head">
-        <h2 class="fw-title">
-          <span class="mask"><span class="line">Experience</span></span>
-        </h2>
-        <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
-      </header>
-    </div>
+  {/* Header is a sibling of the stage, not inside it, so a short viewport can
+      pin the stage alone and let the header scroll away — buying back its
+      height for the entries. On tall viewports the whole band pins and the
+      header rides along at the top. */}
+  <div class="content-grid exp-head-grid">
+    <header class="full exp-head">
+      <h2 class="fw-title">
+        <span class="mask"><span class="line">Experience</span></span>
+      </h2>
+      <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
+    </header>
+  </div>
 
+  <div class="exp-viewport">
     <div class="exp-track">
       {experience.map((item) => {
         const bodyEm = (item.body.length / BODY_LINES) * AVG_ADVANCE_EM;
@@ -114,8 +118,8 @@ const experience = [
               <img
                 src={item.image}
                 alt={item.alt}
-                width="1028"
-                height="630"
+                width="1920"
+                height="1080"
                 loading="lazy"
                 decoding="async"
               />
@@ -168,13 +172,27 @@ const experience = [
     // pin-spacer behind.
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+    // Two conditions rather than one query: which element gets pinned depends
+    // on whether there is room for the header inside the pinned screen. GSAP
+    // re-runs this when the condition flips, so a resize across 950px rebuilds
+    // against the right target.
+    mm.add(
+      {
+        tall: "(min-width: 900px) and (prefers-reduced-motion: no-preference) and (min-height: 950px)",
+        short: "(min-width: 900px) and (prefers-reduced-motion: no-preference) and (max-height: 949px)",
+      },
+      (ctx) => {
+      const viewport = band.querySelector<HTMLElement>(".exp-viewport")!;
+      // Tall: pin the whole band, header included. Short: pin only the stage,
+      // so the header scrolls away and its height goes to the entries.
+      const pinTarget = ctx.conditions?.tall ? band : viewport;
       // The run ends with the last entry's right edge on the right-hand grid
       // line — GridLines' .gl-d border, which sits at the right page margin,
       // so the target is (100vw - --margin). That gives a beat of travel past
       // the final entry without leaving it stranded beside empty canvas.
       // Function-based so invalidateOnRefresh recomputes on resize rather than
       // baking in a stale width.
+
       // Reads the margin live rather than the cached copy: --margin is a
       // clamp() of vw, and ScrollTrigger computes the pin's end from dist()
       // during a refresh, before any of our resize bookkeeping runs. Using the
@@ -202,6 +220,63 @@ const experience = [
       // Mutable: --margin is a clamp() of vw, so it changes on resize. Re-read
       // whenever the ticks are rebuilt.
       let margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
+      // The 16:9 panel is fixed; the entry's WIDTH yields instead. On a short
+      // window a full-width panel would be taller than the band, and the
+      // flex-shrink valve would squash it out of ratio — so the width is
+      // derived from whatever vertical space is left once the header, the
+      // track's padding and the tallest copy row have taken theirs.
+      const sizeEntries = () => {
+        const first = track.querySelector<HTMLElement>(".exp-entry");
+        if (!first) return;
+        // Clear the override so the entry falls back to --exp-entry-max, then
+        // MEASURE it. Reading the custom property directly returns its literal
+        // text — "calc(var(--wide) + var(--space-8))" — which parseFloat turns
+        // into NaN, collapsing the whole calculation.
+        band.style.removeProperty("--exp-entry-w");
+        const maxW = first.getBoundingClientRect().width;
+
+        const tcs = getComputedStyle(track);
+        const contentH =
+          track.clientHeight -
+          parseFloat(tcs.paddingTop) -
+          parseFloat(tcs.paddingBottom);
+        const ecs = getComputedStyle(first);
+        const stackGap = parseFloat(ecs.rowGap) || 0;
+        const inset = parseFloat(ecs.paddingInlineStart) || 0;
+        const tallestCopy = Math.max(
+          ...Array.from(
+            track.querySelectorAll<HTMLElement>(".exp-copy"),
+            (c) => c.offsetHeight,
+          ),
+        );
+
+        const mediaH = contentH - tallestCopy - stackGap;
+        let w = Math.min(maxW, (mediaH * 16) / 9 + inset);
+        // Pitch is w + --exp-gap, and --exp-gap is 8 past a tick multiple, so w
+        // must also sit 8 past one for the dividers to stay on the ruler grid.
+        w = Math.floor((w - 8) / TICK) * TICK + 8;
+        band.style.setProperty("--exp-entry-w", Math.max(TICK, w) + "px");
+      };
+
+      // Runs before ScrollTrigger measures, so the pin distance and the tick
+      // layout are both computed against the final width.
+      ScrollTrigger.addEventListener("refreshInit", sizeEntries);
+      sizeEntries();
+
+      // refreshInit alone did not re-run on a live window resize — the entry
+      // stayed at its load-time width and the panel went back out of ratio.
+      // Drive it from the resize event directly and refresh afterwards, so the
+      // pin distance and ticks follow the new width.
+      let resizeTimer: number | undefined;
+      const onResize = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => {
+          sizeEntries();
+          ScrollTrigger.refresh();
+        }, 150);
+      };
+      window.addEventListener("resize", onResize);
 
       let ticks: HTMLElement[] = [];
       // Each tick's rise is fixed in TRACK space, centred on the entry
@@ -291,8 +366,8 @@ const experience = [
           // so pinning anything inside .content-grid would break the
           // ".content-grid > .full" placement. main.content is a plain block,
           // so a spacer inserted there is harmless.
-          trigger: band,
-          pin: band,
+          trigger: pinTarget,
+          pin: pinTarget,
           start: "top top",
           end: () => "+=" + dist(),
           scrub: true,
@@ -374,6 +449,10 @@ const experience = [
       });
 
       return () => {
+        ScrollTrigger.removeEventListener("refreshInit", sizeEntries);
+        window.removeEventListener("resize", onResize);
+        window.clearTimeout(resizeTimer);
+        band.style.removeProperty("--exp-entry-w");
         horiz.scrollTrigger?.kill();
         horiz.kill();
         gsap.set(track, { clearProps: "transform" });
@@ -381,7 +460,8 @@ const experience = [
         band.classList.remove("has-ticks");
         ticks = [];
       };
-    });
+      },
+    );
   }
 </script>
 
@@ -406,6 +486,7 @@ const experience = [
     --exp-tick: var(--space-2);                          /* 16px pitch */
     --exp-tick-h: var(--space-3);                        /* 24px tall  */
     --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
+    --exp-entry-max: calc(var(--wide) + var(--space-8)); /* 1048px     */
     --exp-rule: 1px;                                     /* hairline   */
     /* Meta type metrics, hoisted so the divider can start at the year's
        optical centre without restating them. */
@@ -430,7 +511,32 @@ const experience = [
     overflow: hidden;
   }
 
-  .exp-head-grid { padding-block-start: var(--space-6); }
+  .exp-head-grid { padding-block-start: var(--space-6); flex: 0 0 auto; }
+
+  /* Short viewports (laptops): the band grows instead of being a fixed screen,
+     the stage alone is a screen tall, and the script pins the stage rather
+     than the band. The header scrolls away above it, handing its ~116px back
+     to the entries — enough at 900px tall to take them from 936px to their
+     1048px cap. Above this height there is room for both, so the band pins
+     whole and the header stays put, as before. */
+  @media (max-height: 949px) {
+    /* display:block, not flex, is load-bearing here. GSAP reserves a pin's
+       scroll distance as padding-bottom on its spacer — but when the pinned
+       element's parent is a flex container it takes a different path and
+       reserves nothing, so the spacer stayed one screen tall against a
+       5412px run and every section below rode up over the pinned stage.
+       The stage is a fixed height in this mode, so it has no need of flex. */
+    .exp-band {
+      display: block;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+    .exp-viewport {
+      flex: 0 0 auto;
+      height: 100svh;
+    }
+  }
   /* .full spans the grid edge to edge, margins included — inset it to the page
      margin so the title lines up with the track's first entry. */
   .exp-head {
@@ -480,10 +586,13 @@ const experience = [
     will-change: transform;
   }
 
+  /* --exp-entry-w is written by sizeEntries() in the script: the widest the
+     entry can be while its 16:9 panel still fits the band's height, capped at
+     --exp-entry-max. The fallback here is what a no-JS render gets. */
   .exp-entry {
     position: relative;
-    flex: 0 0 var(--wide);
-    width: var(--wide);
+    flex: 0 0 var(--exp-entry-w, var(--exp-entry-max));
+    width: var(--exp-entry-w, var(--exp-entry-max));
     padding-inline-start: var(--space-4);
     display: flex;
     flex-direction: column;

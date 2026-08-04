@@ -175,6 +175,7 @@ const experience = [
       // the final entry without leaving it stranded beside empty canvas.
       // Function-based so invalidateOnRefresh recomputes on resize rather than
       // baking in a stale width.
+
       // Reads the margin live rather than the cached copy: --margin is a
       // clamp() of vw, and ScrollTrigger computes the pin's end from dist()
       // during a refresh, before any of our resize bookkeeping runs. Using the
@@ -202,6 +203,63 @@ const experience = [
       // Mutable: --margin is a clamp() of vw, so it changes on resize. Re-read
       // whenever the ticks are rebuilt.
       let margin = parseFloat(getComputedStyle(track).paddingInlineStart) || 0;
+
+      // The 16:9 panel is fixed; the entry's WIDTH yields instead. On a short
+      // window a full-width panel would be taller than the band, and the
+      // flex-shrink valve would squash it out of ratio — so the width is
+      // derived from whatever vertical space is left once the header, the
+      // track's padding and the tallest copy row have taken theirs.
+      const sizeEntries = () => {
+        const first = track.querySelector<HTMLElement>(".exp-entry");
+        if (!first) return;
+        // Clear the override so the entry falls back to --exp-entry-max, then
+        // MEASURE it. Reading the custom property directly returns its literal
+        // text — "calc(var(--wide) + var(--space-8))" — which parseFloat turns
+        // into NaN, collapsing the whole calculation.
+        band.style.removeProperty("--exp-entry-w");
+        const maxW = first.getBoundingClientRect().width;
+
+        const tcs = getComputedStyle(track);
+        const contentH =
+          track.clientHeight -
+          parseFloat(tcs.paddingTop) -
+          parseFloat(tcs.paddingBottom);
+        const ecs = getComputedStyle(first);
+        const stackGap = parseFloat(ecs.rowGap) || 0;
+        const inset = parseFloat(ecs.paddingInlineStart) || 0;
+        const tallestCopy = Math.max(
+          ...Array.from(
+            track.querySelectorAll<HTMLElement>(".exp-copy"),
+            (c) => c.offsetHeight,
+          ),
+        );
+
+        const mediaH = contentH - tallestCopy - stackGap;
+        let w = Math.min(maxW, (mediaH * 16) / 9 + inset);
+        // Pitch is w + --exp-gap, and --exp-gap is 8 past a tick multiple, so w
+        // must also sit 8 past one for the dividers to stay on the ruler grid.
+        w = Math.floor((w - 8) / TICK) * TICK + 8;
+        band.style.setProperty("--exp-entry-w", Math.max(TICK, w) + "px");
+      };
+
+      // Runs before ScrollTrigger measures, so the pin distance and the tick
+      // layout are both computed against the final width.
+      ScrollTrigger.addEventListener("refreshInit", sizeEntries);
+      sizeEntries();
+
+      // refreshInit alone did not re-run on a live window resize — the entry
+      // stayed at its load-time width and the panel went back out of ratio.
+      // Drive it from the resize event directly and refresh afterwards, so the
+      // pin distance and ticks follow the new width.
+      let resizeTimer: number | undefined;
+      const onResize = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => {
+          sizeEntries();
+          ScrollTrigger.refresh();
+        }, 150);
+      };
+      window.addEventListener("resize", onResize);
 
       let ticks: HTMLElement[] = [];
       // Each tick's rise is fixed in TRACK space, centred on the entry
@@ -374,6 +432,10 @@ const experience = [
       });
 
       return () => {
+        ScrollTrigger.removeEventListener("refreshInit", sizeEntries);
+        window.removeEventListener("resize", onResize);
+        window.clearTimeout(resizeTimer);
+        band.style.removeProperty("--exp-entry-w");
         horiz.scrollTrigger?.kill();
         horiz.kill();
         gsap.set(track, { clearProps: "transform" });
@@ -406,6 +468,7 @@ const experience = [
     --exp-tick: var(--space-2);                          /* 16px pitch */
     --exp-tick-h: var(--space-3);                        /* 24px tall  */
     --exp-gap: calc(var(--space-8) + var(--space-1));    /* 136px      */
+    --exp-entry-max: calc(var(--wide) + var(--space-8)); /* 1048px     */
     --exp-rule: 1px;                                     /* hairline   */
     /* Meta type metrics, hoisted so the divider can start at the year's
        optical centre without restating them. */
@@ -480,13 +543,13 @@ const experience = [
     will-change: transform;
   }
 
-  /* --wide plus one scale step. The +8px that --space-8 carries over --wide
-     keeps the pitch (entry + --exp-gap = 1184px) a whole 74 ticks, so the
-     dividers stay on the ruler grid. */
+  /* --exp-entry-w is written by sizeEntries() in the script: the widest the
+     entry can be while its 16:9 panel still fits the band's height, capped at
+     --exp-entry-max. The fallback here is what a no-JS render gets. */
   .exp-entry {
     position: relative;
-    flex: 0 0 calc(var(--wide) + var(--space-8));
-    width: calc(var(--wide) + var(--space-8));
+    flex: 0 0 var(--exp-entry-w, var(--exp-entry-max));
+    width: var(--exp-entry-w, var(--exp-entry-max));
     padding-inline-start: var(--space-4);
     display: flex;
     flex-direction: column;

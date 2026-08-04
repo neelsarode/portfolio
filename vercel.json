@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "headers": [
+    {
+      "//": "Media in public/ ships under stable, non-fingerprinted names, so Vercel's default (max-age=0, must-revalidate) makes every repeat visit re-download the video. A day of freshness plus a month of stale-while-revalidate keeps return visits instant while still letting a swapped file propagate within a day. Not 'immutable' precisely because the names are stable — a re-encoded cover reuses its filename.",
+      "source": "/:file(.+).(mp4|webm|jpg|jpeg|png|svg|woff2)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=2592000"
+        }
+      ]
+    }
+  ]
+}

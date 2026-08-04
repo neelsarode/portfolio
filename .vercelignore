@@ -1,0 +1,10 @@
+# Large source videos sitting in public/ that nothing references. They are
+# untracked, so a Git-based build never sees them — but a CLI deploy uploads
+# the working directory, where they add ~74MB to the payload for no benefit.
+public/Home-page-intro-video.webm
+public/home-page-intro-video-2.webm
+public/TLDR Dashboard Animation.mp4
+
+# Not part of the build.
+.worktrees
+docs

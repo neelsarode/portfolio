@@ -671,17 +671,49 @@ const sections = [
     // 15-20 tiles would stack up hot decoders.
     const gatedVideos = document.querySelectorAll<HTMLVideoElement>(".fw-video, .wd-video");
     if (gatedVideos.length) {
+      const nearViewport = (v: HTMLVideoElement) => {
+        const r = v.getBoundingClientRect();
+        return r.bottom > -160 && r.top < window.innerHeight + 160;
+      };
+
+      // play() rejects for transient reasons — the commonest being a tab
+      // loaded in the BACKGROUND, where Chrome refuses playback outright, but
+      // also decoder pressure or an interrupted load. This used to be
+      // `.catch(() => {})`, which meant one rejection left the tile on its
+      // poster permanently: the observer only fires again when the
+      // intersection CHANGES, and that never happens for someone already
+      // looking at it. Retry with backoff while the element is still near the
+      // viewport.
+      const tryPlay = (v: HTMLVideoElement, attempt = 0) => {
+        if (!v.isConnected || !nearViewport(v)) return;
+        v.play().catch(() => {
+          if (attempt < 4) {
+            setTimeout(() => tryPlay(v, attempt + 1), 300 * 2 ** attempt);
+          }
+        });
+      };
+
       const io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
             const v = e.target as HTMLVideoElement;
-            if (e.isIntersecting) v.play().catch(() => {});
+            if (e.isIntersecting) tryPlay(v);
             else v.pause();
           }
         },
         { rootMargin: "160px 0px" } // start loading/playing just before entry
       );
       gatedVideos.forEach((v) => io.observe(v));
+
+      // Every play() during a background load is rejected, and returning to
+      // the tab fires no intersection change — so nothing would ever restart.
+      // Re-attempt whatever is on screen and paused when the tab is revealed.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState !== "visible") return;
+        gatedVideos.forEach((v) => {
+          if (v.paused && nearViewport(v)) tryPlay(v);
+        });
+      });
     }
 
     // :not(.exp-band) — the Experience timeline reveals its entries from their

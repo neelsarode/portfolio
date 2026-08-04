@@ -520,9 +520,17 @@ const experience = [
      1048px cap. Above this height there is room for both, so the band pins
      whole and the header stays put, as before. */
   @media (max-height: 949px) {
+    /* display:block, not flex, is load-bearing here. GSAP reserves a pin's
+       scroll distance as padding-bottom on its spacer — but when the pinned
+       element's parent is a flex container it takes a different path and
+       reserves nothing, so the spacer stayed one screen tall against a
+       5412px run and every section below rode up over the pinned stage.
+       The stage is a fixed height in this mode, so it has no need of flex. */
     .exp-band {
+      display: block;
       height: auto;
       min-height: 0;
+      overflow: visible;
     }
     .exp-viewport {
       flex: 0 0 auto;

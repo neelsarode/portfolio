@@ -480,10 +480,13 @@ const experience = [
     will-change: transform;
   }
 
+  /* --wide plus one scale step. The +8px that --space-8 carries over --wide
+     keeps the pitch (entry + --exp-gap = 1184px) a whole 74 ticks, so the
+     dividers stay on the ruler grid. */
   .exp-entry {
     position: relative;
-    flex: 0 0 var(--wide);
-    width: var(--wide);
+    flex: 0 0 calc(var(--wide) + var(--space-8));
+    width: calc(var(--wide) + var(--space-8));
     padding-inline-start: var(--space-4);
     display: flex;
     flex-direction: column;

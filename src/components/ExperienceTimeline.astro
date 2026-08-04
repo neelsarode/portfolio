@@ -72,16 +72,20 @@ const experience = [
 ---
 
 <section class="section exp-band">
-  <div class="exp-viewport">
-    <div class="content-grid exp-head-grid">
-      <header class="full exp-head">
-        <h2 class="fw-title">
-          <span class="mask"><span class="line">Experience</span></span>
-        </h2>
-        <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
-      </header>
-    </div>
+  {/* Header is a sibling of the stage, not inside it, so a short viewport can
+      pin the stage alone and let the header scroll away — buying back its
+      height for the entries. On tall viewports the whole band pins and the
+      header rides along at the top. */}
+  <div class="content-grid exp-head-grid">
+    <header class="full exp-head">
+      <h2 class="fw-title">
+        <span class="mask"><span class="line">Experience</span></span>
+      </h2>
+      <span class="mask"><p class="exp-blurb">What I've been up to since 2018</p></span>
+    </header>
+  </div>
 
+  <div class="exp-viewport">
     <div class="exp-track">
       {experience.map((item) => {
         const bodyEm = (item.body.length / BODY_LINES) * AVG_ADVANCE_EM;
@@ -168,7 +172,20 @@ const experience = [
     // pin-spacer behind.
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+    // Two conditions rather than one query: which element gets pinned depends
+    // on whether there is room for the header inside the pinned screen. GSAP
+    // re-runs this when the condition flips, so a resize across 950px rebuilds
+    // against the right target.
+    mm.add(
+      {
+        tall: "(min-width: 900px) and (prefers-reduced-motion: no-preference) and (min-height: 950px)",
+        short: "(min-width: 900px) and (prefers-reduced-motion: no-preference) and (max-height: 949px)",
+      },
+      (ctx) => {
+      const viewport = band.querySelector<HTMLElement>(".exp-viewport")!;
+      // Tall: pin the whole band, header included. Short: pin only the stage,
+      // so the header scrolls away and its height goes to the entries.
+      const pinTarget = ctx.conditions?.tall ? band : viewport;
       // The run ends with the last entry's right edge on the right-hand grid
       // line — GridLines' .gl-d border, which sits at the right page margin,
       // so the target is (100vw - --margin). That gives a beat of travel past
@@ -349,8 +366,8 @@ const experience = [
           // so pinning anything inside .content-grid would break the
           // ".content-grid > .full" placement. main.content is a plain block,
           // so a spacer inserted there is harmless.
-          trigger: band,
-          pin: band,
+          trigger: pinTarget,
+          pin: pinTarget,
           start: "top top",
           end: () => "+=" + dist(),
           scrub: true,
@@ -443,7 +460,8 @@ const experience = [
         band.classList.remove("has-ticks");
         ticks = [];
       };
-    });
+      },
+    );
   }
 </script>
 
@@ -493,7 +511,24 @@ const experience = [
     overflow: hidden;
   }
 
-  .exp-head-grid { padding-block-start: var(--space-6); }
+  .exp-head-grid { padding-block-start: var(--space-6); flex: 0 0 auto; }
+
+  /* Short viewports (laptops): the band grows instead of being a fixed screen,
+     the stage alone is a screen tall, and the script pins the stage rather
+     than the band. The header scrolls away above it, handing its ~116px back
+     to the entries — enough at 900px tall to take them from 936px to their
+     1048px cap. Above this height there is room for both, so the band pins
+     whole and the header stays put, as before. */
+  @media (max-height: 949px) {
+    .exp-band {
+      height: auto;
+      min-height: 0;
+    }
+    .exp-viewport {
+      flex: 0 0 auto;
+      height: 100svh;
+    }
+  }
   /* .full spans the grid edge to edge, margins included — inset it to the page
      margin so the title lines up with the track's first entry. */
   .exp-head {

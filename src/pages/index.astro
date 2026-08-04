@@ -670,7 +670,14 @@ const sections = [
     // scrolled away. Without this the covers alone (5-7MB each, autoplaying
     // from page load regardless of position) put ~8MB on first paint, and
     // 15-20 tiles would stack up hot decoders.
-    const gatedVideos = document.querySelectorAll<HTMLVideoElement>(".fw-video, .wd-video");
+    // .exp-video included so the Experience panels behave like every other
+    // loop on the page. They sit inside a horizontally translated track, which
+    // IntersectionObserver handles fine — it works off the visual box, so a
+    // panel counts as on screen only once the track has actually carried it
+    // there.
+    const gatedVideos = document.querySelectorAll<HTMLVideoElement>(
+      ".fw-video, .wd-video, .exp-video",
+    );
     if (gatedVideos.length) {
       const nearViewport = (v: HTMLVideoElement) => {
         const r = v.getBoundingClientRect();

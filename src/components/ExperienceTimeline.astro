@@ -7,6 +7,9 @@
 // Target line count for an entry's body copy. Each column is sized from its
 // own character count to land near this, then text-wrap:balance evens the
 // ragged edge out.
+// Each entry's panel takes either `video` + `poster` (a muted, looping,
+// viewport-gated clip, same as the rest of the page) or `image` + `alt`.
+// Video wins if both are present; neither leaves the flat placeholder.
 const BODY_LINES = 4;
 // Average glyph advance as a fraction of the font size, used to turn a
 // character count into a column width. Measured against the rendered copy.
@@ -44,6 +47,8 @@ const experience = [
     // \n breaks the qualifier onto its own line — .exp-org is pre-line.
     org: "Conversion Designer Masterclass\n(Design Program)",
     body: "Created a program teaching beginner and intermediate designers how to design and build high-end sales funnels on the platform ClickFunnels through video courses and live trainings. Sold over $500,000 of revenue of the program and taught over 500 students. Owned a Facebook group giving free instructional content with 12k+ members. Created a software called “Template Builder” using Bubble.io that allowed ClickFunnels users to generate prebuilt layout templates from a massive library of templated sections I created.",
+    video: "/exp-masterclass.mp4",
+    poster: "/exp-masterclass-poster.jpg",
     image: null,
     alt: "",
   },
@@ -116,8 +121,26 @@ const experience = [
               <p class="exp-body" style={`--exp-body-w: ${bodyEm.toFixed(2)}em`}>{item.body}</p>
             </span>
           </div>
+          {/* video wins over image when both are set; neither leaves the flat
+              placeholder panel. Same treatment as the Featured Work covers and
+              More Work tiles: preload="none" so it costs nothing until it
+              nears the viewport, and .exp-video is picked up by the shared
+              viewport gate in index.astro, which plays it on entry, pauses it
+              on exit, retries a rejected play() and restarts on tab reveal. */}
           <div class="exp-media">
-            {item.image && (
+            {item.video ? (
+              <video
+                class="exp-video"
+                src={item.video}
+                poster={item.poster}
+                muted
+                loop
+                playsinline
+                preload="none"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+            ) : item.image ? (
               <img
                 src={item.image}
                 alt={item.alt}
@@ -126,7 +149,7 @@ const experience = [
                 loading="lazy"
                 decoding="async"
               />
-            )}
+            ) : null}
           </div>
         </article>
         );
@@ -720,7 +743,8 @@ const experience = [
     background: rgba(255, 255, 255, 0.05);
     overflow: hidden;
   }
-  .exp-media img {
+  .exp-media img,
+  .exp-media video {
     position: absolute;
     inset: 0;
     width: 100%;

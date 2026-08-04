@@ -116,15 +116,15 @@ const dumpItems = [
     poster: "/dump-bracesbybritt-poster.jpg",
   },
   {
-    title: "Perfect Checkout",
-    tags: ["Brand Identity", "Website Design", "Website Development"],
+    title: "Perfect",
+    tags: ["Brand Identity", "Website Design & Development"],
     category: "Personal Brand",
     video: "/dump-perfectcheckout-loop.webm",
     poster: "/dump-perfectcheckout-poster.jpg",
   },
   {
     title: "Infinite Dodos",
-    tags: ["Brand Identity", "Website Design", "Website Development"],
+    tags: ["Brand Identity", "Website Design & Development"],
     category: "Personal Brand",
     video: "/dump-infinitedodos-loop.webm",
     poster: "/dump-infinitedodos-poster.jpg",
@@ -152,7 +152,7 @@ const dumpItems = [
   },
   {
     title: "FunnelPortals",
-    tags: ["Personal Project", "Website", "No-Code Development"],
+    tags: ["Personal", "Website", "No-Code Development"],
     category: "Personal Brand",
     video: "/dump-funnelportals-loop.webm",
     poster: "/dump-funnelportals-poster.jpg",
@@ -1243,15 +1243,39 @@ const sections = [
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    font-size: 13px; /* 14px at 2-up — one step down for the narrower 3-up tiles */
+    /* Holds the original 13px at 1440 and up — every caption fits on one line
+       there — and only eases below that, bottoming out at 11px. Merging the
+       two website tags into one bought back a whole size step: at 1440 the
+       tightest caption needed 11.9px before and fits at 13px now.
+       The floor stays 11px rather than chasing a single line all the way down;
+       at 1100 the tightest caption would need 10px, which is too small to
+       read, so the tag list wraps instead. */
+    font-size: clamp(11px, 0.588vw + 4.53px, 13px);
     line-height: 1.3;
     letter-spacing: -0.01em;
   }
-  .wd-left { display: flex; align-items: center; gap: var(--space-2); min-width: 0; flex: 1; }
+  /* The tags drop below the name, and wrap among themselves, once they stop
+     fitting beside it. Each tag stays nowrap so a label never breaks mid-word;
+     it is the list that reflows. Without this the nowrap row overflowed the
+     tile and pushed the whole page ~37px wide at 1100. */
+  .wd-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    min-width: 0;
+    flex: 1;
+  }
   .wd-name { margin: 0; color: #fff; white-space: nowrap; }
   /* 3-up: tags ride the right edge, replacing the category (which cannot
      also fit at 416px tiles). */
-  .wd-tags { display: flex; align-items: center; gap: var(--space-1); margin-inline-start: auto; }
+  .wd-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-inline-start: auto;
+  }
   .wd-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
   .wd-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
   /* Category replaced by the right-aligned tag list (3-up): hide its mask

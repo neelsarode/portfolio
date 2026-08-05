@@ -6,3 +6,5 @@ dist/
 .playwright-mcp/
 /*.png
 .worktrees/
+.vercel
+.env*

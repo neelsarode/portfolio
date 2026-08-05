@@ -520,20 +520,42 @@ const sections = [
      idempotent). init() picks up every [data-us-project] on the page. -->
 <script is:inline>
   !(function () {
+    // Publishes the moment the hero scene actually starts, so the hero text
+    // can be timed from the scene's own intro rather than from navigation.
+    // The gap between the two is the CDN fetch plus init, which varies with
+    // connection — anchoring to navigation drifted against the scene.
+    function mark() {
+      if (window.__usHeroStart != null) return;
+      window.__usHeroStart = performance.now();
+      window.dispatchEvent(new Event("us:hero-start"));
+    }
+    // init() resolves once the scenes are built and rendering. Older builds
+    // return nothing, so treat a non-thenable as "started now". A throw or a
+    // rejection still marks: better an early hero than a hero that never
+    // arrives because the scene failed.
+    function start(ctx) {
+      var r;
+      try { r = ctx.init(); } catch (e) { mark(); return; }
+      if (r && typeof r.then === "function") r.then(mark, mark);
+      else mark();
+    }
+    function whenReady(ctx) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { start(ctx); });
+      } else { start(ctx); }
+    }
+
     var u = window.UnicornStudio;
     if (u && u.init) {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () { u.init(); });
-      } else { u.init(); }
+      whenReady(u);
     } else {
       window.UnicornStudio = { isInitialized: !1 };
       var i = document.createElement("script");
       i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.2.8/dist/unicornStudio.umd.js";
-      i.onload = function () {
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", function () { UnicornStudio.init(); });
-        } else { UnicornStudio.init(); }
-      };
+      i.onload = function () { whenReady(window.UnicornStudio); };
+      // Blocked or offline CDN: mark immediately rather than leaving the text
+      // waiting on a scene that is never coming.
+      i.onerror = mark;
       (document.head || document.body).appendChild(i);
     }
   })();
@@ -650,18 +672,47 @@ const sections = [
     // tween ends at a true 0. immediateRender hands off from CSS seamlessly.
     const heroRisers = document.querySelectorAll(".hero-overlay .mask > *");
     if (heroRisers.length) {
-      gsap.timeline({ delay: Math.max(0, 5.5 - performance.now() / 1000) })
-        .fromTo(
-          heroRisers,
-          { y: 0, yPercent: 110 },
-          {
-            yPercent: 0,
-            duration: 0.9,
-            ease: "power4.out",
-            stagger: 0.09,
-            immediateRender: true,
-          }
+      const HERO_AT = 5.5; // seconds into the Unicorn scene's intro
+      // Latest we will wait for the scene to report in. It normally starts
+      // within a couple of seconds; this only fires if the scene is broken in
+      // a way that never resolves and never errors, and it stops the copy
+      // being held hostage to that.
+      const GIVE_UP_AT = 9000;
+
+      const runHero = (sceneStartMs: number) => {
+        const elapsed = (performance.now() - sceneStartMs) / 1000;
+        gsap.timeline({ delay: Math.max(0, HERO_AT - elapsed) })
+          .fromTo(
+            heroRisers,
+            { y: 0, yPercent: 110 },
+            {
+              yPercent: 0,
+              duration: 0.9,
+              ease: "power4.out",
+              stagger: 0.09,
+              immediateRender: true,
+            }
+          );
+      };
+
+      const started = (window as any).__usHeroStart;
+      if (started != null) {
+        runHero(started);
+      } else {
+        let fired = false;
+        const once = (from: number) => {
+          if (fired) return;
+          fired = true;
+          clearTimeout(timer);
+          runHero(from);
+        };
+        const timer = window.setTimeout(() => once(performance.now()), GIVE_UP_AT);
+        window.addEventListener(
+          "us:hero-start",
+          () => once((window as any).__usHeroStart ?? performance.now()),
+          { once: true }
         );
+      }
     }
 
     // Viewport-gated playback for every preview loop — Featured Work covers

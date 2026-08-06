@@ -383,6 +383,22 @@ const experience = [
         paintWave(playhead);
       };
 
+      // Creating a PINNED trigger makes ScrollTrigger walk every earlier
+      // trigger and force-refresh any that has no `end` yet (ScrollTrigger.js,
+      // the `curTrigger.end || curTrigger.refresh(0, 1)` loop). On a reload
+      // restored mid-page, the homepage's once:true reveal triggers can still
+      // be unmeasured at this point (their startup refresh is deferred, and
+      // whether it has run yet is a load-timing race) — and the ones already
+      // scrolled past then FIRE and self-kill inside that walk. The loop
+      // compensates for one removal, not a cascade, reads past the mutated
+      // array, and throws "Cannot read properties of undefined (reading
+      // 'end')" — aborting this whole context, so the band never pins and the
+      // sections overlap.
+      //
+      // Pre-measuring each unmeasured trigger here defuses it: getAll()
+      // returns a copy, so self-kills cannot trip THIS loop, and afterwards
+      // the pinned-creation walk short-circuits on `.end` for every survivor.
+      ScrollTrigger.getAll().forEach((t) => t.end || t.refresh());
       const horiz = gsap.to(track, {
         x: () => -dist(),
         ease: "none",

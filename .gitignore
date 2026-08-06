@@ -8,3 +8,6 @@ dist/
 .worktrees/
 .vercel
 .env*
+
+# Per-worktree dev-server port, written by local tooling.
+.variant-port

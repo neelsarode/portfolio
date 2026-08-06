@@ -1,0 +1,359 @@
+---
+// Axis Cursor — vanilla port of the Originkit "axis-cursor" component.
+//
+// The upstream component is React + framer-motion. Both would be new
+// dependencies here (~45KB gzipped of runtime) for four absolutely-positioned
+// divs, so this reproduces it directly. The preset values below are the
+// `neel-portfolio` preset from Originkit, carried over verbatim.
+//
+// Two deliberate departures from upstream, both because upstream is written
+// for a bounded demo container and this runs over a whole document:
+//   1. Positioning is `transform`, not `left`/`top` — those trigger layout on
+//      every pointer move; transforms stay on the compositor.
+//   2. The label flips to the other side of the crosshair near the viewport
+//      edge. Upstream lets it clip, which is invisible inside a padded demo
+//      box but obvious against a real window edge.
+---
+
+<div class="axis-cursor" aria-hidden="true" data-axis-cursor>
+  <div class="ax-line ax-v"></div>
+  <div class="ax-line ax-h"></div>
+  <!-- Nested on purpose: .ax-dot is a bare point moved by JS every frame, the
+       children carry the CSS-transitioned scale. One node cannot do both — a
+       transition on transform would smear the position as well as the size,
+       and the dot would lag behind the pointer.
+       Rings are ordered outermost-first so the solid core paints last. -->
+  <div class="ax-dot">
+    <i class="ax-ring ax-r3"></i>
+    <i class="ax-ring ax-r2"></i>
+    <i class="ax-ring ax-r1"></i>
+    <i class="ax-core"></i>
+  </div>
+  <!-- Same split as the dot, and for the same reason: the outer node tracks
+       the pointer every frame, the inner carries the transitioned offset that
+       pushes the label clear of the rings when they bloom. -->
+  <div class="ax-label"><span>Neel Sarode</span></div>
+</div>
+
+<style>
+  /* Pointer-driven, so it only exists for devices that have one. Touch and
+     stylus get the native affordance untouched — no listeners, no hidden
+     system cursor, nothing to strand a user with no visible pointer. */
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.axis-on),
+    :global(html.axis-on *) {
+      cursor: none;
+    }
+
+    .axis-cursor {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      pointer-events: none;
+      /* Children fade as a group; `visibility` keeps them off the compositor
+         entirely until the pointer first appears. */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s;
+    }
+    .axis-cursor[data-visible] {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.2s ease-in-out, visibility 0s;
+    }
+
+    .ax-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(255, 255, 255, 0.12); /* preset was #FFFFFF3D — 0.24 */
+      will-change: transform;
+    }
+    .ax-v { width: 1px; height: 100%; }
+    .ax-h { width: 100%; height: 1px; }
+
+    /* Outer: position only. Children: size only. */
+    .ax-dot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      will-change: transform;
+    }
+
+    /* Geometry read off the Figma render (node 2517:24589): a solid core with
+       three nested circles, diameters stepping 20 / 32 / 44 / 56. Each ring is
+       9% white — they are stacked, not blended, so the overlaps compound to
+       the 17% and 25% the design shows toward the centre. */
+    .ax-dot i {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      border-radius: 100%;
+      /* Half-size negative offset (per element below) centres each circle on
+         the parent point, so scaling about its own centre keeps it pinned to
+         the crosshair. Resting transforms live on .ax-ring / .ax-core rather
+         than here: `.ax-dot i` would outrank both and pin them to one value. */
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+    .ax-ring {
+      background: rgba(255, 255, 255, 0.09);
+      transform: scale(0);
+    }
+    .ax-r1 { width: 32px; height: 32px; margin: -16px 0 0 -16px; }
+    .ax-r2 { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+    .ax-r3 { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+
+    /* Sized at its hover diameter and scaled DOWN at rest — a circle rasterised
+       at 20px and shrunk stays crisp, where one rasterised at 6px and blown up
+       would sample a 6px texture and blur. 0.3 × 20px = the 6px resting dot. */
+    .ax-core {
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      background: #ffffff;
+      transform: scale(0.3);
+    }
+
+    /* Bloom outward: inner ring leads, outer follows. */
+    .axis-cursor.is-hot .ax-core { transform: scale(1); }
+    .axis-cursor.is-hot .ax-ring { transform: scale(1); }
+    .axis-cursor.is-hot .ax-r1 { transition-delay: 0ms; }
+    .axis-cursor.is-hot .ax-r2 { transition-delay: 45ms; }
+    .axis-cursor.is-hot .ax-r3 { transition-delay: 90ms; }
+    /* Retract inward: reverse the order so it collapses the way it grew. */
+    .ax-r1 { transition-delay: 90ms; }
+    .ax-r2 { transition-delay: 45ms; }
+    .ax-r3 { transition-delay: 0ms; }
+
+    /* Outer: a bare point at the pointer. */
+    .ax-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      will-change: transform;
+    }
+    /* Inner: the visible chip, offset from that point. Matches the rings'
+       duration and curve so the push-out and the bloom read as one gesture. */
+    .ax-label span {
+      display: block;
+      width: max-content;
+      padding: 4px 6px;
+      font-family: var(--font-geist-sans);
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 1.5em;
+      letter-spacing: 0em;
+      text-align: left;
+      white-space: nowrap;
+      color: #ffffff;
+      background: #212121;
+      border-radius: 0;
+      /* Hidden until something names itself. JS writes the transform, scale
+         included, and origin follows the edge-flip so the chip always grows
+         from the corner nearest the pointer. */
+      opacity: 0;
+      transform: scale(0);
+      transform-origin: 0 0;
+      transition:
+        transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s linear,
+        background-color 0.2s linear,
+        color 0.2s linear;
+      will-change: transform, opacity;
+    }
+    .axis-cursor.has-label .ax-label span { opacity: 1; }
+    /* Clickable target: invert the chip. Tied to real clickability, not to
+       whether a label was set, so the inversion never promises a navigation
+       that isn't there. */
+    .axis-cursor.is-hot .ax-label span {
+      color: #212121;
+      background: #ffffff;
+    }
+  }
+
+  /* No pointer to track — render nothing at all. */
+  @media not all and (hover: hover) and (pointer: fine) {
+    .axis-cursor { display: none; }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-axis-cursor]");
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+
+  if (root && fine.matches) {
+    const v = root.querySelector<HTMLElement>(".ax-v")!;
+    const h = root.querySelector<HTMLElement>(".ax-h")!;
+    const dot = root.querySelector<HTMLElement>(".ax-dot")!;
+    const label = root.querySelector<HTMLElement>(".ax-label")!;
+    const chip = label.querySelector<HTMLElement>("span")!;
+
+    // Label offset from the crosshair, per axis. 12 is the preset's resting
+    // value (corner ~17px from centre, a 14px gap off the 3px dot). 30 keeps
+    // that same 14px gap off the 28px outer ring once it blooms.
+    const OFFSET_REST = 12;
+    const OFFSET_HOT = 30;
+
+    // What counts as "clickable" for the ring bloom and the chip inversion.
+    // Selector-based rather than reading computed `cursor: pointer`, because
+    // this component sets `cursor: none` on everything — that signal no longer
+    // exists anywhere on the page.
+    const INTERACTIVE =
+      'a[href], button, [role="button"], input, select, textarea, summary,' +
+      " label[for], [data-cursor-hover]";
+
+    // Untagged clickables (nav links, the About Me link) read their own text.
+    // Capped so a large clickable card can never dump a paragraph into the
+    // chip.
+    const MAX_BORROWED = 40;
+
+    // null means "nothing to name" — the chip stays hidden.
+    const labelFor = (el: Element | null): string | null => {
+      // An explicit tag always wins over borrowed text.
+      const tagged = el?.closest<HTMLElement>("[data-cursor-label]");
+      if (tagged) return tagged.dataset.cursorLabel!.trim() || null;
+      const click = el?.closest(INTERACTIVE);
+      if (click) {
+        const own = (click.textContent || "").replace(/\s+/g, " ").trim();
+        if (own && own.length <= MAX_BORROWED) return own;
+      }
+      return null;
+    };
+
+    document.documentElement.classList.add("axis-on");
+
+    let x = 0, y = 0, queued = false, hot = false;
+    // Text currently displayed in the chip, or null when nothing is named.
+    let shown: string | null = null;
+
+    // Chip size is fixed text, so measure it once instead of reading
+    // offsetWidth inside draw() — that forced a synchronous layout on every
+    // single pointer move.
+    let cw = 0, ch = 0;
+    const measure = () => { cw = chip.offsetWidth; ch = chip.offsetHeight; };
+    measure();
+    // Geist arrives from Google Fonts after first paint and changes the width.
+    document.fonts?.ready.then(() => { measure(); placeChip(); });
+
+    // Only written when the offset actually changes. Rewriting it per frame
+    // would restart the transition every frame and freeze the label mid-move.
+    let chipKey = "";
+    function placeChip() {
+      const off = hot ? OFFSET_HOT : OFFSET_REST;
+      // Flip back across the crosshair rather than run off the window edge.
+      const flipX = x + off + cw > innerWidth;
+      const flipY = y + off + ch > innerHeight;
+      const dx = flipX ? -(off + cw) : off;
+      const dy = flipY ? -(off + ch) : off;
+      const s = shown ? 1 : 0;
+      // Grow from the corner nearest the pointer — top-left normally, mirrored
+      // on whichever axis has flipped.
+      const ox = flipX ? "100%" : "0";
+      const oy = flipY ? "100%" : "0";
+      const key = `${dx},${dy},${s},${ox},${oy}`;
+      if (key !== chipKey) {
+        chipKey = key;
+        chip.style.transformOrigin = `${ox} ${oy}`;
+        // scale() sits after the translate, so it pivots on the chip's own
+        // corner at its offset position rather than dragging in from the dot.
+        chip.style.transform = `translate3d(${dx}px,${dy}px,0) scale(${s})`;
+      }
+    }
+
+    const setHot = (el: Element | null) => {
+      const next = !!el?.closest(INTERACTIVE);
+      if (next !== hot) {
+        hot = next;
+        root.classList.toggle("is-hot", next);
+      }
+      const text = labelFor(el);
+      if (text !== shown) {
+        // Only rewrite on the way IN. Clearing the text on the way out would
+        // collapse the chip to its padding mid-shrink, so the old text rides
+        // the exit and is replaced by the next one.
+        if (text) {
+          chip.textContent = text;
+          measure(); // width changed, so the edge-flip threshold moved with it
+        }
+        shown = text;
+        root.classList.toggle("has-label", !!text);
+      }
+      placeChip();
+    };
+
+    const draw = () => {
+      queued = false;
+      // Lines are 1px, so centring is a half-pixel nudge.
+      v.style.transform = `translate3d(${x - 0.5}px,0,0)`;
+      h.style.transform = `translate3d(0,${y - 0.5}px,0)`;
+      dot.style.transform = `translate3d(${x}px,${y}px,0)`;
+      label.style.transform = `translate3d(${x}px,${y}px,0)`;
+      placeChip(); // no-op unless the flip state changed
+    };
+
+    const onMove = (e: PointerEvent) => {
+      // A touchscreen laptop reports (hover: hover) and (pointer: fine) for its
+      // mouse, so the media query lets it through — correctly, it has a mouse.
+      // But a finger on that same screen also fires pointermove, which would
+      // drag the crosshair around by touch. Mouse only; a touch retires it
+      // until the mouse moves again.
+      if (e.pointerType === "touch" || e.pointerType === "pen") {
+        root.removeAttribute("data-visible");
+        return;
+      }
+      x = e.clientX;
+      y = e.clientY;
+      // The overlay is pointer-events:none, so the event target is whatever
+      // sits underneath — exactly what we want to test.
+      setHot(e.target as Element);
+      if (!root.hasAttribute("data-visible")) {
+        draw(); // place before revealing, so it never fades in from 0,0
+        root.setAttribute("data-visible", "");
+        return;
+      }
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(draw);
+      }
+    };
+
+    addEventListener("pointermove", onMove, { passive: true });
+
+    // Hide when the pointer leaves the window entirely (relatedTarget is null
+    // only when it exits the document, not when it crosses between elements).
+    document.addEventListener("pointerout", (e) => {
+      if (!e.relatedTarget) root.removeAttribute("data-visible");
+    });
+    // A pointerdown that opens a native menu or drags out can strand it.
+    addEventListener("blur", () => root.removeAttribute("data-visible"));
+
+    // Edge-flipping depends on viewport size; recompute on resize.
+    addEventListener("resize", () => {
+      measure();
+      if (root.hasAttribute("data-visible")) draw();
+    });
+
+    // Content moving under a stationary pointer is a hover change with no
+    // pointermove to announce it — and with Lenis smooth scroll that happens
+    // constantly. Re-run the hit test from the last known point instead.
+    let scrollQueued = false;
+    addEventListener(
+      "scroll",
+      () => {
+        if (scrollQueued || !root.hasAttribute("data-visible")) return;
+        scrollQueued = true;
+        requestAnimationFrame(() => {
+          scrollQueued = false;
+          setHot(document.elementFromPoint(x, y));
+        });
+      },
+      { passive: true },
+    );
+  }
+</script>

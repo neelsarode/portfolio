@@ -2,8 +2,10 @@
 import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
+import AsciifyDevPanel from "../components/AsciifyDevPanel.astro";
 import GridLines from "../components/GridLines.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
+import ContactSection from "../components/ContactSection.astro";
 // Homepage — the full-screen (no-sidebar) site. Two Unicorn Studio scenes:
 //   1. HERO — the original embed, full-screen and OPAQUE, so it covers the
 //      fixed scene while at the top; scrolls away to reveal it.
@@ -21,11 +23,12 @@ const fwRows = [
   {
     flip: false,
     logo: "tldr",
+    name: "TL;DR",
     // href intentionally omitted — the row renders as a <div> and is not
     // clickable. The /work/tldr page still exists, just isn't linked from here.
     video: "/tldr-dashboard.mp4",
     poster: "/tldr-dashboard-poster.jpg",
-    desc: "Co-founder and founding designer. Created brand and product design and experience from scratch.",
+    desc: "Co-founder and founding designer. Created brand, product design, and user experience from scratch.",
     note: "TL;DR is a first-of-its-kind clipping software that generates clips of a livestream during the livestream, not after.",
     label: "Founding Design Engineer",
     roles: [
@@ -41,6 +44,7 @@ const fwRows = [
   {
     flip: true,
     logo: "gold",
+    name: "Gold Dollar",
     video: "/gold-dollar-cover.mp4",
     poster: "/gold-dollar-poster.jpg",
     desc: "Founding designer and creative lead at USDKG (Gold Dollar). Brand created from scratch.",
@@ -57,6 +61,7 @@ const fwRows = [
   {
     flip: false,
     logo: "crow",
+    name: "Crow Industries",
     video: "/crow-cover.mp4",
     poster: "/crow-poster.jpg",
     desc: "Early stage designer. Revamped brand and designed and developed new website. Created system for generating AI imagery and video of product.",
@@ -74,6 +79,7 @@ const fwRows = [
   {
     flip: true,
     logo: "solarshare",
+    name: "SolarShare",
     video: "/solarshare-cover.mp4",
     poster: "/solarshare-poster.jpg",
     desc: "Designed product and revamped brand for SolarShare",
@@ -181,26 +187,6 @@ const dumpItems = [
   },
 ];
 
-const sections = [
-  {
-    n: "01",
-    title: "First section",
-    body:
-      "You've scrolled past the hero — this scene is now pinned behind the content and reacts to scroll. Placeholder copy; swap for real content later.",
-  },
-  {
-    n: "02",
-    title: "Second section",
-    body:
-      "Another viewport of scroll so you can judge legibility and how the fixed scene resolves as it animates.",
-  },
-  {
-    n: "03",
-    title: "Third section",
-    body:
-      "Final placeholder section. Add or remove sections to give the scroll-driven scene more or less runway.",
-  },
-];
 ---
 <FullscreenLayout title="Neel Sarode — Founding Design Engineer">
   <!-- Arm the hero entrance before first paint: html.js gates the CSS that
@@ -343,7 +329,7 @@ const sections = [
               {fwRows.map((row) => {
                 const RowTag = row.href ? "a" : "div";
                 return (
-                <RowTag href={row.href} class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group>
+                <RowTag href={row.href} class:list={["fw-row", { "fw-flip": row.flip }]} data-reveal-group data-cursor-label={`${row.name} Case Study →`}>
                   <div class="fw-media" data-fade>
                     {row.video && (
                       <video
@@ -453,7 +439,7 @@ const sections = [
             </div>
             <div class="wd-grid">
               {dumpItems.map((item) => (
-                <article class="wd-tile" data-reveal-group>
+                <article class="wd-tile" data-reveal-group data-cursor-label={item.title}>
                   <div class="wd-media" data-fade>
                     {item.video ? (
                       <video
@@ -495,25 +481,12 @@ const sections = [
 
     <ExperienceTimeline />
 
-    <!-- Sections that reveal the fixed background as they scroll over it.
-         Text is placed on the macro grid (left columns). -->
-    {sections.map((s) => (
-      <section class="section">
-        <div class="content-grid">
-          <div class="full-composed">
-            <div class="section-inner" data-reveal-group>
-              <span class="mask"><p class="eyebrow">Section {s.n}</p></span>
-              <span class="mask m-title"><h2 class="section-title">{s.title}</h2></span>
-              <span class="mask m-body"><p class="section-body">{s.body}</p></span>
-            </div>
-          </div>
-        </div>
-      </section>
-    ))}
+    <ContactSection />
   </main>
 
   <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
   <DevGrid />
+  <AsciifyDevPanel />
 </FullscreenLayout>
 
 <!-- Unicorn Studio — self-loading vanilla snippet (SDK v2.2.8, loads on demand,
@@ -911,10 +884,6 @@ const sections = [
     flex-direction: column;
     justify-content: center;
   }
-  .section-inner { grid-column: 1 / 8; }
-  @media (max-width: 640px) {
-    .section-inner { grid-column: 1 / -1; }
-  }
 
   /* ---- Intro section (Figma 2155:11374) ---- */
   /* Band model (per Figma): a compact section whose vertical space is real
@@ -1230,7 +1199,7 @@ const sections = [
     margin: 0;
     font-size: 12px;
     line-height: 1.2;
-    letter-spacing: -0.01em; /* -0.12px @ 12px */
+    letter-spacing: 0;
     color: rgba(255, 255, 255, 0.65);
     text-wrap: balance; /* no hanging last words */
   }
@@ -1387,24 +1356,8 @@ const sections = [
   /* .mask / .line now live in styles/global.css — they are used inside
      components (SiteNav, ExperienceTimeline) that page-scoped rules cannot
      reach, and an unclipped mask breaks every riser's from-state. */
-  .m-title { margin-block-start: var(--space-2); }
-  .m-body { margin-block-start: var(--space-3); }
 
-  /* Fixed light palette + text-shadow so copy stays legible over the moving
-     scene regardless of theme (the WebGL scene doesn't flip with the theme). */
+  /* Fixed light palette so copy stays legible over the moving scene regardless
+     of theme (the WebGL scene doesn't flip with the theme). */
   .content .eyebrow { color: rgba(246, 243, 236, 0.72); }
-  .section-title {
-    font-size: clamp(28px, 4vw, 44px);
-    line-height: 1.08;
-    font-weight: 500;
-    letter-spacing: -0.6px;
-    color: #f6f3ec;
-    text-shadow: 0 1px 24px rgba(10, 10, 11, 0.55);
-  }
-  .section-body {
-    font-size: clamp(15px, 1.4vw, 17px);
-    line-height: 1.55;
-    color: rgba(246, 243, 236, 0.88);
-    text-shadow: 0 1px 20px rgba(10, 10, 11, 0.6);
-  }
 </style>

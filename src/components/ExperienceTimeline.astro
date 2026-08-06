@@ -63,7 +63,7 @@ const experience = [
     alt: "",
   },
   {
-    year: "2023 → Present",
+    year: "2024 → Present",
     role: "Creative Lead",
     org: "USDKG",
     body: "Founding designer for USDKG, a stablecoin whose gold reserves are backed by the Ministry of Finance of Kyrgyzstan. Ideated and created brand from scratch and handled all things visual for the company, including brand creation, website design and development, document and deck design, social media direction and design, and more.",
@@ -71,7 +71,7 @@ const experience = [
     alt: "Gold Dollar brand work: the logo and stationery, the “Future of Finance, Fully Backed by Gold” website, and printed technical documents covering the USDKG smart contract design and a competitive comparison against other stablecoins. A note reads “The real challenge was creating a Web3 brand that could compete with institutional banking and finance solutions”.",
   },
   {
-    year: "2023 → Present",
+    year: "2024 → Present",
     role: "Co-Founder & Creative Director",
     org: "TL;DR",
     body: "Co-founded TL;DR, a first-of-its kind livestreaming software that generates highlight clips of a Twitch or Kick livestream during the livestream, not after. I handle all things visual and user-focused - including brand creation, website design & development, product direction, feature exploration, product design, front end agentic development, B2B decks and presentations, event design, clothing, and more. Till date we have over 35,000+ installs on our TL;DR Twitch Extension.",
@@ -104,8 +104,11 @@ const experience = [
         // Longer than BODY_LINES lines once capped — top-align those instead,
         // since there is no short paragraph to sit level with the org name.
         const runsLong = bodyEm > BODY_MAX_EM;
+        // org carries a hard \n for the two-line qualifier (.exp-org is
+        // pre-line); the cursor label wants it on one line.
+        const cursorLabel = item.org.replace(/\s*\n\s*/g, " ");
         return (
-        <article class="exp-entry">
+        <article class="exp-entry" data-cursor-label={cursorLabel}>
           <span class="exp-divider" aria-hidden="true"></span>
           <span class="exp-dot" aria-hidden="true"></span>
           <div class:list={["exp-copy", { "exp-copy-long": runsLong }]}>

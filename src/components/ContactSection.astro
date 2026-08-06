@@ -1,0 +1,482 @@
+---
+// Contact — the closing section (Figma node 2462:22239).
+//
+// The signature move: "Get In Touch" scrolls behind the PERSON but in front of
+// the photo's backdrop. Figma does that by stacking two copies of the portrait
+// with the marquee sandwiched between them — the lower copy is the full photo,
+// the upper one is the subject cut out.
+//
+// Shipping the cut-out as its own RGBA PNG cost 640KB–1.4MB depending on how
+// far it was downscaled. Instead the SAME jpeg is drawn twice and the top copy
+// is masked by the cut-out's alpha channel, exported as an 8-bit grayscale PNG
+// (36KB). Cheaper than any cut-out size, and the person renders at full jpeg
+// quality instead of a shrunken PNG.
+const COPIES = 6; // see --cs-shift: (COPIES - 1) × pitch must exceed any viewport
+
+const socials = [
+  // TODO: real destinations — placeholders until confirmed.
+  { label: "Instagram", href: "#" },
+  { label: "Linkedin", href: "#" },
+  { label: "Email", href: "mailto:neel@conversiondesigner.co" },
+];
+
+const actions = [
+  { label: "Hire Fractionally", href: "#" },
+  { label: "Work With Me", href: "#" },
+];
+---
+
+<section class="section contact-band">
+  <div class="content-grid">
+    <div class="full cs-stage">
+      {/* The marquee is aria-hidden (it repeats six times); this carries the
+          section's actual heading for assistive tech and document outline. */}
+      <h2 class="cs-sr">Get in touch</h2>
+
+      <div class="cs-media">
+        {/* .cs-ascii is sized to the IMAGE box (not the pill) so the ascii
+            output canvas shares the image's coordinate space. */}
+        <div class="cs-photo cs-photo-back">
+          <div class="cs-ascii" data-asciify>
+            <canvas class="cs-ascii-src"></canvas>
+            <div class="cs-ascii-content">
+              <img
+                src="/contact-portrait.jpg"
+                width="887"
+                height="1774"
+                loading="lazy"
+                decoding="async"
+                alt="Neel Sarode"
+              />
+            </div>
+            <canvas class="cs-ascii-out"></canvas>
+          </div>
+        </div>
+
+        <div class="cs-marquee" aria-hidden="true">
+          <div class="cs-track">
+            {Array.from({ length: COPIES }).map(() => (
+              <div class="cs-group">
+                <span class="cs-word">Get In Touch</span>
+                <i class="cs-spark"></i>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Same file as the backdrop — masked to the subject, and left crisp:
+            the ascii runs on the layer beneath, so the backdrop dissolves into
+            characters while the person stays sharp. */}
+        <div class="cs-photo cs-photo-front" aria-hidden="true">
+          <img
+            src="/contact-portrait.jpg"
+            width="887"
+            height="1774"
+            loading="lazy"
+            decoding="async"
+            alt=""
+          />
+        </div>
+      </div>
+
+      <div class="cs-lower">
+        <div class="cs-copy" data-reveal-group>
+          <span class="mask"><p class="cs-h">Lets work together</p></span>
+          <span class="mask"
+            ><p class="cs-p">
+              I work with early-stage teams as a founding design engineer:
+              full-time, or fractionally. If you’re pre-seed to Series A and need
+              brand, website, product, and shipped front-end from one person,
+              reach out to me by clicking below.
+            </p></span
+          >
+          <div class="cs-actions" data-fade>
+            {actions.map((a) => (
+              <a class="cs-btn" href={a.href} data-cursor-label={`${a.label} →`}>
+                <span class="cs-btn-label">{a.label}</span>
+                <span class="corner cs-c1"></span>
+                <span class="corner cs-c2"></span>
+                <span class="corner cs-c3"></span>
+                <span class="corner cs-c4"></span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <ul class="cs-links" data-reveal-group>
+          {socials.map((s) => (
+            <li>
+              <span class="mask">
+                <a href={s.href} data-cursor-label={`${s.label} →`}>
+                  {s.label}<span class="cs-arrow"> →</span>
+                </a>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Screen-reader-only heading. */
+  .cs-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* index.astro's `.section` rule is page-scoped and cannot reach a section
+     rendered from a component, so the band's own spacing is declared here —
+     the same reason .exp-band carries its layout in ExperienceTimeline.astro.
+     (The `section` CLASS still matters: the reveal script queries the live DOM,
+     where Astro's scoping does not apply.)
+     The marquee's cap height sits ~94px below this section's top edge, so
+     without a top margin the Experience ruler's ticks land in the type. */
+  .contact-band {
+    margin-block-start: var(--space-8);
+    padding-block-end: var(--space-6);
+  }
+
+  .cs-stage {
+    position: relative;
+    /* Portrait is 471×738 at the 1440 frame — 32.7vw. */
+    --cs-pw: clamp(232px, 32.7vw, 471px);
+  }
+
+  /* ---- Portrait stack ---------------------------------------------------
+     .cs-media is full-bleed so the marquee can run edge to edge; the photo
+     sits in normal flow inside it and sets the height. */
+  .cs-media {
+    position: relative;
+  }
+
+  .cs-photo {
+    width: var(--cs-pw);
+    aspect-ratio: 471 / 738;
+    overflow: hidden;
+    /* 581px in Figma, but CSS scales radii down when they exceed the box, so
+       this resolves to the same stadium. */
+    border-radius: 9999px;
+  }
+  .cs-photo-back {
+    position: relative;
+    margin-inline: auto;
+  }
+  .cs-photo-front {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Decorative, and it sits ON TOP of the layer the ascii lens listens on —
+       without this it would swallow pointermove over the subject and the lens
+       would cut out wherever the person is. */
+    pointer-events: none;
+  }
+
+  /* Explicit box rather than object-fit: a mask aligns to the ELEMENT box, so
+     the element box has to BE the rendered image box. object-fit would offset
+     the pixels inside the box and the mask would sit off the subject.
+     The back layer carries the same geometry on .cs-ascii, so the image and
+     the ascii canvas inside it share one coordinate space. */
+  .cs-photo-front img,
+  .cs-ascii {
+    position: absolute;
+    left: 0;
+    top: -13.38%;
+    width: 100%;
+    height: 127.63%;
+  }
+  .cs-photo-front img {
+    max-width: none; /* beats the global img rule */
+    display: block;
+    -webkit-mask-image: url("/contact-portrait-mask.png");
+    mask-image: url("/contact-portrait-mask.png");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  /* Ascii lens over the BACKDROP layer — unmasked, since the crisp cut-out on
+     top already covers the subject. Clipped by the pill's overflow. */
+  .cs-ascii-content {
+    position: absolute;
+    inset: 0;
+  }
+  .cs-ascii-content img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    display: block;
+  }
+  .cs-ascii-out {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  /* Capture scratch buffer — never displayed. */
+  .cs-ascii-src {
+    display: none;
+  }
+
+  /* ---- Marquee ----------------------------------------------------------
+     Sits between the two portrait copies. Every internal measure is in em of
+     the type size, so the whole lockup scales with one clamp(). */
+  .cs-marquee {
+    position: absolute;
+    inset-inline: 0;
+    top: 26.76%; /* Figma: centre 197.5px into the 738px portrait */
+    transform: translateY(-50%);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .cs-track {
+    display: flex;
+    width: max-content;
+    animation: cs-marquee var(--cs-dur, 22s) linear infinite;
+  }
+
+  .cs-group {
+    display: flex;
+    align-items: center;
+    flex: none;
+    /* Trailing padding matches the inner gap, so one group's width IS the
+       repeat pitch and the percentage shift below lands exactly on a seam. */
+    gap: 0.2516em;
+    padding-inline-end: 0.2516em;
+    font-size: clamp(56px, 14.35vw, 206.649px);
+    line-height: 1;
+  }
+
+  .cs-word {
+    font-family: var(--font-geist-sans);
+    font-weight: 400;
+    letter-spacing: -0.04em; /* -8.266px at 206.649px */
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  /* Same 4-point star as --icon-spark (the Figma path normalises to identical
+     coordinates), carrying Figma's radial white→#999 fill. */
+  .cs-spark {
+    flex: none;
+    width: 0.4107em; /* 84.875 / 206.649 */
+    height: 0.4107em;
+    background: radial-gradient(circle at 50% 50%, #fff 0%, #999 100%);
+    -webkit-mask: var(--icon-spark) no-repeat center / contain;
+    mask: var(--icon-spark) no-repeat center / contain;
+  }
+
+  /* Shift by exactly one group. With six copies, the five that remain on
+     screen must out-span the viewport — 5 × ~1279px covers past 5K. */
+  @keyframes cs-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(calc(-100% / 6), 0, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cs-track { animation: none; }
+  }
+
+  /* ---- Copy + links ----------------------------------------------------- */
+  .cs-lower {
+    display: grid;
+    gap: var(--space-5);
+    padding-inline: var(--margin);
+    margin-block-start: var(--space-6);
+  }
+
+  .cs-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .cs-h {
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  .cs-p {
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+    /* Holds the measure when stacked — without it the paragraph runs the full
+       width on a tablet. Matches the design's 308px and is a no-op inside the
+       narrower grid column at desktop. */
+    max-width: 46ch;
+  }
+
+  .cs-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-block-start: var(--space-3);
+  }
+
+  /* Corner brackets, not a border: four 6px L-marks at the box corners. Real
+     elements rather than pseudo-elements so the section's reveal can fade them
+     in — it collects `.corner` nodes, which it cannot do for pseudo-elements. */
+  .cs-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-2);
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
+    white-space: nowrap;
+  }
+  /* Widths are set per corner at MATCHING specificity — a shorthand `border: 0`
+     here would be 0,2,0 and silently beat a 0,1,0 `.cs-c1` override. */
+  .cs-btn .corner {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-style: solid;
+    border-color: #fff;
+    border-width: 0;
+  }
+  .cs-btn .cs-c1 { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+  .cs-btn .cs-c2 { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+  .cs-btn .cs-c3 { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+  .cs-btn .cs-c4 { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+  .cs-btn:hover { color: var(--ember); }
+  .cs-btn:hover .corner { border-color: var(--ember); }
+
+  .cs-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .cs-links a { color: #fff; }
+  .cs-arrow { color: rgba(255, 255, 255, 0.5); }
+  .cs-links a:hover,
+  .cs-links a:hover .cs-arrow { color: var(--ember); }
+
+  /* ---- Composed layout: copy and links flank the portrait --------------- */
+  @media (min-width: 900px) {
+    .cs-lower {
+      position: absolute;
+      inset-inline: 0;
+      /* Figma: copy bottom sits 144px above the portrait bottom. */
+      bottom: calc(var(--space-8) + var(--space-2));
+      margin-block-start: 0;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--gutter);
+      align-items: end;
+    }
+    .cs-copy { grid-column: 1 / 4; }
+    .cs-links {
+      grid-column: 10 / 13;
+      /* Links ride higher than the copy — they line up with the paragraph,
+         not with the buttons below it. */
+      margin-block-end: var(--space-6);
+    }
+  }
+</style>
+
+<script>
+  // Ascii lens over the portrait's backdrop layer. Vendored from Canvas UI via
+  // its framework-agnostic factory — see src/scripts/asciify.ts for why there
+  // is no React here.
+  //
+  // Imported DYNAMICALLY (below, inside the observer) rather than statically:
+  // a static import lands the shader in the page's first-load bundle for every
+  // visitor, including phones and reduced-motion users who never run it. As a
+  // separate chunk it costs nothing until someone with a mouse actually
+  // reaches this section.
+
+  // Shipped configuration. Named so the dev tweak panel can read it for its
+  // initial slider positions and its Reset.
+  const ASCII_OPTS = {
+    // Tuned in the dev panel (the "Ascii" chip) — these are chosen values, not
+    // the library defaults. Reset in the panel restores exactly this set.
+    charset: "blocks" as const,
+    // Fraction of the canvas HEIGHT (942px here), so this is a ~500px lens —
+    // most of the portrait, which reads as the image resolving rather than as
+    // a patch over it.
+    radius: 0.53,
+    // Softness is the feather as a fraction of the radius. NOT the library's
+    // 1: that puts `inner` at 0, so the shader's per-cell dither
+    // (step(hash21(cell), mask)) fires across the whole lens instead of only
+    // its edge, and the result looks patchy rather than solid.
+    softness: 0.7,
+    scale: 3.4,
+    spacing: 0,
+    // 0 leaves the cells transparent between glyphs, so the photo reads
+    // through the block field rather than being replaced by opaque paper.
+    background: "auto" as const,
+    backgroundOpacity: 0,
+    contrast: 1.5,
+    brightness: 0,
+    invert: 0,
+    // Coverage of asciified cells inside the lens — a third of them, so the
+    // blocks scatter over the photo instead of tiling it solidly.
+    strength: 0.32,
+    baseStrength: 0,
+    followSpeed: 4,
+    glow: 0.5,
+    aberration: 0.25,
+  };
+
+  const host = document.querySelector<HTMLElement>("[data-asciify]");
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Cursor-driven, so it is pointless without a pointer — and it is motion, so
+  // reduced-motion opts out entirely rather than just losing its easing.
+  if (host && fine.matches && !reduce.matches) {
+    const source = host.querySelector<HTMLCanvasElement>(".cs-ascii-src")!;
+    const content = host.querySelector<HTMLElement>(".cs-ascii-content")!;
+    const output = host.querySelector<HTMLCanvasElement>(".cs-ascii-out")!;
+
+    // Deferred: this section is the last on the page, and creating the WebGL
+    // context up front would cost a shader compile plus a context on every
+    // load, for something most visitors reach late or never.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        import("../scripts/asciify").then(({ createAsciify }) => {
+          const instance = createAsciify({ source, content, output }, ASCII_OPTS);
+          // Handle for the dev tweak panel. import.meta.env.DEV is statically
+          // false in a production build, so this is dropped at bundle time.
+          if (import.meta.env.DEV) {
+            (window as any).__asciify = { instance, defaults: ASCII_OPTS };
+            dispatchEvent(new Event("asciify:ready"));
+          }
+        });
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(host);
+  }
+</script>

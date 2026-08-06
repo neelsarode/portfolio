@@ -31,8 +31,18 @@
   </div>
   <!-- Same split as the dot, and for the same reason: the outer node tracks
        the pointer every frame, the inner carries the transitioned offset that
-       pushes the label clear of the rings when they bloom. -->
-  <div class="ax-label"><span>Neel Sarode</span></div>
+       pushes the label clear of the rings when they bloom.
+       Inside the chip: a text span (rewritten by JS) and the scroll-hint
+       arrow, hidden except in scroll mode. TWO copies of the glyph make the
+       wrap seamless — as one slides out of the bottom of the chip, the other
+       is already entering from the top, and the loop point is invisible
+       because both copies are identical. -->
+  <div class="ax-label">
+    <span class="ax-chip">
+      <span class="ax-chip-t">Neel Sarode</span>
+      <span class="ax-chip-a"><span class="ax-chip-a-track"><i>→</i><i>→</i></span></span>
+    </span>
+  </div>
 </div>
 
 <style>
@@ -139,9 +149,14 @@
       will-change: transform;
     }
     /* Inner: the visible chip, offset from that point. Matches the rings'
-       duration and curve so the push-out and the bloom read as one gesture. */
-    .ax-label span {
-      display: block;
+       duration and curve so the push-out and the bloom read as one gesture.
+       Scoped by class, NOT `.ax-label span` — that selector would also catch
+       the chip's own children (text span, arrow widget) and hand each of them
+       padding and a background. */
+    .ax-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       width: max-content;
       padding: 4px 6px;
       font-family: var(--font-geist-sans);
@@ -167,13 +182,53 @@
         color 0.2s linear;
       will-change: transform, opacity;
     }
-    .axis-cursor.has-label .ax-label span { opacity: 1; }
+    .axis-cursor.has-label .ax-chip { opacity: 1; }
     /* Clickable target: invert the chip. Tied to real clickability, not to
        whether a label was set, so the inversion never promises a navigation
-       that isn't there. */
-    .axis-cursor.is-hot .ax-label span {
+       that isn't there. The scroll hint shares the inversion — it is a call
+       to act too, just "scroll" rather than "click". */
+    .axis-cursor.is-hot .ax-chip,
+    .ax-chip.ax-scrolling {
       color: #212121;
       background: #ffffff;
+    }
+
+    /* ---- Scroll hint (hero) ------------------------------------------------
+       "Scroll" plus the → glyph rotated to point down, per the Figma. The
+       arrow lives in a one-line-high window and a track twice that tall holds
+       two copies; the track slides down by exactly one copy and snaps back, so
+       the glyph exits the bottom as its twin enters from the top and the reset
+       frame is pixel-identical to the start frame. Linear, per the design. */
+    .ax-chip-a {
+      display: none;
+      height: 1.5em;
+      width: 1em;
+      overflow: hidden;
+    }
+    .ax-chip.ax-scrolling .ax-chip-a { display: block; }
+    .ax-chip-a-track {
+      display: flex;
+      flex-direction: column;
+      animation: ax-arrow-wrap 1.3s linear infinite;
+    }
+    .ax-chip-a-track i {
+      font-style: normal;
+      height: 1.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* The Figma is the → glyph rotated 90°, not the ↓ character — the two
+         differ in Geist (↓ draws a longer stem). */
+      transform: rotate(90deg);
+    }
+    @keyframes ax-arrow-wrap {
+      from { transform: translateY(-50%); }
+      to { transform: translateY(0); }
+    }
+    /* The hint may still appear under reduced motion (it is a static label
+       then); only the looping travel is motion, so only that is switched off. */
+    @media (prefers-reduced-motion: reduce) {
+      .ax-chip-a-track { animation: none; }
     }
   }
 
@@ -192,7 +247,8 @@
     const h = root.querySelector<HTMLElement>(".ax-h")!;
     const dot = root.querySelector<HTMLElement>(".ax-dot")!;
     const label = root.querySelector<HTMLElement>(".ax-label")!;
-    const chip = label.querySelector<HTMLElement>("span")!;
+    const chip = label.querySelector<HTMLElement>(".ax-chip")!;
+    const chipText = chip.querySelector<HTMLElement>(".ax-chip-t")!;
 
     // Label offset from the crosshair, per axis. 12 is the preset's resting
     // value (corner ~17px from centre, a 14px gap off the 3px dot). 30 keeps
@@ -213,15 +269,34 @@
     // chip.
     const MAX_BORROWED = 40;
 
+    // "Scroll ↓" hint zone (the hero). Held back until the hero entrance has
+    // finished so the hint never competes with the headline still rising.
+    // Under reduced motion that entrance never runs — the copy just appears —
+    // so there is nothing to wait for and the hint is eligible immediately
+    // (its own arrow loop is separately stilled in CSS).
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const scrollHintReady = () =>
+      (window as any).__heroIntroDone === true || reduce.matches;
+
+    type LabelState = { text: string; scroll?: boolean };
+
     // null means "nothing to name" — the chip stays hidden.
-    const labelFor = (el: Element | null): string | null => {
+    const labelFor = (el: Element | null): LabelState | null => {
       // An explicit tag always wins over borrowed text.
       const tagged = el?.closest<HTMLElement>("[data-cursor-label]");
-      if (tagged) return tagged.dataset.cursorLabel!.trim() || null;
+      if (tagged) {
+        const t = tagged.dataset.cursorLabel!.trim();
+        return t ? { text: t } : null;
+      }
       const click = el?.closest(INTERACTIVE);
       if (click) {
         const own = (click.textContent || "").replace(/\s+/g, " ").trim();
-        if (own && own.length <= MAX_BORROWED) return own;
+        if (own && own.length <= MAX_BORROWED) return { text: own };
+      }
+      // AFTER the interactive check on purpose: the nav sits inside the hero,
+      // and hovering "Work" should read "Work", not "Scroll".
+      if (el?.closest("[data-cursor-scroll]") && scrollHintReady()) {
+        return { text: "Scroll", scroll: true };
       }
       return null;
     };
@@ -272,17 +347,21 @@
         hot = next;
         root.classList.toggle("is-hot", next);
       }
-      const text = labelFor(el);
-      if (text !== shown) {
+      const state = labelFor(el);
+      // \0 cannot appear in real label text, so the scroll state can never
+      // collide with a literal data-cursor-label="Scroll".
+      const key = state ? (state.scroll ? "\0scroll" : state.text) : null;
+      if (key !== shown) {
         // Only rewrite on the way IN. Clearing the text on the way out would
-        // collapse the chip to its padding mid-shrink, so the old text rides
-        // the exit and is replaced by the next one.
-        if (text) {
-          chip.textContent = text;
+        // collapse the chip to its padding mid-shrink, so the old content
+        // rides the exit and is replaced by the next one.
+        if (state) {
+          chipText.textContent = state.text;
+          chip.classList.toggle("ax-scrolling", !!state.scroll);
           measure(); // width changed, so the edge-flip threshold moved with it
         }
-        shown = text;
-        root.classList.toggle("has-label", !!text);
+        shown = key;
+        root.classList.toggle("has-label", !!state);
       }
       placeChip();
     };
@@ -337,6 +416,15 @@
     addEventListener("resize", () => {
       measure();
       if (root.hasAttribute("data-visible")) draw();
+    });
+
+    // The hero entrance finishing is also a label change with no pointermove
+    // to announce it: a pointer parked in the hero since load would otherwise
+    // not see the Scroll hint until it moved.
+    addEventListener("hero:intro-done", () => {
+      if (root.hasAttribute("data-visible")) {
+        setHot(document.elementFromPoint(x, y));
+      }
     });
 
     // Content moving under a stationary pointer is a hover change with no

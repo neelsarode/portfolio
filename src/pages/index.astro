@@ -212,7 +212,10 @@ const dumpItems = [
   <main class="content">
     <!-- Hero: original embed, opaque; scrolls away to reveal the fixed scene.
          Nav + title/desc are placed on the 12-col macro grid. -->
-    <section class="hero">
+    {/* data-cursor-scroll: the axis cursor shows its "Scroll ↓" hint while the
+        pointer is anywhere over the hero — but only once the entrance has
+        finished (see the hero timeline's onComplete below). */}
+    <section class="hero" data-cursor-scroll>
       <div
         class="us-scene us-hero"
         data-us-project={HERO_PROJECT}
@@ -654,7 +657,17 @@ const dumpItems = [
 
       const runHero = (sceneStartMs: number) => {
         const elapsed = (performance.now() - sceneStartMs) / 1000;
-        gsap.timeline({ delay: Math.max(0, HERO_AT - elapsed) })
+        gsap.timeline({
+          delay: Math.max(0, HERO_AT - elapsed),
+          // The axis cursor holds its "Scroll" hint back until the entrance
+          // has fully played, so the hint never competes with the headline
+          // still rising. Flag + event: the flag covers a cursor script that
+          // checks later, the event wakes one already waiting.
+          onComplete: () => {
+            (window as any).__heroIntroDone = true;
+            dispatchEvent(new Event("hero:intro-done"));
+          },
+        })
           .fromTo(
             heroRisers,
             { y: 0, yPercent: 110 },

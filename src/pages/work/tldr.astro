@@ -2,70 +2,80 @@
 import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
 import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
-// Case-study page template (reached from Featured Work row 1). Structure and
-// content follow the CMS-page reference (Livingless example content, CDN
-// images) — every style is adapted to the site system: Geist type recipes,
-// the 12-col macro grid + --space-* scale, void canvas throughout (no
-// light/dark section alternation), sharp media corners, masked GSAP reveals,
-// structural grid lines, Lenis via FullscreenLayout. Swap the example
-// content for the real TL;DR study later — the shell is the deliverable.
+import DevGrid from "../../components/DevGrid.astro";
+// TL;DR case study (Figma 2548:24573). Typography is copied EXACTLY from the
+// file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
+// spacing and columns are mapped onto the site system — the design's 1296px
+// container IS the 12-col macro grid at 1440 (col 86 + gutter 24), so every
+// media width in the file lands on a whole column span:
+//   746 = 7 cols · 526 = 5 cols · 636 = 6 cols · wide = 12 cols.
+// The one exception is the TwitchCon pair (360/912), which sits off-grid in
+// the file and is approximated to 4/8 cols.
+//
+// Media policy: the Brand row is real — left panel is an exported image, the
+// right panel is the Twitch extension REBUILT AS HTML over the prism
+// backdrop (interim image; swap in the background video when supplied).
+// Every other panel is a placeholder slot (the file leaves them empty)
+// awaiting real screenshots/loops — same drop-in flow as the homepage covers.
 
 const info = [
-  { label: "Things we did", values: ["Sora consulting", "Webflow development", "AI Prompting"] },
-  { label: "Client", values: ["Livingless, Inc."] },
-  { label: "Year", values: ["2028"] },
-  { label: "Live website", values: [], link: { text: "Visit website", href: "#" } },
+  {
+    label: "Things I Did",
+    values: [
+      "Brand Creation",
+      "Product UI/UX",
+      "Product Front-End Code (React)",
+      "Website Design & Development",
+      "Investor & Sales Decks",
+      "Clothing & Event Design",
+    ],
+  },
+  { label: "Company", values: ["TL;DR"] },
+  { label: "Role", values: ["Co-Founder", "Creative Director"] },
+  { label: "Year", values: ["2024 → Present"] },
+  { label: "Live website", values: [], link: { text: "Visit website", href: "https://tl-dr.tv" } },
 ];
 
-const bands = [
-  {
-    kind: "pair",
-    imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c5f2b47284901fd2454b2_67c82db8e5707cb06cd7436f1d0ca312f2014463.png",
-    imgB: "https://byqsupply-components.netlify.app/humanmachine/images/ContactImage2.webp",
-    overlayLabel: "Adaptable brand frameworks",
-    label: "Brand Systems",
-    body:
-      "We design adaptable brand frameworks built to scale across every touchpoint, from visual identity to communication guidelines. Our approach is rooted in clarity and consistency — making sure every color, font, and element speaks the same language while leaving room for organic growth. Whether it's launching a fresh brand or refreshing an existing one, we focus on building systems that last, adapt, and tell your story with precision.",
-  },
-  {
-    kind: "single",
-    imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c6102da3e1062d7ccd574_Frame%201321315842.png",
-    label: "Digital Experiences",
-    body:
-      "We craft immersive digital platforms — websites, product pages, and interactive campaigns — that merge seamless functionality with refined aesthetics. Each project is a balance of speed, usability, and storytelling, designed to work perfectly across all devices and user contexts. By combining human-centered design with machine-driven optimization, we create digital experiences that feel effortless yet unforgettable.",
-  },
+const myTldrFeatures = [
+  "Modular bento-style layout engine that adapts based off what the user sets up",
+  "Detection if the user is live on Twitch or Kick to drive traffic to their stream",
+  "Opt-in for user to send out email and text blasts when they go live",
+  "Stream highlight clips from TL;DR",
+  "User’s livestreaming schedule",
+  "Links to their affiliate products",
 ];
 
-const designBand = {
-  imgA: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c610347d4be22e5ad7fec_adf44daa9a315a74c2468e3e1d36bf8c5f49a285.png",
-  imgB: "https://cdn.prod.website-files.com/688139c2591d806374ecc178/688c610368f529584d37f07b_fd101586589bb01d54cfa309fe61040f61b74907.png",
-  overlayLabel: "Subtle micro-interactions",
-  label: "Motion & AI Design",
-  body:
-    "From subtle micro-interactions to full-scale motion graphics, we use animation to bring depth, emotion, and flow to every brand experience. Paired with AI-driven design elements, our motion systems are both intelligent and engaging, helping brands communicate more dynamically without sacrificing clarity. We believe in motion as a storytelling tool — one that highlights the essentials, guides the user, and builds a sense of living, breathing design.",
-};
+const streamhubFeatures = [
+  "Drag and drop canvas to position and resize sub account livestreams",
+  "Manual clipping button per sub account livestream",
+  "Ability to toggle on & off subaccounts in the canvas view",
+];
 
+// Placeholder cards carried over from the design file (it still shows the
+// template's example projects here). Swap for two real projects + media.
 const moreWork = [
-  {
-    href: "/",
-    img: "https://byqsupply-components.netlify.app/humanmachine/images/CMS_Grid_Image2.webp",
-    title: "Nomad Vision™",
-    tags: ["Branding", "Web Design", "AI Prompting"],
-  },
-  {
-    href: "/work/tldr",
-    img: "https://byqsupply-components.netlify.app/humanmachine/images/CMS_Grid_Image3.png",
-    title: "Livingless",
-    tags: ["Sora Consulting", "Webflow Development", "AI Prompting"],
-  },
+  { title: "Nomad Vision™", tags: ["Branding", "Web Design", "AI Prompting"] },
+  { title: "Livingless", tags: ["Sora Consulting", "Webflow Development", "AI Prompting"] },
 ];
 ---
-<FullscreenLayout title="Livingless — Case Study — Neel Sarode">
+<FullscreenLayout title="TL;DR — Case Study — Neel Sarode">
   <GridLines />
 
+  <!-- Shared radial fill for the spark bullets (exact gradient from the file:
+       white core to #999 tips). One defs block; every bullet references it. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <radialGradient id="cs-spark-grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(7.5 7.5) rotate(90) scale(7.5)">
+        <stop stop-color="white" />
+        <stop offset="1" stop-color="#999999" />
+      </radialGradient>
+    </defs>
+  </svg>
+
   <main class="content">
-    <!-- 1 · Hero: full-viewport image, nav overlaid top, title bottom-left
-         on the grid margin. Sharp, full-bleed — the site's media language. -->
+    <!-- 1 · Hero — full viewport, nav overlaid, title bottom-left. The file
+         leaves the hero media empty; the dashboard loop is the obvious
+         occupant and was already encoded for the homepage. -->
     <section class="cs-hero" data-reveal-group>
       <video
         class="cs-hero-img"
@@ -83,122 +93,581 @@ const moreWork = [
       <div class="cs-hero-overlay">
         <header class="cs-nav"><SiteNav activePath="/" /></header>
         <h1 class="cs-title">
-          <span class="mask"><span class="line">Livingless</span></span>
+          <span class="mask"><span class="line">TL;DR</span></span>
         </h1>
       </div>
     </section>
 
-    <!-- 2 · About: info tiles (cols 1-6) + standfirst (cols 7-13). -->
+    <!-- 2 · About — info tiles (cols 1-6) + standfirst (cols 7-13). -->
     <section class="cs-band cs-about">
       <div class="content-grid">
         <div class="full-composed">
           <div class="cs-info" data-reveal-group>
-            {info.map((tile) => (
-              <div class="cs-tile">
-                <span class="mask"><p class="cs-label">{tile.label}</p></span>
-                {tile.values.map((v) => (
-                  <span class="mask"><p class="cs-value">{v}</p></span>
+            <div class="cs-tile cs-tile-tall">
+              <span class="mask"><p class="cs-ilabel">{info[0].label}</p></span>
+              <div class="cs-tile-values">
+                {info[0].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
                 ))}
-                {tile.link && (
-                  <span class="mask"><a class="cs-value cs-link" href={tile.link.href}>{tile.link.text}</a></span>
-                )}
               </div>
-            ))}
+            </div>
+            <div class="cs-tile-stack">
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[1].label}</p></span>
+                {info[1].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[2].label}</p></span>
+                {info[2].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[3].label}</p></span>
+              {info[3].values.map((v) => (
+                <span class="mask"><p class="cs-ivalue">{v}</p></span>
+              ))}
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[4].label}</p></span>
+              <span class="mask">
+                <a class="cs-ivalue cs-ilink" href={info[4].link!.href} target="_blank" rel="noopener">{info[4].link!.text}</a>
+              </span>
+            </div>
           </div>
+
           <div class="cs-standfirst" data-reveal-group>
-            <h2 class="cs-statement">
-              <span class="mask"><span class="line">
-                Livingless is a curated brand concept — built to show how human
-                intuition and machine precision can create design that feels
-                effortless, timeless, and alive. This is not just a showcase.
-              </span></span>
-            </h2>
+            <span class="mask"><p class="cs-statement">
+              <span class="mut">TL;DR is a software platform that empowers livestreamers
+              with growth tools like AI-generated live highlight clips, video editing,
+              and distribution across socials.</span>
+            </p></span>
+            <span class="mask"><p class="cs-statement">
+              I joined at formation and built everything users see: the brand and
+              website from zero, the product UX, and large parts of shipped React
+              front-end. Most feature and product direction decisions were mine.
+            </p></span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 3-4 · Brand / Experiences: image grid + label/body row. -->
-    {bands.map((band) => (
-      <section class="cs-band">
-        <div class="content-grid">
-          <div class="full-composed" data-reveal-group>
-            {band.kind === "pair" ? (
-              <>
-                <div class="cs-img cs-img-a" data-fade>
-                  <img src={band.imgA} alt="" loading="lazy" decoding="async" />
-                </div>
-                <div class="cs-img cs-img-b" data-fade>
-                  <img src={band.imgB} alt="" loading="lazy" decoding="async" />
-                  <p class="cs-img-caption">{band.overlayLabel}</p>
-                </div>
-              </>
-            ) : (
-              <div class="cs-img cs-img-wide" data-fade>
-                <img src={band.imgA} alt="" loading="lazy" decoding="async" />
-              </div>
-            )}
-            <span class="mask cs-rowlabel"><p class="cs-label">{band.label}</p></span>
-            <span class="mask cs-rowbody"><p class="cs-body">{band.body}</p></span>
-          </div>
-        </div>
-      </section>
-    ))}
-
-    <!-- 5 · Quote -->
+    <!-- 3 · Brand — final media: brand panel (5 cols) + the extension panel
+         (7 cols) rebuilt in HTML, then The Brand System row. -->
     <section class="cs-band">
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
-          <div class="cs-quote">
-            <span class="mask"><svg class="cs-quote-mark" viewBox="0 0 48 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M9.96923 44C6.89231 44 4.49231 42.841 2.76923 40.523C0.923077 38.2051 0 35.0501 0 31.058C0 25.1343 1.23077 19.7257 3.69231 14.8322C6.27692 9.93875 10.4 5.3672 16.0615 1.11759C17.5385 -0.0413917 18.7077 -0.298944 19.5692 0.344935C20.0615 0.731266 20.3077 1.31076 20.3077 2.08341C20.3077 2.72729 19.8769 3.37117 19.0154 4.01505C14.8308 7.74956 12.1231 10.647 10.8923 12.7074C9.78462 14.6391 9.23077 16.6995 9.23077 18.8887C9.23077 21.2066 9.72308 23.0095 10.7077 24.2973C11.6923 25.4563 12.8 26.4865 14.0308 27.3879C15.2615 28.1606 16.3692 29.1264 17.3538 30.2854C18.3385 31.4443 18.8308 33.1828 18.8308 35.5008C18.8308 37.8188 18.0308 39.8148 16.4308 41.4889C14.9538 43.163 12.8 44 9.96923 44ZM37.6615 44C34.5846 44 32.1231 42.841 30.2769 40.523C28.5538 38.2051 27.6923 35.0501 27.6923 31.058C27.6923 25.1343 28.9231 19.7257 31.3846 14.8322C33.9692 9.93875 38.0923 5.3672 43.7538 1.11759C45.2308 -0.0413917 46.4 -0.298944 47.2615 0.344935C47.7538 0.731266 48 1.31076 48 2.08341C48 2.72729 47.5692 3.37117 46.7077 4.01505C42.5231 7.74956 39.8154 10.647 38.5846 12.7074C37.4769 14.6391 36.9231 16.6995 36.9231 18.8887C36.9231 21.2066 37.4154 23.0095 38.4 24.2973C39.3846 25.4563 40.4923 26.4865 41.7231 27.3879C42.9538 28.1606 44.0615 29.1264 45.0462 30.2854C46.0308 31.4443 46.5231 33.1828 46.5231 35.5008C46.5231 37.8188 45.7231 39.8148 44.1231 41.4889C42.6462 43.163 40.4923 44 37.6615 44Z" fill="currentColor" />
-            </svg></span>
-            <blockquote class="cs-quote-text">
-              <span class="mask"><span class="line">"Design isn't about decoration — it's about</span></span>
-              <span class="mask"><span class="line">systems that breathe with purpose. Human +</span></span>
-              <span class="mask"><span class="line">Machine© is where clarity and boldness converge."</span></span>
-            </blockquote>
-            <div class="cs-quote-attr">
-              <span class="mask"><p class="cs-value">Juno Cypher</p></span>
-              <span class="mask"><p class="cs-label">Founder & Director of Digital Realms</p></span>
+          <div class="cs-img cs-pair-b-left" data-fade>
+            <img src="/tldr-brand-system.jpg" alt="The TL;DR brand system: pixel logotype on black with a purple glow." loading="lazy" decoding="async" />
+          </div>
+          {/* Extension panel: ColorFlow loop behind the Twitch extension
+              rebuilt as live HTML at (80,89)/746×648 per the file, plus the
+              stat card. The mock is sized in container-query units so it
+              scales with the panel exactly like the Figma frame. */}
+          <div class="cs-img cs-pair-a-right cs-ext-panel" data-fade>
+            <video
+              class="cs-ext-bg"
+              src="/tldr-prism-loop.mp4"
+              poster="/tldr-prism-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <div class="cs-ext" aria-hidden="true">
+              <div class="cs-ext-head">
+                <span class="cs-ext-logo"><img src="/tldr-ext-logo.svg" alt="" /></span>
+                <span class="cs-ext-px cs-ext-px1"></span>
+                <span class="cs-ext-px cs-ext-px2"></span>
+                <span class="cs-ext-px cs-ext-px3"></span>
+                <span class="cs-ext-pill">
+                  <span class="cs-ext-pill-icon"><img src="/tldr-ext-pill-icon.svg" alt="" /></span>
+                  <span class="cs-ext-pill-text">Capturing Clips</span>
+                </span>
+              </div>
+              <div class="cs-ext-row">
+                <p class="cs-ext-h">Stream Highlights</p>
+                <span class="cs-ext-avatar"><img src="/tldr-ext-avatar.jpg" alt="" /></span>
+              </div>
+              <div class="cs-ext-card">
+                <span class="cs-ext-thumb"><img src="/tldr-ext-clip-deadlock.jpg" alt="" loading="lazy" decoding="async" /></span>
+                <div class="cs-ext-cap">
+                  <p class="cs-ext-title">Getting a crazy double kill while getting pushed</p>
+                  <div class="cs-ext-meta"><span>Deadlock</span><span class="cs-ext-dim">1:03:56</span></div>
+                  <div class="cs-ext-actions">
+                    <div class="cs-ext-reacts">
+                      <span class="cs-ext-react cs-ext-react-hot"><img src="/tldr-ext-emoji-heart.png" alt="" /><span>15</span></span>
+                      <span class="cs-ext-react cs-ext-react-mid"><img src="/tldr-ext-emoji-grin.png" alt="" /><span>242</span></span>
+                      <span class="cs-ext-react"><img src="/tldr-ext-emoji-joy.png" alt="" /><span>4</span></span>
+                      <span class="cs-ext-react"><img src="/tldr-ext-emoji-weary.png" alt="" /><span>12</span></span>
+                      <span class="cs-ext-react"><img src="/tldr-ext-emoji-astonished.png" alt="" /><span>10</span></span>
+                    </div>
+                    <span class="cs-ext-share">
+                      <span class="cs-ext-share-t">Share</span>
+                      <img class="cs-ext-share-i" src="/tldr-ext-share-icon.svg" alt="" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="cs-ext-card">
+                <span class="cs-ext-thumb"><img src="/tldr-ext-clip-league.jpg" alt="" loading="lazy" decoding="async" /></span>
+                <div class="cs-ext-cap">
+                  <p class="cs-ext-title">MayzeFPS and his girlfriend share a High-Five for Muscles!</p>
+                  <div class="cs-ext-meta">
+                    <span>Just Chatting</span><span class="cs-ext-dim">1:03:56</span>
+                    <span class="cs-ext-badge"><img src="/tldr-ext-badge.png" alt="" /></span>
+                    <span class="cs-ext-share cs-ext-share-solo">
+                      <img class="cs-ext-share-i cs-ext-share-i-lg" src="/tldr-ext-share-icon.svg" alt="" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cs-stat cs-stat-brand">
+              <div class="cs-stat-logo-row">
+                <img class="cs-stat-twitch" src="/tldr-twitch-logo.png" alt="Twitch" width="56" height="28" />
+                <p class="cs-stat-store">Extension Store</p>
+              </div>
+              <div class="cs-stat-nums">
+                <p class="cs-stat-num">35,000+</p>
+                <p class="cs-stat-sub">Twitch Extension Installs</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- 6 · Design: pair grid + label/body (same shape as brand band). -->
-    <section class="cs-band">
       <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <div class="cs-img cs-img-a" data-fade>
-            <img src={designBand.imgA} alt="" loading="lazy" decoding="async" />
-          </div>
-          <div class="cs-img cs-img-b" data-fade>
-            <img src={designBand.imgB} alt="" loading="lazy" decoding="async" />
-            <p class="cs-img-caption">{designBand.overlayLabel}</p>
-          </div>
-          <span class="mask cs-rowlabel"><p class="cs-label">{designBand.label}</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">{designBand.body}</p></span>
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">The Brand System</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            TL;DR originally began as an extension inside of Twitch’s ecosystem, so
+            the brand had to feel native to it. I built the identity on codes
+            streamers already trust: Purples similar to Twitch’s spectrum and a
+            pixel logotype that gives TL;DR its own mark inside that familiar world.
+          </p></span>
         </div>
       </div>
     </section>
 
-    <!-- 7 · More work: stacked title + 2-up cards (work-dump caption language). -->
+    <!-- 4 · Website -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">The platform does a bunch of things. The website had to
+            promise just one: </span>growth. <span class="mut">I designed the site
+            so </span>every feature is framed as a piece of the puzzle of growing as
+            a livestreamer.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/tldr-website-loop.mp4"
+              poster="/tldr-website-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <div class="cs-stat">
+              <p class="cs-stat-num">10,000+</p>
+              <p class="cs-stat-sub">Signups to our platform</p>
+            </div>
+          </div>
+          <div class="cs-img cs-pair-a-left" data-fade>
+            <img src="/tldr-website-pages.jpg" alt="TL;DR website pages: the streamer landing page, social scheduling, and the Twitch extension section." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-b-right" data-fade>
+            <video
+              src="/tldr-mobile-loop.mp4"
+              poster="/tldr-mobile-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">The Website Challenge</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">I designed and built the entire website end-to-end: </span>
+            structure, copy hierarchy, and development on Webflow.
+            <span class="mut"> Streamers don’t shop for features, they shop for </span>outcomes<span class="mut">
+            - so every section leads with what a streamer gets and demotes “how it
+            works” to a supporting layer.</span>
+          </p></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Product Design -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">Product design at TL;DR wasn’t just hand-off work. </span>
+            I made most feature and UX direction calls, deciding not just how things
+            looked but what features got built and why.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/tldr-timeline-loop.mp4"
+              poster="/tldr-timeline-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Product Design</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            I designed the platform around the idea that streamers use TL;DR around
+            their streams - before going live, between sessions, and in the minutes
+            after ending. The UI was built for that rhythm: fast to scan and
+            dark-native alongside OBS and Twitch. I placed key components in
+            specific places for quick and easy usage of the platform.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          {/* Scheduled-posts panel: the dashboard's "Upcoming Scheduled
+              Posts" card REBUILT AS HTML, centered on the panel fill —
+              skeleton empty state loops into three populated posts
+              (usp-* global styles + script; timings in TIMELINE). */}
+          <div class="cs-img cs-pair-a-left cs-usp-panel" data-fade>
+            <img src="/tldr-scheduled-bg.jpg" alt="" loading="lazy" decoding="async" />
+            <div class="cs-usp-center">
+              <section class="usp-card" aria-hidden="true">
+                <div class="usp-layout">
+
+                  <header class="usp-head">
+                    <p class="usp-title">Upcoming<br />Scheduled Posts</p>
+                    <button class="usp-cta" type="button" tabindex="-1">
+                      Go to Content Calendar
+                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
+                        <path d="M1.5 7.5L7.5 1.5M7.5 1.5H2.7M7.5 1.5V6.3" stroke="white" stroke-opacity="0.72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </header>
+
+                  <div class="usp-list">
+
+                    <!-- empty state: skeleton stack + pill -->
+                    <div class="usp-empty" id="usp-empty" aria-hidden="true">
+                      <div class="usp-bones" id="usp-bones"></div>
+                      <div class="usp-pill-wrap">
+                        <span class="usp-pill" id="usp-pill">No posts scheduled</span>
+                      </div>
+                    </div>
+
+                    <!-- live layer: 3 posts across 2 day groups -->
+                    <div class="usp-posts" id="usp-posts">
+
+                      <div class="usp-dayrow usp-row" data-step="0">
+                        <time class="usp-day">Today · Fri, Aug 8</time>
+                        <span class="usp-divider"></span>
+                      </div>
+
+                      <article class="usp-item" data-step="1">
+                        <div class="usp-item-head">
+                          <time class="usp-time">3:00PM PST</time>
+                          <div class="usp-platforms">
+                            <!-- tiktok active · instagram dim · youtube dim -->
+                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white" fill-opacity="0.32"/></svg>
+                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white" fill-opacity="0.32"/></svg>
+                          </div>
+                        </div>
+                        <p class="usp-item-title">Highlights from tonight's ranked climb</p>
+                      </article>
+
+                      <article class="usp-item" data-step="2">
+                        <div class="usp-item-head">
+                          <time class="usp-time">6:30PM PST</time>
+                          <div class="usp-platforms">
+                            <!-- tiktok dim · instagram active · youtube dim -->
+                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white" fill-opacity="0.32"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white"/></svg>
+                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white" fill-opacity="0.32"/></svg>
+                          </div>
+                        </div>
+                        <p class="usp-item-title">Behind the scenes at team scrims</p>
+                      </article>
+
+                      <div class="usp-dayrow usp-row" data-step="3">
+                        <time class="usp-day">Tomorrow · Sat, Aug 9</time>
+                        <span class="usp-divider"></span>
+                      </div>
+
+                      <article class="usp-item" data-step="4">
+                        <div class="usp-item-head">
+                          <time class="usp-time">11:00AM PST</time>
+                          <div class="usp-platforms">
+                            <!-- tiktok dim · instagram dim · youtube active -->
+                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white" fill-opacity="0.32"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white" fill-opacity="0.32"/></svg>
+                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white"/></svg>
+                          </div>
+                        </div>
+                        <p class="usp-item-title">Weekly top 5 plays</p>
+                      </article>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="usp-fadeout" aria-hidden="true"></div>
+              </section>
+            </div>
+          </div>
+          <div class="cs-img cs-pair-b-right" data-fade>
+            <video
+              src="/tldr-micro-loop.mp4"
+              poster="/tldr-micro-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-caption">Subtle micro-interactions</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Feature Builds -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">Every handoff lost something - spacing, states, motion.
+            So I cut the handoff: </span>Now I build my designs in React myself,
+            working with Claude Code and MCP tooling to ship accurate, functional
+            front-end at speed. Product development sped up by multiples.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <video
+              src="/tldr-figma-loop.mp4"
+              poster="/tldr-figma-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-badge">Before</p>
+            <p class="cs-img-caption">Figma files</p>
+            <p class="cs-hover-note">Every feature started as a full Figma flow — screens, states, and edge cases specced before any code.</p>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <video
+              src="/tldr-prototype-loop.mp4"
+              poster="/tldr-prototype-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-badge">After</p>
+            <p class="cs-img-caption">React prototype dashboard</p>
+            <p class="cs-hover-note">The same flows rebuilt as a working React dashboard — spacing, states, and motion carried over intact.</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Feature Builds</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            Building front-end myself changed what I could take on. Instead of
+            designing features for someone else to build, I started ideating full
+            features and building them myself. Both featured in-depth below.
+          </p></span>
+        </div>
+      </div>
+
+      <!-- Feature: My TL:DR — image left, spec column right. -->
+      <div class="content-grid">
+        <div class="full-composed cs-feature" data-reveal-group>
+          <div class="cs-img cs-feat-img-left" data-fade>
+            <video
+              src="/tldr-mytldr-loop.mp4"
+              poster="/tldr-mytldr-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-feat-col cs-feat-col-right">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">My TL;DR</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                I designed and built out a fully functional prototyped version of My
+                TL;DR, an upgraded link-in-bio product specifically targeted towards
+                live streamers, while keeping everything inline with the TL;DR brand.
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
+              {myTldrFeatures.map((f) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <p class="cs-feat-body">{f}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature: Streamhub — spec column left, image right. -->
+      <div class="content-grid">
+        <div class="full-composed cs-feature" data-reveal-group>
+          <div class="cs-feat-col cs-feat-col-left">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">Streamhub</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                I also designed and built out Streamhub for our B2B users, giving a
+                master account the ability to watch all the sub accounts streams
+                simultaneously on a customizable canvas
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
+              {streamhubFeatures.map((f) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <p class="cs-feat-body">{f}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="cs-img cs-feat-img-right" data-fade>
+            <video
+              src="/tldr-streamhub-loop.mp4"
+              poster="/tldr-streamhub-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · TwitchCon -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">I created TL;DR's brand system to work even outside
+            the product</span> - in B2B and pitch decks, on convention floors,
+            and even on clothing.<span class="mut"> Here's some other places I
+            pushed TL;DR's design system to:</span>
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-narrow-left" data-fade>
+            <video
+              src="/tldr-twitchcon-2025-san-diego-loop.mp4"
+              poster="/tldr-twitchcon-2025-san-diego-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-caption">Twitchcon San Diego 2025</p>
+          </div>
+          <div class="cs-img cs-pair-broad-right" data-fade>
+            <img src="/tldr-twitchcon-stage.jpg" alt="TL;DR founders presenting on the TwitchCon booth stage, with the product and 'What is TL;DR?' on the screen wall behind them." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/tldr-totem-loop.mp4"
+              poster="/tldr-totem-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-caption">B2B and Pitch Deck Design</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · More work — placeholder cards from the file. -->
     <section class="cs-band cs-more">
       <div class="content-grid">
         <div class="full-composed">
           <h2 class="cs-more-title" data-reveal-group>
-            <span class="mask"><span class="line">More</span></span>
-            <span class="mask"><span class="line">work</span></span>
+            <span class="mask"><span class="line">More work</span></span>
           </h2>
           <div class="cs-cards">
             {moreWork.map((card) => (
-              <a class="cs-card" href={card.href} data-reveal-group>
-                <div class="cs-card-media" data-fade>
-                  <img src={card.img} alt="" loading="lazy" decoding="async" />
-                  <div class="cs-card-veil" aria-hidden="true"></div>
-                </div>
+              <article class="cs-card" data-reveal-group data-cursor-label={card.title}>
+                <div class="cs-card-media" data-fade></div>
                 <div class="cs-card-caption">
                   <span class="mask"><p class="cs-card-name">{card.title}</p></span>
                   <div class="cs-card-tags">
@@ -210,13 +679,17 @@ const moreWork = [
                     ))}
                   </div>
                 </div>
-              </a>
+              </article>
             ))}
           </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`).
+       Ascii/BG chips are homepage-only — their targets don't exist here. -->
+  <DevGrid ascii={false} bg={false} />
 </FullscreenLayout>
 
 <!-- Same reveal system as the homepage: masked line rises + media fades per
@@ -237,6 +710,23 @@ const moreWork = [
       ? wireLenis()
       : addEventListener("lenis:init", wireLenis, { once: true });
 
+    // Panel loops autoplay below the fold, and Chrome's offscreen media
+    // optimisation can pause them there without resuming on scroll — same
+    // failure mode the homepage covers solve. Gate each on visibility.
+    document
+      .querySelectorAll<HTMLVideoElement>("video.cs-ext-bg, .cs-img > video")
+      .forEach((v) => {
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) v.play().catch(() => {});
+              else v.pause();
+            });
+          },
+          { rootMargin: "160px" },
+        ).observe(v);
+      });
+
     gsap.utils.toArray<HTMLElement>("[data-reveal-group]").forEach((group) => {
       const risers = group.querySelectorAll(".mask > *");
       const fades = group.querySelectorAll("[data-fade]");
@@ -256,12 +746,95 @@ const moreWork = [
       }
     });
   } else {
-    // Reduced motion: hero loop stays on its poster frame.
-    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img").forEach((v) => {
+    // Reduced motion: the hero and extension loops stay on their posters.
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, video.cs-ext-bg, .cs-img > video").forEach((v) => {
       v.removeAttribute("autoplay");
       v.pause();
       v.currentTime = 0;
     });
+  }
+</script>
+
+<script>
+  // Upcoming Scheduled Posts — the animated dashboard-card rebuild in the
+  // Product Design section. Self-contained: it only touches usp-* elements,
+  // and the loop restarts from the empty state each time the card scrolls
+  // into view. All timings live in TIMELINE.
+  const uspCard = document.querySelector(".usp-card");
+  const uspEmpty = document.getElementById("usp-empty");
+  const uspPill = document.getElementById("usp-pill");
+  const uspPosts = document.getElementById("usp-posts");
+  const uspBones = document.getElementById("usp-bones");
+
+  if (uspCard && uspEmpty && uspPill && uspPosts && uspBones) {
+    const rows = uspPosts.querySelectorAll("[data-step]");
+
+    // Skeleton stack (mirrors the production EmptyState).
+    const groups = [["72%", "58%", "84%"], ["66%", "78%"], ["54%", "70%", "62%"]];
+    uspBones.innerHTML = groups
+      .map(
+        (widths) =>
+          '<div class="usp-dayrow"><span class="usp-bone usp-bone--day"></span><span class="usp-divider"></span></div>' +
+          widths
+            .map(
+              (w) =>
+                '<div class="usp-item" style="border-color:transparent">' +
+                '<div class="usp-item-head"><span class="usp-bone usp-bone--time"></span>' +
+                '<div class="usp-platforms"><span class="usp-bone usp-bone--dot"></span><span class="usp-bone usp-bone--dot"></span><span class="usp-bone usp-bone--dot"></span></div></div>' +
+                '<span class="usp-bone usp-bone--title" style="width:' + w + '"></span></div>',
+            )
+            .join(""),
+      )
+      .join("");
+
+    // Reduced motion: the CSS shows the populated state statically.
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // [delay-from-loop-start(ms), action]
+      const TIMELINE: [number, () => void][] = [
+        [1400, () => uspPill.classList.add("usp-out")],
+        [1750, () => { uspEmpty.classList.add("usp-fade"); uspPosts.classList.add("usp-live"); }],
+        [1950, () => rows[0].classList.add("usp-in")], // day: today
+        [2150, () => rows[1].classList.add("usp-in")], // post 1
+        [2800, () => rows[2].classList.add("usp-in")], // post 2
+        [3450, () => rows[3].classList.add("usp-in")], // day: tomorrow
+        [3650, () => rows[4].classList.add("usp-in")], // post 3
+        [7400, () => uspPosts.classList.add("usp-fade")],
+        [7850, () => reset()],
+      ];
+
+      let timers: ReturnType<typeof setTimeout>[] = [];
+      let running = false;
+
+      const clearState = () => {
+        uspPosts.classList.remove("usp-live", "usp-fade");
+        uspEmpty.classList.remove("usp-fade");
+        uspPill.classList.remove("usp-out");
+        rows.forEach((r) => r.classList.remove("usp-in"));
+      };
+      const schedule = () => {
+        TIMELINE.forEach(([delay, action]) => timers.push(setTimeout(action, delay)));
+      };
+      function reset() {
+        clearState();
+        if (running) schedule();
+      }
+      const start = () => {
+        if (running) return;
+        running = true;
+        schedule();
+      };
+      const stop = () => {
+        running = false;
+        timers.forEach(clearTimeout);
+        timers = [];
+        clearState();
+      };
+
+      new IntersectionObserver(
+        (entries) => (entries[0].isIntersecting ? start() : stop()),
+        { threshold: 0.35 },
+      ).observe(uspCard);
+    }
   }
 </script>
 
@@ -277,29 +850,65 @@ const moreWork = [
   }
   .line { display: block; }
 
-  /* ---- Shared type recipes (site system, Geist only) ---- */
+  /* ============================================================
+     Type recipes — EXACT values from the Figma file. All Geist 400.
+       display title    52 / 1    / -0.04em
+       body (24-class)  24 / 1.2  / -0.02em   white, .mut spans 65%
+       about statement  24 / 1.15 / -0.02em
+       row label        16 / 1.2  / -0.01em   65%
+       stat number      24 / 1.15 / -0.02em   · stat sub 16 / 1.15 / 65%
+       info label       14 / 1.2  / -0.01em   65%
+       info value       14 / 1.48 / -0.01em   white
+       feature title    18 / 1.48 / -0.01em   white
+       feature body     14 / 1.2  / -0.01em   65% (lead-in white)
+       image caption    12 / 1.2  / -0.01em   88%
+     ============================================================ */
+  .cs-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-body {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-statement {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .mut { color: rgba(255, 255, 255, 0.65); }
+  .cs-center { text-align: center; text-wrap: balance; }
   .cs-label {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ilabel {
     margin: 0;
     font-size: 14px;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.65);
   }
-  .cs-value {
+  .cs-ivalue {
     margin: 0;
     font-size: 14px;
     line-height: 1.48;
     letter-spacing: -0.01em;
     color: #fff;
   }
-  .cs-link { text-decoration: underline; text-underline-offset: 3px; }
-  .cs-body {
-    margin: 0;
-    font-size: clamp(15px, 1.4vw, 17px);
-    line-height: 1.55;
-    letter-spacing: -0.01em;
-    color: rgba(255, 255, 255, 0.88);
-  }
+  .cs-ilink { text-decoration: underline; text-underline-offset: 3px; }
 
   /* ---- 1 · Hero ---- */
   .cs-hero {
@@ -316,7 +925,6 @@ const moreWork = [
     height: 100%;
     object-fit: cover;
   }
-  /* Legibility scrim: bottom-weighted, like the homepage hero treatment. */
   .cs-hero-scrim {
     position: absolute;
     inset: 0;
@@ -333,20 +941,19 @@ const moreWork = [
     padding: clamp(16px, 1.2vw, 20px);
   }
   .cs-nav { padding: 0; }
-  .cs-title {
-    margin: 0;
-    padding: 0;
-    font-size: clamp(34px, 5.4vw, 52px);
-    line-height: 1;
-    letter-spacing: -0.04em;
-    font-weight: 400;
-    color: #fff;
-  }
 
-  /* ---- Section bands: --space-8 rhythm on the void canvas ---- */
-  .cs-band { padding-block: 0 var(--space-8); }
+  /* ---- Section rhythm (from the file: 96 into About, 128 between bands,
+         64 around intros and label/body rows, 24 between media rows). ---- */
+  .cs-band { padding-block-end: var(--space-8); }
   .cs-about { padding-block: var(--space-7) var(--space-8); }
-  .cs-band .full-composed { row-gap: var(--space-6); }
+  .cs-row { margin-block-start: var(--space-6); }
+  .cs-intro {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 702px;
+    margin-block-end: var(--space-6);
+  }
+  .cs-feature { margin-block-start: var(--space-6); }
 
   /* ---- 2 · About ---- */
   .cs-info {
@@ -356,73 +963,447 @@ const moreWork = [
     gap: var(--space-4) var(--gutter);
     align-content: start;
   }
-  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); }
-  .cs-standfirst { grid-column: 7 / 13; }
-  .cs-statement {
-    margin: 0;
-    font-size: clamp(24px, 2.5vw, 36px);
-    line-height: 1.15;
-    letter-spacing: -0.04em;
-    font-weight: 400;
-    color: #fff;
+  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); align-content: start; }
+  .cs-tile-values { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-tile-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-standfirst {
+    grid-column: 7 / 13;
+    max-width: 618px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    /* One blank line at 24/1.15 — the file separates the paragraphs with a
+       double break, not a spacing token. */
+    gap: 1.15em;
+    font-size: clamp(18px, 1.67vw, 24px);
   }
-  .cs-statement .line { white-space: normal; }
 
-  /* ---- 3-6 · Media bands ---- */
-  /* Pair: 7/5 columns (the reference's 1.5fr/1fr on our macro grid). */
+  /* ---- Media panels ----
+     The pair/wide widths in the file are whole column spans (see header
+     comment). Heights: pairs are 648 at 1440 (45vw), wides 806 (56vw). */
   .cs-img {
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.05); /* sharp corners, no stroke */
+    background: #171718; /* the file's placeholder fill */
   }
-  .cs-img img {
+  /* Direct child only: the extension panel nests its own imgs (logo, emoji,
+     thumbnails, the stat card's Twitch mark) which size themselves — a bare
+     descendant selector here would stretch every one of them to 100%. */
+  .cs-img > img,
+  .cs-img > video {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-  .cs-img-a { grid-column: 1 / 8; height: clamp(380px, 45vw, 680px); }
-  .cs-img-b { grid-column: 8 / 13; height: clamp(380px, 45vw, 680px); }
-  .cs-img-wide { grid-column: 1 / 13; height: clamp(480px, 56vw, 880px); }
-  /* Overlay caption: plain quiet label, bottom-left (no glass pills here). */
+  /* Heights via aspect-ratio, not clamps: the grid is fluid past 1440, and a
+     capped height lets the panels drift wide-and-short there — which pushed
+     the extension mock (sized off panel WIDTH) out of the panel's bottom.
+     Each ratio is the file's box (row height 648, or 806 for wides), so every
+     pair resolves to the same row height at any container width. */
+  /* ONE box per row carries the ratio and drives the row height; its partner
+     has no ratio and stretches to match. Giving both boxes their own ratio
+     leaves them ~2px ragged at wide viewports, because the fixed 24px gutters
+     shift each box's width FRACTION slightly as the grid grows. */
+  .cs-pair-a-left { grid-column: 1 / 8; aspect-ratio: 746 / 648; }
+  .cs-pair-b-right { grid-column: 8 / 13; }
+  .cs-pair-b-left { grid-column: 1 / 6; }
+  .cs-pair-a-right { grid-column: 6 / 13; aspect-ratio: 746 / 648; }
+  .cs-pair-half-left { grid-column: 1 / 7; aspect-ratio: 636 / 648; }
+  .cs-pair-half-right { grid-column: 7 / 13; }
+  /* 4/8-col approximation of the file's off-grid 360/912 pair. */
+  .cs-pair-narrow-left { grid-column: 1 / 5; }
+  .cs-pair-broad-right { grid-column: 5 / 13; aspect-ratio: 856 / 648; }
+  .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
+  /* Scheduled-posts panel: real HTML, not a video — the card centers on
+     the panel fill. Component styles live in the is:global block below. */
+  .cs-usp-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3);
+  }
   .cs-img-caption {
     position: absolute;
-    left: var(--space-3);
-    bottom: var(--space-3);
+    left: var(--space-2);
+    bottom: var(--space-2);
     margin: 0;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: rgba(255, 255, 255, 0.88);
-    text-shadow: 0 1px 16px rgba(10, 10, 11, 0.8);
   }
-  /* Label/body row beneath the media: label cols 1-8, body cols 8-13. */
-  .cs-rowlabel { grid-column: 1 / 8; align-self: start; }
-  .cs-rowbody { grid-column: 8 / 13; }
+  /* Before/After chip (Figma 2589:38875) — top-left partner to the caption.
+     The file's 36px chip read massive in situ, so it runs at 16px with the
+     dev-chip padding rhythm; the fill maps to the charcoal token. */
+  .cs-img-badge {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-radius: 999px;
+    background: var(--charcoal);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: #fff;
+  }
 
-  /* ---- 5 · Quote ---- */
-  .cs-quote {
-    grid-column: 2 / 12;
+  /* ---- Stat overlay (bottom-right of a media panel) ---- */
+  .cs-stat {
+    position: absolute;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+    background: var(--void);
   }
-  .cs-quote-mark { width: 48px; height: 44px; color: rgba(255, 255, 255, 0.4); }
-  .cs-quote-text {
+  .cs-stat-num {
     margin: 0;
-    font-size: clamp(28px, 3.6vw, 44px);
-    line-height: 1.08;
-    letter-spacing: -0.04em;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-stat-sub {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  /* ---- Hover note (bottom-right corner box, shown on panel hover) ----
+     Same box language as .cs-stat, but holds a sentence of copy and only
+     appears while the panel is hovered — fades/rises in, reverses out. */
+  .cs-hover-note {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-width: 340px;
+    margin: 0;
+    padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+    background: var(--void);
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.88);
+    opacity: 0;
+    transform: translateY(var(--space-1));
+    transition:
+      opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cs-img:hover > .cs-hover-note {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-hover-note { transition: none; transform: none; }
+  }
+
+  /* Brand stat card variant: Twitch logo row above the numbers (gap 32). */
+  .cs-stat-brand { gap: var(--space-4); }
+  .cs-stat-logo-row { display: flex; align-items: center; gap: var(--space-1); }
+  .cs-stat-twitch { width: 56px; height: auto; display: block; }
+  .cs-stat-store {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-stat-nums { display: flex; flex-direction: column; gap: var(--space-1); }
+
+  /* ============================================================
+     Twitch extension — rebuilt as HTML (Figma 2549:24992).
+     The frame is 318×496 at (80,89) inside the 746×648 panel. The panel is
+     a size container and the mock's font-size is set in cqw so that 1em on
+     the mock equals 16 design-px AT ANY PANEL WIDTH — every internal
+     measurement below is the Figma px value divided by 16.
+     Product type is Open Sauce Two (self-hosted below); the two 8px meta
+     runs are Inter Display in the file and fall back to Geist here.
+     ============================================================ */
+  @font-face {
+    font-family: "Open Sauce Two";
+    src: url("/fonts/OpenSauceTwo-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Open Sauce Two";
+    src: url("/fonts/OpenSauceTwo-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  .cs-ext-panel { container-type: inline-size; }
+  .cs-ext-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cs-ext {
+    position: absolute;
+    left: 10.72%;          /* 80 / 746 */
+    top: 13.73%;           /* 89 / 648 */
+    width: 42.63%;         /* 318 / 746 */
+    height: 31em;          /* 496 — clips the list mid-card, per the file */
+    font-size: 16px;       /* fallback if container queries are unsupported */
+    font-size: 2.1447cqw;  /* 16px × (panel / 746) */
+    font-family: "Open Sauce Two", var(--font-geist-sans);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 3em 1em 1em;  /* 48 / 16 / 16 — header bar sits in the top 32 */
+    border-radius: 0.25em;
+    background: #201c2b;
+    overflow: hidden;
+    /* The file's five-layer ambient shadow, in em so it scales too. */
+    box-shadow:
+      9.9375em 17.6875em 5.6875em rgba(0, 0, 0, 0.01),
+      6.3125em 11.3125em 5.1875em rgba(0, 0, 0, 0.04),
+      3.5625em 6.375em 4.375em rgba(0, 0, 0, 0.15),
+      1.5625em 2.8125em 3.25em rgba(0, 0, 0, 0.26),
+      0.375em 0.6875em 1.8125em rgba(0, 0, 0, 0.29);
+  }
+  .cs-ext p { margin: 0; }
+
+  /* Header bar: logo left, Capturing Clips pill right. */
+  .cs-ext-head {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2em;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .cs-ext-logo {
+    position: absolute;
+    left: 0.6875em;
+    top: 0.5625em;
+    width: 3.0625em;
+    height: 0.8346em;
+  }
+  .cs-ext-logo img { width: 100%; height: 100%; display: block; }
+  /* The purple semicolon of the logotype — drawn as pixels in the file. */
+  .cs-ext-px { position: absolute; background: #c197ff; }
+  .cs-ext-px1 { left: 2.0394em; top: 0.6825em; width: 0.1816em; height: 0.1816em; }
+  .cs-ext-px2 { left: 2.0394em; top: 1.0338em; width: 0.1816em; height: 0.1816em; }
+  .cs-ext-px3 { left: 2.1306em; top: 1.2156em; width: 0.0908em; height: 0.1816em; }
+  .cs-ext-pill {
+    position: absolute;
+    right: 0.2856em;
+    top: 0.25em;
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 0.125em;
+    padding: 0.25em;
+    border-radius: 0.25em;
+    background: rgba(141, 122, 255, 0.12);
+    box-shadow:
+      inset 0 0.125em 0.1875em rgba(255, 255, 255, 0.07),
+      inset 0 -0.0625em 0.1875em -0.0625em rgba(255, 255, 255, 0.07);
+  }
+  .cs-ext-pill-icon { position: relative; width: 0.7143em; height: 0.7143em; flex: none; }
+  .cs-ext-pill-icon img {
+    position: absolute;
+    inset: -5% -13.2% -29.61% -13.21%;
+    width: auto;
+    height: auto;
+  }
+  .cs-ext-pill-text {
+    padding-inline: 0.125em;
+    font-size: 0.6875em;      /* 11 */
+    line-height: 1.4545;      /* 16 */
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  /* Stream Highlights + avatar */
+  .cs-ext-row { display: flex; align-items: center; justify-content: space-between; }
+  .cs-ext-h {
+    font-size: 0.9375em;      /* 15 */
+    line-height: 1.6;         /* 24 */
+    font-weight: 600;
+    color: #fff;
+  }
+  .cs-ext-avatar {
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    flex: none;
+    border-radius: 0.125em;
+    border: 0.033em solid rgba(255, 255, 255, 0.17);
+    overflow: hidden;
+  }
+  .cs-ext-avatar img {
+    position: absolute;
+    left: 0;
+    top: -24.92%;             /* the file's crop of the portrait */
+    width: 100%;
+    height: 199.1%;
+    max-width: none;
+  }
+
+  /* Clip cards */
+  .cs-ext-card { display: flex; flex-direction: column; gap: 1em; }
+  .cs-ext-thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 132 / 74;
+    border-radius: 0.25em;
+    border: 0.0625em solid rgba(255, 255, 255, 0.17);
+    overflow: hidden;
+  }
+  .cs-ext-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cs-ext-cap { display: flex; flex-direction: column; gap: 0.375em; }
+  .cs-ext-title {
+    font-size: 0.6875em;      /* 11 */
+    line-height: 1.4545;      /* 16 */
+    font-weight: 600;
+    color: #fff;
+  }
+  .cs-ext-meta {
+    display: flex;
+    align-items: center;
+    gap: 1em; /* meta font is 8px, so 1em = the file's 8px gap */
+    font-family: var(--font-geist-sans); /* Inter Display in the file */
+    font-size: 0.5em;         /* 8 */
+    font-weight: 500;
+    line-height: normal;
+    color: #fff;
+  }
+  .cs-ext-dim { color: rgba(255, 255, 255, 0.59); }
+  /* Inside the 8px meta row, so 1.75em/1.875em = the file's 14×15. */
+  .cs-ext-badge { width: 1.75em; height: 1.875em; flex: none; }
+  .cs-ext-badge img { width: 100%; height: 100%; display: block; }
+
+  .cs-ext-actions { display: flex; align-items: flex-start; justify-content: space-between; }
+  .cs-ext-reacts { display: flex; align-items: center; gap: 0.125em; }
+  .cs-ext-react {
+    display: flex;
+    align-items: center;
+    gap: 0.125em;
+    padding: 0.125em;
+    border-radius: 0.25em;
+    border: 0.03125em solid rgba(255, 255, 255, 0.08);
+    background: #15121e;
+  }
+  .cs-ext-react-hot { background: #373245; border-color: transparent; }
+  .cs-ext-react-mid { background: #231f2f; }
+  .cs-ext-react img { width: 0.75em; height: 0.75em; display: block; }
+  .cs-ext-react span {
+    font-size: 0.5em;         /* 8 */
+    line-height: 1.22;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .cs-ext-share {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 0.923em;
+    padding: 0.1539em 0.2308em;
+    border-radius: 0.2609em;
+    background: rgba(141, 122, 255, 0.12);
+    box-shadow:
+      inset 0 0.0769em 0.1154em -0.0625em rgba(255, 255, 255, 0.07),
+      inset 0 -0.0385em 0.1154em -0.125em rgba(255, 255, 255, 0.07),
+      0 0.0385em 0.0385em -0.03125em rgba(0, 0, 0, 0.12);
+    flex: none;
+  }
+  .cs-ext-share-t {
+    padding-inline: 0.1539em;
+    font-size: 0.4231em;      /* 6.77 */
+    line-height: 1.4544;      /* 9.85 */
+    font-weight: 600;
+    color: #d1b2ff;
+    white-space: nowrap;
+  }
+  .cs-ext-share-i { width: 0.3314em; height: 0.3314em; display: block; }
+  .cs-ext-share-i-lg { width: 0.5384em; height: 0.5384em; }
+  .cs-ext-meta .cs-ext-share-solo {
+    margin-left: auto;
+    font-size: 2em; /* meta is 8px-based; restore the 16px em basis */
+  }
+
+  /* ---- Label / body rows: label cols 1-6, body cols 6-13 (549px start and
+         747px measure in the file — exactly the col-6 boundary). ---- */
+  .cs-rowlabel { grid-column: 1 / 6; align-self: start; }
+  .cs-rowbody { grid-column: 6 / 13; text-wrap: balance; }
+  /* The fluid grid outgrows a comfortable measure on big monitors — step the
+     body's start line right one column at a time, so the block stays near the
+     1440 design's 746px but its left edge always sits on a grid line. Each
+     threshold is where the current span passes ~880px. (These must follow the
+     base rule: same specificity, later wins.) */
+  @media (min-width: 1650px) { .cs-rowbody { grid-column: 7 / 13; } }
+  @media (min-width: 1980px) { .cs-rowbody { grid-column: 8 / 13; } }
+  @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
+  @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
+
+  /* ---- Feature rows (My TL:DR / Streamhub) ---- */
+  .cs-feat-img-left { grid-column: 1 / 10; aspect-ratio: 984 / 806; }
+  .cs-feat-img-right { grid-column: 4 / 13; aspect-ratio: 984 / 806; }
+  .cs-feat-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .cs-feat-col-right { grid-column: 10 / 13; }
+  .cs-feat-col-left { grid-column: 1 / 4; grid-row: 1; }
+  .cs-feat-head { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cs-feat-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
     font-weight: 400;
     color: #fff;
   }
-  .cs-quote-attr { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-feat-body {
+    margin: 0;
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-feat-lead {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-feat-list { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cs-feat-item { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .cs-bullet { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px; }
 
-  /* ---- 7 · More work ---- */
+  /* ---- 8 · More work ---- */
   .cs-more { padding-block-end: var(--space-8); }
   .cs-more-title {
     grid-column: 1 / -1;
-    margin: 0;
+    margin: 0 0 var(--space-6);
     font-size: clamp(34px, 5.4vw, 52px);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -436,29 +1417,12 @@ const moreWork = [
     gap: var(--space-4) var(--gutter);
   }
   .cs-card { display: flex; flex-direction: column; gap: var(--space-2); color: #fff; }
-  .cs-card:hover { color: #fff; }
   .cs-card-media {
     position: relative;
-    aspect-ratio: 632 / 548;
+    aspect-ratio: 636 / 551;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
+    background: #171718;
   }
-  .cs-card-media img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  /* Hover: quiet dim (the reference's overlay, minus the GIF). */
-  .cs-card-veil {
-    position: absolute;
-    inset: 0;
-    background: rgba(10, 10, 11, 0.32);
-    opacity: 0;
-    transition: opacity var(--dur-ui) linear;
-  }
-  .cs-card:hover .cs-card-veil { opacity: 1; }
   .cs-card-caption {
     display: flex;
     align-items: center;
@@ -475,12 +1439,269 @@ const moreWork = [
 
   /* ---- Responsive: collapse to single column under 900px ---- */
   @media (max-width: 900px) {
-    .cs-info, .cs-standfirst, .cs-quote,
-    .cs-img-a, .cs-img-b, .cs-img-wide,
-    .cs-rowlabel, .cs-rowbody { grid-column: 1 / -1; }
-    .cs-img-a, .cs-img-b { height: clamp(300px, 60vw, 480px); }
-    .cs-img-wide { height: clamp(320px, 64vw, 520px); }
+    .cs-info, .cs-standfirst,
+    .cs-rowlabel, .cs-rowbody,
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-pair-narrow-left, .cs-pair-broad-right,
+    .cs-img-wide,
+    .cs-feat-img-left, .cs-feat-img-right,
+    .cs-feat-col-left, .cs-feat-col-right { grid-column: 1 / -1; }
+    .cs-feat-col-left { grid-row: auto; }
+    .cs-feat-body { max-width: none; }
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-pair-narrow-left, .cs-pair-broad-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
+    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
+    /* The scheduled-posts card is content-sized HTML — its stacked mobile
+       layout is taller than the pairs' clamped height, so let the panel
+       wrap the card instead of clipping it. */
+    .cs-usp-panel { height: auto; aspect-ratio: auto; }
+    .cs-usp-center { position: static; padding: var(--space-3); }
+    /* The extension composition scales off panel width — keep the file's
+       ratio here or the mock loses its bottom breathing room again. */
+    .cs-ext-panel { height: auto; aspect-ratio: 746 / 648; }
     .cs-cards { grid-template-columns: 1fr; }
     .cs-card-tags { display: none; }
+  }
+</style>
+
+<style is:global>
+  /* ---- Upcoming Scheduled Posts (usp-*) ----
+     Component styles for the scheduled-posts card in Product Design.
+     Global, not scoped: the skeleton rows are injected by script at
+     runtime, so Astro's scope attribute would never reach them. Every
+     selector is usp-prefixed — nothing can leak. Colors/typography are
+     the product's real design tokens, not the site scale, matching how
+     the Twitch extension rebuild carries its own file-exact values. */
+  .usp-card {
+    --usp-font: 'Open Sauce Two', 'Inter', -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, sans-serif;
+    --usp-surface-0: #111111;   /* card            */
+    --usp-surface-1: #161616;   /* post item       */
+    --usp-surface-2: #202020;   /* button          */
+    --usp-hairline: rgba(255, 255, 255, 0.07);
+    --usp-text-high: #ffffff;
+    --usp-text-med: rgba(255, 255, 255, 0.72);
+    --usp-text-low: rgba(255, 255, 255, 0.48);
+    --usp-bone: rgba(255, 255, 255, 0.05);
+    --usp-bone-strong: rgba(255, 255, 255, 0.07);
+    --usp-accent: rgba(193, 151, 255, 0.4); /* landing glow */
+
+    position: relative;
+    overflow: hidden;
+    width: min(640px, 100%);
+    border: 1px solid var(--usp-hairline);
+    border-radius: 24px;
+    background: var(--usp-surface-0);
+    padding: 24px;
+    font-family: var(--usp-font);
+    box-shadow:
+      0px 56px 56px -28px rgba(0, 0, 0, 0.04),
+      0px 32px 32px -16px rgba(0, 0, 0, 0.04),
+      0px 6px 6px -3px rgba(0, 0, 0, 0.04),
+      0px 3px 3px -1.5px rgba(0, 0, 0, 0.04),
+      0px 1px 1px -0.5px rgba(0, 0, 0, 0.04);
+  }
+
+  .usp-layout { display: flex; flex-direction: column; gap: 20px; }
+  @media (min-width: 560px) {
+    .usp-layout { flex-direction: row; }
+  }
+
+  .usp-head {
+    min-width: 215px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+  }
+  .usp-title {
+    margin: 0;
+    font-size: 22px;
+    line-height: 32px;
+    font-weight: 400;
+    color: var(--usp-text-high);
+  }
+  .usp-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--usp-surface-2);
+    color: var(--usp-text-med);
+    font-family: var(--usp-font);
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow:
+      0px -1px 3px -2px rgba(0, 0, 0, 0.07) inset,
+      0px 2px 3px -1px rgba(255, 255, 255, 0.07) inset,
+      0px 1px 1px -0.5px rgba(0, 0, 0, 0.04);
+    transition: background 0.2s ease;
+  }
+  .usp-cta:hover { background: #272727; }
+  .usp-cta svg { display: block; }
+
+  /* posts column — skeleton layer and live layer stacked in one cell */
+  .usp-list {
+    flex: 1;
+    min-width: 0;
+    height: 288px; /* fits the 3 populated posts; skeleton clips under the fade */
+    display: grid;
+  }
+  /* Stacked layout only: flex: 1's 0% basis is vertical there, so the list
+     would content-size to the 560px skeleton and ignore the height above.
+     (Must come after the base rule — media queries don't add specificity.) */
+  @media (max-width: 559.98px) {
+    .usp-list { flex: none; }
+  }
+  .usp-empty, .usp-posts { grid-area: 1 / 1; }
+
+  /* ---- day header row (shared by both layers) ---- */
+  .usp-dayrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .usp-day {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--usp-text-med);
+    white-space: nowrap;
+  }
+  .usp-divider {
+    flex: 1;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--usp-hairline);
+  }
+
+  /* ---- post item ---- */
+  .usp-item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid var(--usp-hairline);
+    border-radius: 8px;
+    background: var(--usp-surface-1);
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .usp-item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .usp-time {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--usp-text-low);
+  }
+  .usp-platforms { display: flex; align-items: center; gap: 6px; }
+  .usp-platforms svg { display: block; }
+  .usp-item-title {
+    margin: 0;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 400;
+    color: var(--usp-text-high);
+  }
+
+  /* ---- skeleton (empty state) ---- */
+  .usp-empty {
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.45s ease;
+  }
+  .usp-bones { opacity: 0.5; }
+  .usp-bone { border-radius: 8px; background: var(--usp-bone); display: block; }
+  .usp-bone--day { height: 8px; width: 88px; }
+  .usp-bone--time { height: 8px; width: 68px; }
+  .usp-bone--title { height: 8px; background: var(--usp-bone-strong); }
+  .usp-bone--dot { height: 14px; width: 14px; border-radius: 999px; }
+
+  .usp-pill-wrap {
+    pointer-events: none;
+    position: absolute;
+    inset: 118px 0 auto 0;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+  }
+  .usp-pill {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 500;
+    color: var(--usp-text-med);
+    border: 1px solid var(--usp-hairline);
+    border-radius: 8px;
+    background: rgba(22, 22, 22, 0.9);
+    padding: 8px 16px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow:
+      0 18px 48px rgba(0, 0, 0, 0.52),
+      0 6px 18px rgba(0, 0, 0, 0.38);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  /* ---- live layer ---- */
+  .usp-posts {
+    position: relative;
+    z-index: 5;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+  }
+  .usp-posts.usp-live { visibility: visible; }
+
+  /* rows start hidden; .usp-in plays the entrance */
+  .usp-posts .usp-row,
+  .usp-posts .usp-item {
+    opacity: 0;
+  }
+  .usp-posts .usp-row.usp-in {
+    animation: usp-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .usp-posts .usp-item.usp-in {
+    animation:
+      usp-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+      usp-land 1.1s ease-out forwards;
+  }
+  @keyframes usp-enter {
+    from { opacity: 0; transform: translateY(14px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  /* brief brand-tinted border glow as each card lands */
+  @keyframes usp-land {
+    0%   { border-color: var(--usp-accent); box-shadow: 0 0 0 3px rgba(193, 151, 255, 0.12); }
+    100% { border-color: var(--usp-hairline); box-shadow: 0 0 0 0 rgba(193, 151, 255, 0); }
+  }
+
+  /* exit states driven by JS */
+  .usp-out { opacity: 0 !important; transform: translateY(-6px) scale(0.97); }
+  .usp-fade { opacity: 0 !important; }
+
+  /* bottom fade — same as production */
+  .usp-fadeout {
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 103px;
+    background: linear-gradient(to bottom, rgba(17, 17, 17, 0), #111111);
+    z-index: 8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .usp-posts .usp-row, .usp-posts .usp-item { opacity: 1 !important; animation: none !important; }
+    .usp-posts { visibility: visible !important; }
+    .usp-empty { opacity: 0 !important; }
   }
 </style>

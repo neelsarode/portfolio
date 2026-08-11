@@ -11,7 +11,12 @@
 //
 // Toggle: the "Grid" chip (bottom-right) or press `g`. State persists in
 // localStorage across reloads.
+//
+// The Ascii and BG chips only make sense where their targets exist (the
+// contact asciify panel and the homepage fixed-scene manager) — pages
+// without them opt out via props. The grid chip renders everywhere.
 const dev = import.meta.env.DEV;
+const { ascii = true, bg = true } = Astro.props;
 ---
 {dev && (
   <>
@@ -19,20 +24,24 @@ const dev = import.meta.env.DEV;
       {Array.from({ length: 12 }).map(() => <div class="dev-col"></div>)}
     </div>
     <div class="dev-chips">
-      <button
-        class="dev-chip mono-label"
-        id="dev-ascii-btn"
-        type="button"
-        aria-pressed="false"
-        title="Asciify tweak panel (contact section)"
-      >Ascii</button>
-      <button
-        class="dev-chip mono-label"
-        id="dev-bg-btn"
-        type="button"
-        aria-pressed="false"
-        title="Toggle fixed background scene"
-      >BG</button>
+      {ascii && (
+        <button
+          class="dev-chip mono-label"
+          id="dev-ascii-btn"
+          type="button"
+          aria-pressed="false"
+          title="Asciify tweak panel (contact section)"
+        >Ascii</button>
+      )}
+      {bg && (
+        <button
+          class="dev-chip mono-label"
+          id="dev-bg-btn"
+          type="button"
+          aria-pressed="false"
+          title="Toggle fixed background scene"
+        >BG</button>
+      )}
       <button
         class="dev-chip mono-label"
         id="dev-grid-btn"

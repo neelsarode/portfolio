@@ -1,0 +1,1131 @@
+---
+// SCAFFOLD: cloned from tldr.astro so USDKG shares the case-study format.
+// Hero media + info tiles are real; every other panel still carries TLDR
+// media/copy as placeholders — swap section by section as USDKG content
+// lands (same drop-in flow as the TLDR build).
+import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
+import SiteNav from "../../components/SiteNav.astro";
+import GridLines from "../../components/GridLines.astro";
+import DevGrid from "../../components/DevGrid.astro";
+// USDKG case study (Figma 2548:24573). Typography is copied EXACTLY from the
+// file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
+// spacing and columns are mapped onto the site system — the design's 1296px
+// container IS the 12-col macro grid at 1440 (col 86 + gutter 24), so every
+// media width in the file lands on a whole column span:
+//   746 = 7 cols · 526 = 5 cols · 636 = 6 cols · wide = 12 cols.
+// The one exception is the TwitchCon pair (360/912), which sits off-grid in
+// the file and is approximated to 4/8 cols.
+//
+// Media policy: the Brand row is real — left panel is an exported image, the
+// right panel is the Twitch extension REBUILT AS HTML over the prism
+// backdrop (interim image; swap in the background video when supplied).
+// Every other panel is a placeholder slot (the file leaves them empty)
+// awaiting real screenshots/loops — same drop-in flow as the homepage covers.
+
+const info = [
+  {
+    label: "Things I Did",
+    values: [
+      "Brand Identity Design",
+      "Website Design",
+      "Website Development",
+      "Document Design",
+      "Deck Design",
+    ],
+  },
+  { label: "Company", values: ["USDKG"] },
+  { label: "Role", values: ["Founding Designer", "Creative Lead"] },
+  { label: "Year", values: ["2024 → Present"] },
+  { label: "Live website", values: [], link: { text: "Visit website", href: "https://usdkg.com" } },
+];
+
+const moreWork = [
+  { title: "Nomad Vision™", tags: ["Branding", "Web Design", "AI Prompting"] },
+  { title: "Livingless", tags: ["Sora Consulting", "Webflow Development", "AI Prompting"] },
+];
+---
+<FullscreenLayout title="USDKG — Case Study — Neel Sarode">
+  <GridLines />
+
+  <!-- Shared radial fill for the spark bullets (exact gradient from the file:
+       white core to #999 tips). One defs block; every bullet references it. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <radialGradient id="cs-spark-grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(7.5 7.5) rotate(90) scale(7.5)">
+        <stop stop-color="white" />
+        <stop offset="1" stop-color="#999999" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <main class="content">
+    <!-- 1 · Hero — full viewport, nav overlaid, title bottom-left. The file
+         leaves the hero media empty; the dashboard loop is the obvious
+         occupant and was already encoded for the homepage. -->
+    <section class="cs-hero" data-reveal-group>
+      <video
+        class="cs-hero-img"
+        src="/gold-dollar-cover.mp4"
+        poster="/gold-dollar-poster.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        tabindex="-1"
+        data-fade
+      ></video>
+      <div class="cs-hero-scrim" aria-hidden="true"></div>
+      <div class="cs-hero-overlay">
+        <header class="cs-nav"><SiteNav activePath="/" /></header>
+        <h1 class="cs-title">
+          <span class="mask"><span class="line">USDKG</span></span>
+        </h1>
+      </div>
+    </section>
+
+    <!-- 2 · About — info tiles (cols 1-6) + standfirst (cols 7-13). -->
+    <section class="cs-band cs-about">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="cs-info" data-reveal-group>
+            <div class="cs-tile cs-tile-tall">
+              <span class="mask"><p class="cs-ilabel">{info[0].label}</p></span>
+              <div class="cs-tile-values">
+                {info[0].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile-stack">
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[1].label}</p></span>
+                {info[1].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[2].label}</p></span>
+                {info[2].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[3].label}</p></span>
+              {info[3].values.map((v) => (
+                <span class="mask"><p class="cs-ivalue">{v}</p></span>
+              ))}
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[4].label}</p></span>
+              <span class="mask">
+                <a class="cs-ivalue cs-ilink" href={info[4].link!.href} target="_blank" rel="noopener">{info[4].link!.text}</a>
+              </span>
+            </div>
+          </div>
+
+          <div class="cs-standfirst" data-reveal-group>
+            <span class="mask"><p class="cs-statement">
+              <span class="mut">USDKG is a gold-backed stablecoin licensed by the
+              Ministry of Finance of the Kyrgyz Republic - a digital dollar
+              collateralized by audited physical gold, built to serve both crypto
+              and institutional finance.</span>
+            </p></span>
+            <span class="mask"><p class="cs-statement">
+              They were deciding between using a major agency and a single person.
+              They went with the one person. I created the brand identity, currency
+              mark, website, and every document the company put in front of
+              officials and the public.
+            </p></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Brand — brand panel (5 cols) + timeline loop (7 cols), then
+         The Brand System row. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-b-left" data-fade>
+            <img src="/usdkg-brand.jpg" alt="The Gold Dollar mark and logotype centered on a gold-lit dark backdrop." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-a-right" data-fade>
+            <img src="/usdkg-government-meeting.jpg" alt="An official meeting room of the Kyrgyz Republic: delegates at a long table beneath the state emblem and national flags." loading="lazy" decoding="async" />
+            <div class="cs-stat cs-stat-note">
+              <p class="cs-stat-num">November, 2025</p>
+              <p class="cs-stat-sub">Launched at a state ceremony attended by the President of the Kyrgyz Republic</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Government-Backed</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">USDKG launched with an initial $50M issuance backed
+            by physical gold held in national reserves, issued through a
+            state-owned entity under the Ministry of Finance of the Kyrgyz
+            Republic and smart contracts audited by ConsenSys.</span> The brand
+            required design that could hold up next to a government seal.
+          </p></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Built as a Symbol — the currency-mark story -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">Most logos live on websites, but this one </span>had
+            to work as a currency symbol<span class="mut">: legible at ticker
+            size, distinct next to currency symbols, and credible on a national
+            reserve report.</span>
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide cs-currency-panel" data-fade>
+            <img src="/usdkg-currency.jpg" alt="Brand pattern: the Gold Dollar KG mark set among dollar, euro, pound, and yen symbols over prismatic gold light." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-square-left" data-fade>
+            <video
+              src="/usdkg-product-loop.mp4"
+              poster="/usdkg-product-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-img cs-pair-fill-right" data-fade>
+            <video
+              src="/usdkg-convention-loop.mp4"
+              poster="/usdkg-convention-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-caption cs-caption-dark">Logo use at conventions</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Built as a Symbol</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            The <svg class="cs-kg-mark" viewBox="0 0 133 222" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19.0566 77.124L88.7529 0H112.567L58.124 60.3184C61.8265 59.7769 65.6834 59.5049 69.6953 59.5049C82.0759 59.5049 92.4905 61.7621 100.938 66.2773C109.532 70.7926 116.306 76.9102 121.258 84.6299C126.356 92.3496 129.852 101.017 131.745 110.63L112.081 111.94C110.188 101.89 105.964 93.7339 99.4092 87.4707C92.8547 81.0619 82.9499 77.8574 69.6953 77.8574C57.8975 77.8575 48.2848 80.7706 40.8564 86.5967C33.5737 92.4229 28.1842 100.143 24.6885 109.756C21.3384 119.223 19.6631 129.565 19.6631 140.78C19.6631 152.578 21.4106 163.211 24.9062 172.679C28.402 182.001 33.8646 189.429 41.293 194.964C48.7213 200.499 58.1887 203.267 69.6953 203.267C78.8716 203.267 86.8106 201.227 93.5107 197.148C100.211 192.924 105.381 187.316 109.022 180.325C112.664 173.334 114.557 165.76 114.703 157.604H70.1328V139.688H132.182V218.123H118.199L117.244 192.056C115.365 196.409 112.772 200.439 109.46 204.141C104.508 209.53 98.5353 213.826 91.5439 217.03C84.6982 220.089 77.2698 221.619 69.2588 221.619C54.6934 221.619 42.2399 218.123 31.8984 211.132C21.5571 204.14 13.6189 194.6 8.08398 182.511C4.40642 174.162 1.98444 165.032 0.816406 155.123H0.267578V149.101C0.0900474 146.382 2.5778e-06 143.609 0 140.78C0 137.991 0.0902426 135.255 0.267578 132.572V0H19.0566V77.124Z" fill="currentColor"/></svg> mark
+            is built from the same skeleton as $ and €<span class="mut"> - two
+            strokes on a letterform - so it</span> reads as currency at 12 pixels
+            on an exchange ticker<span class="mut"> and holds its weight beside
+            the majors.</span>
+          </p></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Website -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">Crypto users smell corporate from a mile away.
+            Institutions flinch at anything that looks like crypto.</span> The
+            brand had to hold both.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/gold-dollar-cover.mp4"
+              poster="/gold-dollar-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-img cs-pair-a-left" data-fade>
+            <img src="/usdkg-website-pages.jpg" alt="Gold Dollar website pages: the hero with 'The Future of Finance, Fully Backed by Gold', the stability statement, and the FAQ beside the gold monolith." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-b-right" data-fade>
+            <video
+              src="/usdkg-timeline-loop.mp4"
+              poster="/usdkg-timeline-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">The Website Challenge</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">Institutions don’t buy solutions on promises. They
+            buy </span>proof<span class="mut"> - so the site leads with </span>audited
+            reserves, ministry oversight, redemption paths, and press
+            coverage<span class="mut"> surfaced on the first screen instead of
+            buried in a footer.</span>
+          </p></span>
+        </div>
+      </div>
+
+      <!-- 5.5 · Experiences (Figma 2613:55967) — hero-showcase video (8 cols)
+           beside a 4-col side column: GPU-detection code image on top, the
+           label/body stack pinned to the bottom. Same band as the website
+           story; cs-row's margin keeps the challenge text evenly spaced. -->
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <div class="cs-img cs-exp-media" data-fade>
+            <video
+              src="/usdkg-hero-showcase-loop.mp4"
+              poster="/usdkg-hero-showcase-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-exp-side">
+            <div class="cs-img cs-exp-code" data-fade>
+              <img src="/usdkg-gpu-code.jpg" alt="The GPU-detection script: checkGPUPerformance() probes the WebGL renderer string for high-end NVIDIA, AMD, and Apple Silicon GPUs." loading="lazy" decoding="async" />
+            </div>
+            <div class="cs-exp-text">
+              <span class="mask"><p class="cs-exp-label">Optimizing Hero Section per Device</p></span>
+              <span class="mask"><p class="cs-exp-body">
+                The hero section uses a combination of WebGL + Three.js when
+                displaying our Spline 3D scene, so I created a script that
+                detects the user’s GPU and CPU and defaults back to a looping
+                video if the user’s device cannot handle the scene, improving
+                accessibility across more devices.
+              </p></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Feature Builds -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro"><p class="cs-body cs-center">
+            <span class="mut">I designed all of the brand’s key documents -
+            including </span>the brochure institutions get at conventions<span class="mut">,
+            and </span>the whitepaper where skeptics look under the hood online.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <img src="/usdkg-deck.jpg" alt="Gold Dollar pitch deck: an open spread on global commerce and reserve management beside the 'Future of Finance, Fully Backed by Gold' cover." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/usdkg-whitepaper.jpg" alt="The USDKG whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · More work — placeholder cards from the file. -->
+    <section class="cs-band cs-more">
+      <div class="content-grid">
+        <div class="full-composed">
+          <h2 class="cs-more-title" data-reveal-group>
+            <span class="mask"><span class="line">More work</span></span>
+          </h2>
+          <div class="cs-cards">
+            {moreWork.map((card) => (
+              <article class="cs-card" data-reveal-group data-cursor-label={card.title}>
+                <div class="cs-card-media" data-fade></div>
+                <div class="cs-card-caption">
+                  <span class="mask"><p class="cs-card-name">{card.title}</p></span>
+                  <div class="cs-card-tags">
+                    {card.tags.map((t, i) => (
+                      <>
+                        {i > 0 && <span class="cs-card-sep" aria-hidden="true"></span>}
+                        <span class="mask"><p class="cs-card-tag">{t}</p></span>
+                      </>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`).
+       Ascii/BG chips are homepage-only — their targets don't exist here. -->
+  <DevGrid ascii={false} bg={false} />
+</FullscreenLayout>
+
+<!-- Same reveal system as the homepage: masked line rises + media fades per
+     [data-reveal-group], wired to Lenis. gsap.from only — no-JS/reduced-motion
+     visitors simply see the content. -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const wireLenis = () => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+    };
+    (window as any).lenis
+      ? wireLenis()
+      : addEventListener("lenis:init", wireLenis, { once: true });
+
+    // Panel loops autoplay below the fold, and Chrome's offscreen media
+    // optimisation can pause them there without resuming on scroll — same
+    // failure mode the homepage covers solve. Gate each on visibility.
+    document
+      .querySelectorAll<HTMLVideoElement>("video.cs-ext-bg, .cs-img > video")
+      .forEach((v) => {
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) v.play().catch(() => {});
+              else v.pause();
+            });
+          },
+          { rootMargin: "160px" },
+        ).observe(v);
+      });
+
+    gsap.utils.toArray<HTMLElement>("[data-reveal-group]").forEach((group) => {
+      const risers = group.querySelectorAll(".mask > *");
+      const fades = group.querySelectorAll("[data-fade]");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+      if (risers.length) {
+        tl.from(risers, {
+          yPercent: 110,
+          duration: 0.9,
+          ease: "power4.out",
+          stagger: 0.09,
+        });
+      }
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: the hero and extension loops stay on their posters.
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, video.cs-ext-bg, .cs-img > video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+</script>
+
+
+<style>
+  .content { position: relative; z-index: 1; }
+
+  /* ---- Masked line reveals (same recipe as the homepage) ---- */
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.14em;
+    margin-block-end: -0.14em;
+  }
+  .line { display: block; }
+
+  /* ============================================================
+     Type recipes — EXACT values from the Figma file. All Geist 400.
+       display title    52 / 1    / -0.04em
+       body (24-class)  24 / 1.2  / -0.02em   white, .mut spans 65%
+       about statement  24 / 1.15 / -0.02em
+       row label        16 / 1.2  / -0.01em   65%
+       stat number      24 / 1.15 / -0.02em   · stat sub 16 / 1.15 / 65%
+       info label       14 / 1.2  / -0.01em   65%
+       info value       14 / 1.48 / -0.01em   white
+       feature title    18 / 1.48 / -0.01em   white
+       feature body     14 / 1.2  / -0.01em   65% (lead-in white)
+       image caption    12 / 1.2  / -0.01em   88%
+     ============================================================ */
+  .cs-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-body {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-statement {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .mut { color: rgba(255, 255, 255, 0.65); }
+  .cs-center { text-align: center; text-wrap: balance; }
+  .cs-label {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ilabel {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ivalue {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-ilink { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---- 1 · Hero ---- */
+  .cs-hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .cs-hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cs-hero-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 10, 11, 0.25) 0%, rgba(10, 10, 11, 0) 30%, rgba(10, 10, 11, 0) 55%, rgba(10, 10, 11, 0.55) 100%);
+  }
+  /* Edge-hug overlay — the homepage hero's exact padding recipe. */
+  .cs-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+  }
+  .cs-nav { padding: 0; }
+
+  /* ---- Section rhythm (from the file: 96 into About, 128 between bands,
+         64 around intros and label/body rows, 24 between media rows). ---- */
+  .cs-band { padding-block-end: var(--space-8); }
+  .cs-about { padding-block: var(--space-7) var(--space-8); }
+  .cs-row { margin-block-start: var(--space-6); }
+  .cs-intro {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 702px;
+    margin-block-end: var(--space-6);
+  }
+  .cs-feature { margin-block-start: var(--space-6); }
+
+  /* ---- 2 · About ---- */
+  .cs-info {
+    grid-column: 1 / 6;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--gutter);
+    align-content: start;
+  }
+  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); align-content: start; }
+  .cs-tile-values { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-tile-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-standfirst {
+    grid-column: 8 / 13;
+    max-width: 680px;
+    text-wrap: balance;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    /* One blank line at 24/1.15 — the file separates the paragraphs with a
+       double break, not a spacing token. */
+    gap: 1.15em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
+
+  /* ---- Media panels ----
+     The pair/wide widths in the file are whole column spans (see header
+     comment). Heights: pairs are 648 at 1440 (45vw), wides 806 (56vw). */
+  .cs-img {
+    position: relative;
+    overflow: hidden;
+    background: #171718; /* the file's placeholder fill */
+  }
+  /* Direct child only: the extension panel nests its own imgs (logo, emoji,
+     thumbnails, the stat card's Twitch mark) which size themselves — a bare
+     descendant selector here would stretch every one of them to 100%. */
+  .cs-img > img,
+  .cs-img > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Heights via aspect-ratio, not clamps: the grid is fluid past 1440, and a
+     capped height lets the panels drift wide-and-short there — which pushed
+     the extension mock (sized off panel WIDTH) out of the panel's bottom.
+     Each ratio is the file's box (row height 648, or 806 for wides), so every
+     pair resolves to the same row height at any container width. */
+  /* ONE box per row carries the ratio and drives the row height; its partner
+     has no ratio and stretches to match. Giving both boxes their own ratio
+     leaves them ~2px ragged at wide viewports, because the fixed 24px gutters
+     shift each box's width FRACTION slightly as the grid grows. */
+  .cs-pair-a-left { grid-column: 1 / 8; aspect-ratio: 746 / 648; }
+  .cs-pair-b-right { grid-column: 8 / 13; }
+  .cs-pair-b-left { grid-column: 1 / 6; }
+  .cs-pair-a-right { grid-column: 6 / 13; aspect-ratio: 746 / 648; }
+  .cs-pair-half-left { grid-column: 1 / 7; aspect-ratio: 636 / 648; }
+  .cs-pair-half-right { grid-column: 7 / 13; }
+  /* 4/8-col approximation of the file's off-grid 360/912 pair. */
+  .cs-pair-narrow-left { grid-column: 1 / 5; }
+  .cs-pair-broad-right { grid-column: 5 / 13; aspect-ratio: 856 / 648; }
+  .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
+  /* Currency-pattern panel: box matches the asset's exact ratio so cover
+     never crops or edge-samples it. (After .cs-img-wide — later rule wins.) */
+  .cs-currency-panel { aspect-ratio: 2000 / 1123; }
+  /* Square pair (Product Design): equal 6-col spans, the left box carries
+     the 1:1 ratio and drives the row height — the right stretches to the
+     same height and, at equal width, lands square too (one ratio per row,
+     so the edges can never go ragged). */
+  .cs-pair-square-left { grid-column: 1 / 7; aspect-ratio: 1 / 1; }
+  .cs-pair-fill-right { grid-column: 7 / 13; }
+
+  /* ---- Experiences row (Figma 2613:55967) ----
+     Showcase video (8 cols, file box 856×674) drives the row height; the
+     4-col side column splits into the code panel (file box 416×325) on top
+     and the label/body stack pinned to the bottom. */
+  .cs-exp-media { grid-column: 1 / 9; aspect-ratio: 856 / 674; }
+  .cs-exp-side {
+    grid-column: 9 / 13;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .cs-exp-code { aspect-ratio: 416 / 325; }
+  .cs-exp-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .cs-exp-label {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-exp-body {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-img-caption {
+    position: absolute;
+    left: var(--space-2);
+    bottom: var(--space-2);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  /* For captions sitting on light media */
+  .cs-caption-dark { color: rgba(0, 0, 0, 0.88); }
+  /* The KG currency mark set inline in running text: sized so the G bowl
+     (y 59.5→222 of the 222-unit viewBox) spans cap height — the K strokes
+     ride above it like the mark's ascender. Bottom on the baseline;
+     currentColor so it dims inside .mut spans. */
+  .cs-kg-mark {
+    display: inline-block;
+    height: 0.98em;
+    width: auto;
+    vertical-align: baseline;
+    margin-inline: 0.05em;
+  }
+  /* Before/After chip (Figma 2589:38875) — top-left partner to the caption.
+     The file's 36px chip read massive in situ, so it runs at 16px with the
+     dev-chip padding rhythm; the fill maps to the charcoal token. */
+  .cs-img-badge {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-radius: 999px;
+    background: var(--charcoal);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: #fff;
+  }
+
+  /* ---- Stat overlay (bottom-right of a media panel) ---- */
+  .cs-stat {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+    background: var(--void);
+  }
+  .cs-stat-num {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-stat-sub {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  /* Stat box variant carrying a sentence rather than a metric — capped so
+     the sub wraps instead of stretching across the panel. */
+  .cs-stat-note { max-width: 420px; }
+  .cs-stat-note .cs-stat-num { font-size: 16px; } /* trial: headline at body size — delete to revert to 24px */
+  .cs-stat-note .cs-stat-sub { line-height: 1.35; }
+
+  /* ---- Hover note (bottom-right corner box, shown on panel hover) ----
+     Same box language as .cs-stat, but holds a sentence of copy and only
+     appears while the panel is hovered — fades/rises in, reverses out. */
+  .cs-hover-note {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-width: 340px;
+    margin: 0;
+    padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+    background: var(--void);
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.88);
+    opacity: 0;
+    transform: translateY(var(--space-1));
+    transition:
+      opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cs-img:hover > .cs-hover-note {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-hover-note { transition: none; transform: none; }
+  }
+
+  /* Brand stat card variant: Twitch logo row above the numbers (gap 32). */
+  .cs-stat-brand { gap: var(--space-4); }
+  .cs-stat-logo-row { display: flex; align-items: center; gap: var(--space-1); }
+  .cs-stat-twitch { width: 56px; height: auto; display: block; }
+  .cs-stat-store {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-stat-nums { display: flex; flex-direction: column; gap: var(--space-1); }
+
+  /* ============================================================
+     Twitch extension — rebuilt as HTML (Figma 2549:24992).
+     The frame is 318×496 at (80,89) inside the 746×648 panel. The panel is
+     a size container and the mock's font-size is set in cqw so that 1em on
+     the mock equals 16 design-px AT ANY PANEL WIDTH — every internal
+     measurement below is the Figma px value divided by 16.
+     Product type is Open Sauce Two (self-hosted below); the two 8px meta
+     runs are Inter Display in the file and fall back to Geist here.
+     ============================================================ */
+  @font-face {
+    font-family: "Open Sauce Two";
+    src: url("/fonts/OpenSauceTwo-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Open Sauce Two";
+    src: url("/fonts/OpenSauceTwo-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  .cs-ext-panel { container-type: inline-size; }
+  .cs-ext-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cs-ext {
+    position: absolute;
+    left: 10.72%;          /* 80 / 746 */
+    top: 13.73%;           /* 89 / 648 */
+    width: 42.63%;         /* 318 / 746 */
+    height: 31em;          /* 496 — clips the list mid-card, per the file */
+    font-size: 16px;       /* fallback if container queries are unsupported */
+    font-size: 2.1447cqw;  /* 16px × (panel / 746) */
+    font-family: "Open Sauce Two", var(--font-geist-sans);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 3em 1em 1em;  /* 48 / 16 / 16 — header bar sits in the top 32 */
+    border-radius: 0.25em;
+    background: #201c2b;
+    overflow: hidden;
+    /* The file's five-layer ambient shadow, in em so it scales too. */
+    box-shadow:
+      9.9375em 17.6875em 5.6875em rgba(0, 0, 0, 0.01),
+      6.3125em 11.3125em 5.1875em rgba(0, 0, 0, 0.04),
+      3.5625em 6.375em 4.375em rgba(0, 0, 0, 0.15),
+      1.5625em 2.8125em 3.25em rgba(0, 0, 0, 0.26),
+      0.375em 0.6875em 1.8125em rgba(0, 0, 0, 0.29);
+  }
+  .cs-ext p { margin: 0; }
+
+  /* Header bar: logo left, Capturing Clips pill right. */
+  .cs-ext-head {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2em;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .cs-ext-logo {
+    position: absolute;
+    left: 0.6875em;
+    top: 0.5625em;
+    width: 3.0625em;
+    height: 0.8346em;
+  }
+  .cs-ext-logo img { width: 100%; height: 100%; display: block; }
+  /* The purple semicolon of the logotype — drawn as pixels in the file. */
+  .cs-ext-px { position: absolute; background: #c197ff; }
+  .cs-ext-px1 { left: 2.0394em; top: 0.6825em; width: 0.1816em; height: 0.1816em; }
+  .cs-ext-px2 { left: 2.0394em; top: 1.0338em; width: 0.1816em; height: 0.1816em; }
+  .cs-ext-px3 { left: 2.1306em; top: 1.2156em; width: 0.0908em; height: 0.1816em; }
+  .cs-ext-pill {
+    position: absolute;
+    right: 0.2856em;
+    top: 0.25em;
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 0.125em;
+    padding: 0.25em;
+    border-radius: 0.25em;
+    background: rgba(141, 122, 255, 0.12);
+    box-shadow:
+      inset 0 0.125em 0.1875em rgba(255, 255, 255, 0.07),
+      inset 0 -0.0625em 0.1875em -0.0625em rgba(255, 255, 255, 0.07);
+  }
+  .cs-ext-pill-icon { position: relative; width: 0.7143em; height: 0.7143em; flex: none; }
+  .cs-ext-pill-icon img {
+    position: absolute;
+    inset: -5% -13.2% -29.61% -13.21%;
+    width: auto;
+    height: auto;
+  }
+  .cs-ext-pill-text {
+    padding-inline: 0.125em;
+    font-size: 0.6875em;      /* 11 */
+    line-height: 1.4545;      /* 16 */
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  /* Stream Highlights + avatar */
+  .cs-ext-row { display: flex; align-items: center; justify-content: space-between; }
+  .cs-ext-h {
+    font-size: 0.9375em;      /* 15 */
+    line-height: 1.6;         /* 24 */
+    font-weight: 600;
+    color: #fff;
+  }
+  .cs-ext-avatar {
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    flex: none;
+    border-radius: 0.125em;
+    border: 0.033em solid rgba(255, 255, 255, 0.17);
+    overflow: hidden;
+  }
+  .cs-ext-avatar img {
+    position: absolute;
+    left: 0;
+    top: -24.92%;             /* the file's crop of the portrait */
+    width: 100%;
+    height: 199.1%;
+    max-width: none;
+  }
+
+  /* Clip cards */
+  .cs-ext-card { display: flex; flex-direction: column; gap: 1em; }
+  .cs-ext-thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 132 / 74;
+    border-radius: 0.25em;
+    border: 0.0625em solid rgba(255, 255, 255, 0.17);
+    overflow: hidden;
+  }
+  .cs-ext-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cs-ext-cap { display: flex; flex-direction: column; gap: 0.375em; }
+  .cs-ext-title {
+    font-size: 0.6875em;      /* 11 */
+    line-height: 1.4545;      /* 16 */
+    font-weight: 600;
+    color: #fff;
+  }
+  .cs-ext-meta {
+    display: flex;
+    align-items: center;
+    gap: 1em; /* meta font is 8px, so 1em = the file's 8px gap */
+    font-family: var(--font-geist-sans); /* Inter Display in the file */
+    font-size: 0.5em;         /* 8 */
+    font-weight: 500;
+    line-height: normal;
+    color: #fff;
+  }
+  .cs-ext-dim { color: rgba(255, 255, 255, 0.59); }
+  /* Inside the 8px meta row, so 1.75em/1.875em = the file's 14×15. */
+  .cs-ext-badge { width: 1.75em; height: 1.875em; flex: none; }
+  .cs-ext-badge img { width: 100%; height: 100%; display: block; }
+
+  .cs-ext-actions { display: flex; align-items: flex-start; justify-content: space-between; }
+  .cs-ext-reacts { display: flex; align-items: center; gap: 0.125em; }
+  .cs-ext-react {
+    display: flex;
+    align-items: center;
+    gap: 0.125em;
+    padding: 0.125em;
+    border-radius: 0.25em;
+    border: 0.03125em solid rgba(255, 255, 255, 0.08);
+    background: #15121e;
+  }
+  .cs-ext-react-hot { background: #373245; border-color: transparent; }
+  .cs-ext-react-mid { background: #231f2f; }
+  .cs-ext-react img { width: 0.75em; height: 0.75em; display: block; }
+  .cs-ext-react span {
+    font-size: 0.5em;         /* 8 */
+    line-height: 1.22;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .cs-ext-share {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 0.923em;
+    padding: 0.1539em 0.2308em;
+    border-radius: 0.2609em;
+    background: rgba(141, 122, 255, 0.12);
+    box-shadow:
+      inset 0 0.0769em 0.1154em -0.0625em rgba(255, 255, 255, 0.07),
+      inset 0 -0.0385em 0.1154em -0.125em rgba(255, 255, 255, 0.07),
+      0 0.0385em 0.0385em -0.03125em rgba(0, 0, 0, 0.12);
+    flex: none;
+  }
+  .cs-ext-share-t {
+    padding-inline: 0.1539em;
+    font-size: 0.4231em;      /* 6.77 */
+    line-height: 1.4544;      /* 9.85 */
+    font-weight: 600;
+    color: #d1b2ff;
+    white-space: nowrap;
+  }
+  .cs-ext-share-i { width: 0.3314em; height: 0.3314em; display: block; }
+  .cs-ext-share-i-lg { width: 0.5384em; height: 0.5384em; }
+  .cs-ext-meta .cs-ext-share-solo {
+    margin-left: auto;
+    font-size: 2em; /* meta is 8px-based; restore the 16px em basis */
+  }
+
+  /* ---- Label / body rows: label cols 1-6, body cols 6-13 (549px start and
+         747px measure in the file — exactly the col-6 boundary). ---- */
+  .cs-rowlabel { grid-column: 1 / 6; align-self: start; }
+  .cs-rowbody { grid-column: 6 / 13; text-wrap: balance; }
+  /* The fluid grid outgrows a comfortable measure on big monitors — step the
+     body's start line right one column at a time, so the block stays near the
+     1440 design's 746px but its left edge always sits on a grid line. Each
+     threshold is where the current span passes ~880px. (These must follow the
+     base rule: same specificity, later wins.) */
+  @media (min-width: 1650px) { .cs-rowbody { grid-column: 7 / 13; } }
+  @media (min-width: 1980px) { .cs-rowbody { grid-column: 8 / 13; } }
+  @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
+  @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
+
+  /* ---- Feature rows (My USDKG / Streamhub) ---- */
+  .cs-feat-img-left { grid-column: 1 / 10; aspect-ratio: 984 / 806; }
+  .cs-feat-img-right { grid-column: 4 / 13; aspect-ratio: 984 / 806; }
+  .cs-feat-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .cs-feat-col-right { grid-column: 10 / 13; }
+  .cs-feat-col-left { grid-column: 1 / 4; grid-row: 1; }
+  .cs-feat-head { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cs-feat-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-feat-body {
+    margin: 0;
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-feat-lead {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-feat-list { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cs-feat-item { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .cs-bullet { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px; }
+
+  /* ---- 8 · More work ---- */
+  .cs-more { padding-block-end: var(--space-8); }
+  .cs-more-title {
+    grid-column: 1 / -1;
+    margin: 0 0 var(--space-6);
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-cards {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--gutter);
+  }
+  .cs-card { display: flex; flex-direction: column; gap: var(--space-2); color: #fff; }
+  .cs-card-media {
+    position: relative;
+    aspect-ratio: 636 / 551;
+    overflow: hidden;
+    background: #171718;
+  }
+  .cs-card-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 14px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .cs-card-name { margin: 0; color: #fff; white-space: nowrap; }
+  .cs-card-tags { display: flex; align-items: center; gap: var(--space-1); }
+  .cs-card-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+  .cs-card-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
+
+  /* ---- Responsive: collapse to single column under 900px ---- */
+  @media (max-width: 900px) {
+    .cs-info, .cs-standfirst,
+    .cs-rowlabel, .cs-rowbody,
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-pair-narrow-left, .cs-pair-broad-right,
+    .cs-pair-square-left, .cs-pair-fill-right,
+    .cs-exp-media, .cs-exp-side,
+    .cs-img-wide,
+    .cs-feat-img-left, .cs-feat-img-right,
+    .cs-feat-col-left, .cs-feat-col-right { grid-column: 1 / -1; }
+    .cs-feat-col-left { grid-row: auto; }
+    .cs-feat-body { max-width: none; }
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-pair-narrow-left, .cs-pair-broad-right,
+    .cs-pair-square-left, .cs-pair-fill-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
+    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
+    .cs-currency-panel { height: auto; aspect-ratio: 2000 / 1123; }
+    /* The extension composition scales off panel width — keep the file's
+       ratio here or the mock loses its bottom breathing room again. */
+    .cs-ext-panel { height: auto; aspect-ratio: 746 / 648; }
+    .cs-cards { grid-template-columns: 1fr; }
+    .cs-card-tags { display: none; }
+  }
+</style>
+

@@ -1705,3 +1705,14 @@ const moreWork = [
     .usp-empty { opacity: 0 !important; }
   }
 </style>
+
+<style is:global>
+  /* Case-study selection tint (TL;DR purple): overrides the site-wide charcoal
+     band — page CSS loads after global.css, so this wins here and ships
+     only with this page. */
+  ::selection {
+    background: #241b31;
+    color: #c9a8ff;
+    text-shadow: 0 0 12px rgba(193, 151, 255, 0.45);
+  }
+</style>

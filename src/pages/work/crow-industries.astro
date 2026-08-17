@@ -1,13 +1,13 @@
 ---
-// SCAFFOLD: cloned from tldr.astro so USDKG shares the case-study format.
+// SCAFFOLD: cloned from tldr.astro so Crow Industries shares the case-study format.
 // Hero media + info tiles are real; every other panel still carries TLDR
-// media/copy as placeholders — swap section by section as USDKG content
+// media/copy as placeholders — swap section by section as Crow Industries content
 // lands (same drop-in flow as the TLDR build).
 import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
 import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
-// USDKG case study (Figma 2548:24573). Typography is copied EXACTLY from the
+// Crow Industries case study (Figma 2548:24573). Typography is copied EXACTLY from the
 // file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
 // spacing and columns are mapped onto the site system — the design's 1296px
 // container IS the 12-col macro grid at 1440 (col 86 + gutter 24), so every
@@ -26,17 +26,18 @@ const info = [
   {
     label: "Things I Did",
     values: [
-      "Brand Identity Design",
       "Website Design",
       "Website Development",
+      "AI-Generated Imagery",
+      "AI-Generated Video",
       "Document Design",
       "Deck Design",
     ],
   },
-  { label: "Company", values: ["USDKG"] },
-  { label: "Role", values: ["Founding Designer", "Creative Lead"] },
-  { label: "Year", values: ["2024 → Present"] },
-  { label: "Live website", values: [], link: { text: "Visit website", href: "https://usdkg.com" } },
+  { label: "Company", values: ["Crow Industries"] },
+  { label: "Role", values: ["Head of Design"] },
+  { label: "Year", values: ["2024 → Present"] }, // TODO: confirm Crow years
+  { label: "Live website", values: [], link: { text: "Visit website", href: "https://www.crowindustriesinc.com" } },
 ];
 
 const moreWork = [
@@ -44,7 +45,7 @@ const moreWork = [
   { title: "Livingless", tags: ["Sora Consulting", "Webflow Development", "AI Prompting"] },
 ];
 ---
-<FullscreenLayout title="USDKG — Case Study — Neel Sarode">
+<FullscreenLayout title="Crow Industries — Case Study — Neel Sarode">
   <GridLines />
 
   <!-- Shared radial fill for the spark bullets (exact gradient from the file:
@@ -65,8 +66,8 @@ const moreWork = [
     <section class="cs-hero" data-reveal-group>
       <video
         class="cs-hero-img"
-        src="/gold-dollar-cover.mp4"
-        poster="/gold-dollar-poster.jpg"
+        src="/crow-cover.mp4"
+        poster="/crow-poster.jpg"
         autoplay
         muted
         loop
@@ -79,7 +80,7 @@ const moreWork = [
       <div class="cs-hero-overlay">
         <header class="cs-nav"><SiteNav activePath="/" /></header>
         <h1 class="cs-title">
-          <span class="mask"><span class="line">USDKG</span></span>
+          <span class="mask"><span class="line">Crow Industries</span></span>
         </h1>
       </div>
     </section>
@@ -127,16 +128,17 @@ const moreWork = [
 
           <div class="cs-standfirst" data-reveal-group>
             <span class="mask"><p class="cs-statement">
-              <span class="mut">USDKG is a gold-backed stablecoin licensed by the
-              Ministry of Finance of the Kyrgyz Republic - a digital dollar
-              collateralized by audited physical gold, built to serve both crypto
-              and institutional finance.</span>
+              <span class="mut">Crow Industries is a defense tech company building
+              Fenris: an unmanned ground vehicle that carries up to 1,000 lbs of
+              payload through contested, GPS-denied environments, keeping humans
+              out of harm’s way.</span>
             </p></span>
             <span class="mask"><p class="cs-statement">
-              They were deciding between using a major agency and a single person.
-              They went with the one person. I created the brand identity, currency
-              mark, website, and every document the company put in front of
-              officials and the public.
+              I came in and revamped how the brand shows up: the website
+              end-to-end, the decks and documents that go in front of investors
+              and defense partners, and assets used at events through AI
+              generated imagery and video pipelines that put Fenris in
+              environments that camera crews couldn’t normally reach.
             </p></span>
           </div>
         </div>
@@ -164,7 +166,7 @@ const moreWork = [
         <div class="full-composed cs-row" data-reveal-group>
           <span class="mask cs-rowlabel"><p class="cs-label">Government-Backed</p></span>
           <span class="mask cs-rowbody"><p class="cs-body">
-            <span class="mut">USDKG launched with an initial $50M issuance backed
+            <span class="mut">Crow Industries launched with an initial $50M issuance backed
             by physical gold held in national reserves, issued through a
             state-owned entity under the Ministry of Finance of the Kyrgyz
             Republic and smart contracts audited by ConsenSys.</span> The brand
@@ -276,33 +278,6 @@ const moreWork = [
               aria-hidden="true"
             ></video>
           </div>
-          <div class="cs-img cs-pair-square-left cs-btn-panel" data-fade>
-            <video
-              src="/usdkg-button-loop.mp4"
-              poster="/usdkg-button-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-            <p class="cs-img-caption">Micro-interactions</p>
-          </div>
-          <div class="cs-img cs-pair-fill-right" data-fade>
-            <video
-              src="/usdkg-mobile-loop.mp4"
-              poster="/usdkg-mobile-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
         </div>
       </div>
       <div class="content-grid">
@@ -373,7 +348,7 @@ const moreWork = [
             <img src="/usdkg-deck.jpg" alt="Gold Dollar pitch deck: an open spread on global commerce and reserve management beside the 'Future of Finance, Fully Backed by Gold' cover." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/usdkg-whitepaper.jpg" alt="The USDKG whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
+            <img src="/usdkg-whitepaper.jpg" alt="The Crow Industries whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -712,22 +687,6 @@ const moreWork = [
   }
   /* For captions sitting on light media */
   .cs-caption-dark { color: rgba(0, 0, 0, 0.88); }
-  /* Button-hover panel only: the recording has a browser link-preview pill
-     that flashes in its bottom-left corner. A corner patch in the video's
-     own backdrop color sits ON TOP of the video and hides it invisibly;
-     the caption stacks above the patch. Sized in % of the square panel so
-     it tracks the video scale at every viewport. */
-  .cs-btn-panel { background: #081121; }
-  .cs-btn-panel::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 45%;
-    height: 12%;
-    background: #081121;
-  }
-  .cs-btn-panel .cs-img-caption { z-index: 1; }
   /* The KG currency mark set inline in running text: sized so the G bowl
      (y 59.5→222 of the 222-unit viewBox) spans cap height — the K strokes
      ride above it like the mark's ascender. Bottom on the baseline;
@@ -1067,7 +1026,7 @@ const moreWork = [
   @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
   @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
 
-  /* ---- Feature rows (My USDKG / Streamhub) ---- */
+  /* ---- Feature rows (My Crow Industries / Streamhub) ---- */
   .cs-feat-img-left { grid-column: 1 / 10; aspect-ratio: 984 / 806; }
   .cs-feat-img-right { grid-column: 4 / 13; aspect-ratio: 984 / 806; }
   .cs-feat-col {
@@ -1173,12 +1132,12 @@ const moreWork = [
 </style>
 
 <style is:global>
-  /* Case-study selection tint (Gold Dollar gold): overrides the site-wide charcoal
+  /* Case-study selection tint (Crow olive-yellow): overrides the site-wide charcoal
      band — page CSS loads after global.css, so this wins here and ships
      only with this page. */
   ::selection {
-    background: #2b2211;
-    color: #e6b45c;
-    text-shadow: 0 0 12px rgba(228, 180, 88, 0.45);
+    background: #23260f;
+    color: #dbe36a;
+    text-shadow: 0 0 12px rgba(219, 227, 106, 0.4);
   }
 </style>

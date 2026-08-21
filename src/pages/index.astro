@@ -62,8 +62,7 @@ const fwRows = [
     flip: false,
     logo: "crow",
     name: "Crow Industries",
-    // href intentionally omitted while the case study is still scaffold —
-    // relink to /work/crow-industries when it's ready.
+    href: "/work/crow-industries",
     video: "/crow-cover.mp4",
     poster: "/crow-poster.jpg",
     desc: "Early stage designer. Revamped brand and designed and developed new website. Created system for generating AI imagery and video of product.",
@@ -1161,6 +1160,15 @@ const dumpItems = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Linked rows only: the loop eases in a touch on hover — the standard
+     "this tile is clickable" cue for looping media. Unlinked rows (studies
+     without a page yet) stay still so nothing promises a click it can't keep. */
+  a.fw-row:hover .fw-video { transform: scale(1.04); }
+  @media (prefers-reduced-motion: reduce) {
+    .fw-video { transition: none; }
+    a.fw-row:hover .fw-video { transform: none; }
   }
   .fw-meta {
     grid-column: 11 / 13;

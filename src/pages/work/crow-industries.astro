@@ -7,6 +7,7 @@ import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
 import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
+import MoreWork from "../../components/MoreWork.astro";
 // Crow Industries case study (Figma 2548:24573). Typography is copied EXACTLY from the
 // file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
 // spacing and columns are mapped onto the site system — the design's 1296px
@@ -38,11 +39,6 @@ const info = [
   { label: "Role", values: ["Head of Design"] },
   { label: "Year", values: ["2024 → Present"] }, // TODO: confirm Crow years
   { label: "Live website", values: [], link: { text: "Visit website", href: "https://www.crowindustriesinc.com" } },
-];
-
-const moreWork = [
-  { title: "Nomad Vision™", tags: ["Branding", "Web Design", "AI Prompting"] },
-  { title: "Livingless", tags: ["Sora Consulting", "Webflow Development", "AI Prompting"] },
 ];
 ---
 <FullscreenLayout title="Crow Industries — Case Study — Neel Sarode">
@@ -145,105 +141,60 @@ const moreWork = [
       </div>
     </section>
 
-    <!-- 3 · Brand — brand panel (5 cols) + timeline loop (7 cols), then
-         The Brand System row. -->
-    <section class="cs-band">
+    <!-- 3 · The Problem → AI imagery pipeline (Figma 2654:57222). Label/body
+         row, the Figma Weave wide panel with its bottom-right tab, a centred
+         intro, then a media stack: wide · pair · wide · pair · wide (24 apart).
+         All eight panels are real: the Weave canvas loop (A), then
+         AI-generated Fenris loops and stills (B–H). -->
+    <section class="cs-band cs-band-tight">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">The Problem</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">Fenris needed to be seen on the field: different
+              terrains, payloads, and missions, </span>but we lacked the imagery
+              and video needed <span class="mut">to make an editorial level
+              website and brand showing the actual product.</span>
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              <span class="mut">The imagery and video needed to be generated and
+              had to match the real machine exactly but </span>standard models
+              didn’t cut it. <span class="mut">The vehicle would come out looking
+              completely different than the actual design. </span>That’s when I
+              decided to use LoRA models to encapsulate the product exactly into
+              a model that could be used over and over with 1:1 accuracy.
+            </p></span>
+          </div>
+        </div>
+      </div>
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
-          <div class="cs-img cs-pair-b-left" data-fade>
-            <img src="/usdkg-brand.jpg" alt="The Gold Dollar mark and logotype centered on a gold-lit dark backdrop." loading="lazy" decoding="async" />
-          </div>
-          <div class="cs-img cs-pair-a-right" data-fade>
-            <img src="/usdkg-government-meeting.jpg" alt="An official meeting room of the Kyrgyz Republic: delegates at a long table beneath the state emblem and national flags." loading="lazy" decoding="async" />
-            <div class="cs-stat cs-stat-note">
-              <p class="cs-stat-num">November, 2025</p>
-              <p class="cs-stat-sub">Launched at a state ceremony attended by the President of the Kyrgyz Republic</p>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/crow-weave-loop.mp4"
+              poster="/crow-weave-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <div class="cs-stat cs-stat-tab">
+              <p class="cs-stat-num">Figma Weave</p>
+              <p class="cs-stat-sub">Pipeline for AI generated imagery and video</p>
             </div>
           </div>
         </div>
       </div>
       <div class="content-grid">
         <div class="full-composed cs-row" data-reveal-group>
-          <span class="mask cs-rowlabel"><p class="cs-label">Government-Backed</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">
-            <span class="mut">Crow Industries launched with an initial $50M issuance backed
-            by physical gold held in national reserves, issued through a
-            state-owned entity under the Ministry of Finance of the Kyrgyz
-            Republic and smart contracts audited by ConsenSys.</span> The brand
-            required design that could hold up next to a government seal.
-          </p></span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4 · Built as a Symbol — the currency-mark story -->
-    <section class="cs-band">
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <span class="mask cs-intro"><p class="cs-body cs-center">
-            <span class="mut">Most logos live on websites, but this one </span>had
-            to work as a currency symbol<span class="mut">: legible at ticker
-            size, distinct next to currency symbols, and credible on a national
-            reserve report.</span>
-          </p></span>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <div class="cs-img cs-img-wide cs-currency-panel" data-fade>
-            <img src="/usdkg-currency.jpg" alt="Brand pattern: the Gold Dollar KG mark set among dollar, euro, pound, and yen symbols over prismatic gold light." loading="lazy" decoding="async" />
-          </div>
-          <div class="cs-img cs-pair-square-left" data-fade>
-            <video
-              src="/usdkg-product-loop.mp4"
-              poster="/usdkg-product-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
-          <div class="cs-img cs-pair-fill-right" data-fade>
-            <video
-              src="/usdkg-convention-loop.mp4"
-              poster="/usdkg-convention-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-            <p class="cs-img-caption cs-caption-dark">Logo use at conventions</p>
-          </div>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          <span class="mask cs-rowlabel"><p class="cs-label">Built as a Symbol</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">
-            The <svg class="cs-kg-mark" viewBox="0 0 133 222" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19.0566 77.124L88.7529 0H112.567L58.124 60.3184C61.8265 59.7769 65.6834 59.5049 69.6953 59.5049C82.0759 59.5049 92.4905 61.7621 100.938 66.2773C109.532 70.7926 116.306 76.9102 121.258 84.6299C126.356 92.3496 129.852 101.017 131.745 110.63L112.081 111.94C110.188 101.89 105.964 93.7339 99.4092 87.4707C92.8547 81.0619 82.9499 77.8574 69.6953 77.8574C57.8975 77.8575 48.2848 80.7706 40.8564 86.5967C33.5737 92.4229 28.1842 100.143 24.6885 109.756C21.3384 119.223 19.6631 129.565 19.6631 140.78C19.6631 152.578 21.4106 163.211 24.9062 172.679C28.402 182.001 33.8646 189.429 41.293 194.964C48.7213 200.499 58.1887 203.267 69.6953 203.267C78.8716 203.267 86.8106 201.227 93.5107 197.148C100.211 192.924 105.381 187.316 109.022 180.325C112.664 173.334 114.557 165.76 114.703 157.604H70.1328V139.688H132.182V218.123H118.199L117.244 192.056C115.365 196.409 112.772 200.439 109.46 204.141C104.508 209.53 98.5353 213.826 91.5439 217.03C84.6982 220.089 77.2698 221.619 69.2588 221.619C54.6934 221.619 42.2399 218.123 31.8984 211.132C21.5571 204.14 13.6189 194.6 8.08398 182.511C4.40642 174.162 1.98444 165.032 0.816406 155.123H0.267578V149.101C0.0900474 146.382 2.5778e-06 143.609 0 140.78C0 137.991 0.0902426 135.255 0.267578 132.572V0H19.0566V77.124Z" fill="currentColor"/></svg> mark
-            is built from the same skeleton as $ and €<span class="mut"> - two
-            strokes on a letterform - so it</span> reads as currency at 12 pixels
-            on an exchange ticker<span class="mut"> and holds its weight beside
-            the majors.</span>
-          </p></span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5 · Website -->
-    <section class="cs-band">
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <span class="mask cs-intro"><p class="cs-body cs-center">
-            <span class="mut">Crypto users smell corporate from a mile away.
-            Institutions flinch at anything that looks like crypto.</span> The
-            brand had to hold both.
+          <span class="mask cs-intro cs-intro-wide"><p class="cs-body cs-center">
+            Here’s some of the high-quality imagery and video I produced for
+            Crow Industries that was used across the website, decks, and print
+            assets:
           </p></span>
         </div>
       </div>
@@ -251,24 +202,8 @@ const moreWork = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/gold-dollar-cover.mp4"
-              poster="/gold-dollar-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
-          <div class="cs-img cs-pair-a-left" data-fade>
-            <img src="/usdkg-website-pages.jpg" alt="Gold Dollar website pages: the hero with 'The Future of Finance, Fully Backed by Gold', the stability statement, and the FAQ beside the gold monolith." loading="lazy" decoding="async" />
-          </div>
-          <div class="cs-img cs-pair-b-right" data-fade>
-            <video
-              src="/usdkg-timeline-loop.mp4"
-              poster="/usdkg-timeline-poster.jpg"
+              src="/crow-desert-loop.mp4"
+              poster="/crow-desert-poster.jpg"
               autoplay
               muted
               loop
@@ -281,28 +216,11 @@ const moreWork = [
         </div>
       </div>
       <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          <span class="mask cs-rowlabel"><p class="cs-label">The Website Challenge</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">
-            <span class="mut">Institutions don’t buy solutions on promises. They
-            buy </span>proof<span class="mut"> - so the site leads with </span>audited
-            reserves, ministry oversight, redemption paths, and press
-            coverage<span class="mut"> surfaced on the first screen instead of
-            buried in a footer.</span>
-          </p></span>
-        </div>
-      </div>
-
-      <!-- 5.5 · Experiences (Figma 2613:55967) — hero-showcase video (8 cols)
-           beside a 4-col side column: GPU-detection code image on top, the
-           label/body stack pinned to the bottom. Same band as the website
-           story; cs-row's margin keeps the challenge text evenly spaced. -->
-      <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          <div class="cs-img cs-exp-media" data-fade>
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade style="--focus-x: 68%">
             <video
-              src="/usdkg-hero-showcase-loop.mp4"
-              poster="/usdkg-hero-showcase-poster.jpg"
+              src="/crow-quarry-loop.mp4"
+              poster="/crow-quarry-poster.jpg"
               autoplay
               muted
               loop
@@ -312,76 +230,176 @@ const moreWork = [
               aria-hidden="true"
             ></video>
           </div>
-          <div class="cs-exp-side">
-            <div class="cs-img cs-exp-code" data-fade>
-              <img src="/usdkg-gpu-code.jpg" alt="The GPU-detection script: checkGPUPerformance() probes the WebGL renderer string for high-end NVIDIA, AMD, and Apple Silicon GPUs." loading="lazy" decoding="async" />
-            </div>
-            <div class="cs-exp-text">
-              <span class="mask"><p class="cs-exp-label">Optimizing Hero Section per Device</p></span>
-              <span class="mask"><p class="cs-exp-body">
-                The hero section uses a combination of WebGL + Three.js when
-                displaying our Spline 3D scene, so I created a script that
-                detects the user’s GPU and CPU and defaults back to a looping
-                video if the user’s device cannot handle the scene, improving
-                accessibility across more devices.
-              </p></span>
-            </div>
+          <div class="cs-img cs-pair-half-right" data-fade style="--focus-x: 66%">
+            <video
+              src="/crow-night-loop.mp4"
+              poster="/crow-night-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <img src="/crow-fenris-v2.jpg" alt="Fenris V2 with a mounted turret rolling through a ruined city street at dusk, headlights cutting through the haze." loading="lazy" decoding="async" />
+            <p class="cs-img-caption">Fenris V2 Model</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <img src="/crow-fenris-gurney.jpg" alt="Fenris V2 carrying a casualty on a gurney attachment across a scorched field as explosions go off behind it." loading="lazy" decoding="async" />
+            <p class="cs-img-caption">Fenris V2 + Gurney attatchment</p>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/crow-fenris-units.jpg" alt="Three Fenris units in convoy through a dim mine tunnel, headlights on, dust hanging in the air." loading="lazy" decoding="async" />
+            <p class="cs-img-caption">Showcasing multiple units in one image</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/crow-hero-loop.mp4"
+              poster="/crow-hero-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 6 · Feature Builds -->
+    <!-- 4 · Website visuals (Figma 2687:27464). Centred intro, then a media
+         stack: wide · pair · wide · pair (24 apart). All six panels are real:
+         the timeline loop, button-hover loop, Defense pages, the case-study
+         cover loop, then the Mining and Space pages. -->
+    <section class="cs-band cs-band-tight">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <span class="mask cs-intro cs-intro-narrow"><p class="cs-body cs-center">
+            <span class="mut">For the website, I went with a </span>larger-than-life
+            display of cinematic visuals<span class="mut"> that paint a picture
+            of the product and its capabilities in the defense, mining, and
+            space sectors.</span>
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/crow-timeline-loop.mp4"
+              poster="/crow-timeline-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <video
+              src="/crow-button-loop.mp4"
+              poster="/crow-button-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/crow-site-defense.jpg" alt="Two Defense pages of the Crow Industries site side by side: the Fenris hero, “The Ultimate Battlefield Assistant”, and the logistics, counter-UAS, medical evacuation and command-and-control sections." loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <video
+              src="/crow-cover.mp4"
+              poster="/crow-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <img src="/crow-site-mining.jpg" alt="Two Mining pages of the Crow Industries site: “Redefining Resource Extraction on Earth”, the fleet control room, precision surveying, extreme environment access, and the demo call-to-action." loading="lazy" decoding="async" />
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/crow-site-space.jpg" alt="Two Space pages of the Crow Industries site: “Pioneering Humanity’s Future Beyond Earth”, a Fenris fleet on the lunar surface, resource extraction, logistics, and off-world operations." loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Print work. Centred intro, then a media stack: pair (the two
+         brochure frames) · wide (the convention banners), 24 apart. All
+         three panels are real print mockups. -->
     <section class="cs-band">
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <span class="mask cs-intro"><p class="cs-body cs-center">
-            <span class="mut">I designed all of the brand’s key documents -
-            including </span>the brochure institutions get at conventions<span class="mut">,
-            and </span>the whitepaper investors scrutinize online.
+            Print work delivered: <span class="mut">Briefing documents presented
+            to governments, product catalogs sent to potential buyers, and
+            banners for the convention floor. </span>All derived from the same
+            generated pipeline of imagery, upscaled for print.
           </p></span>
         </div>
       </div>
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/usdkg-deck.jpg" alt="Gold Dollar pitch deck: an open spread on global commerce and reserve management beside the 'Future of Finance, Fully Backed by Gold' cover." loading="lazy" decoding="async" />
+            <img src="/crow-print-briefing.jpg" alt="Crow Industries government briefing document: the Luxembourg NATO defense-investment cover with Fenris beneath state flags, and the open spread with specifications, customers, and the Israel partnership page." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/usdkg-whitepaper.jpg" alt="The Crow Industries whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
+            <img src="/crow-print-catalog.jpg" alt="Crow Industries product catalog spreads: Fenris Kinetic (The Breacher) and Fenris Guardian (The Squadmate) pages with mission profiles and operational specs, beside the photo-led cover." loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-img-wide" data-fade>
+            <img src="/crow-print-banners.jpg" alt="Three Crow Industries roll-up banners in a marble lobby: Fenris units in desert, Mars-colony, and ruined-city scenes, each with the Crow logotype and website URL." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 8 · More work — placeholder cards from the file. -->
-    <section class="cs-band cs-more">
-      <div class="content-grid">
-        <div class="full-composed">
-          <h2 class="cs-more-title" data-reveal-group>
-            <span class="mask"><span class="line">More work</span></span>
-          </h2>
-          <div class="cs-cards">
-            {moreWork.map((card) => (
-              <article class="cs-card" data-reveal-group data-cursor-label={card.title}>
-                <div class="cs-card-media" data-fade></div>
-                <div class="cs-card-caption">
-                  <span class="mask"><p class="cs-card-name">{card.title}</p></span>
-                  <div class="cs-card-tags">
-                    {card.tags.map((t, i) => (
-                      <>
-                        {i > 0 && <span class="cs-card-sep" aria-hidden="true"></span>}
-                        <span class="mask"><p class="cs-card-tag">{t}</p></span>
-                      </>
-                    ))}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- More work — the other featured case studies (shared component). -->
+    <MoreWork current="crow-industries" />
   </main>
 
   <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`).
@@ -451,7 +469,6 @@ const moreWork = [
     });
   }
 </script>
-
 
 <style>
   .content { position: relative; z-index: 1; }
@@ -561,6 +578,9 @@ const moreWork = [
          64 around intros and label/body rows, 24 between media rows). ---- */
   .cs-band { padding-block-end: var(--space-8); }
   .cs-about { padding-block: var(--space-7) var(--space-8); }
+  /* Band that hands off to a centred intro: 64 below its last panel so the
+     intro sits evenly (64 / 64) between the media above and below it. */
+  .cs-band-tight { padding-block-end: var(--space-6); }
   .cs-row { margin-block-start: var(--space-6); }
   .cs-intro {
     grid-column: 1 / -1;
@@ -569,6 +589,15 @@ const moreWork = [
     margin-block-end: var(--space-6);
   }
   .cs-feature { margin-block-start: var(--space-6); }
+  /* Row that OPENS a band (the previous band's 128 already sits above it):
+     no top margin, 64 down to the media that follows. */
+  .cs-row-lead { margin-block-end: var(--space-6); }
+  /* Consecutive media rows in a stack (24 apart in the file, = the gutter). */
+  .cs-stack { margin-block-start: var(--space-3); }
+  /* Intro variant for the AI-imagery lead-in — the file sets this one at 772. */
+  .cs-intro-wide { max-width: 772px; }
+  /* Intro variant for the website-visuals lead-in — the file sets it at 658. */
+  .cs-intro-narrow { max-width: 658px; }
 
   /* ---- 2 · About ---- */
   .cs-info {
@@ -612,6 +641,10 @@ const moreWork = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Per-panel focal point: a 16:9 loop in a near-square pair panel keeps
+       only the middle ~55% of its width, so panels whose subject sits
+       off-centre set --focus-x on the .cs-img to re-centre the crop. */
+    object-position: var(--focus-x, 50%) var(--focus-y, 50%);
     display: block;
   }
   /* Heights via aspect-ratio, not clamps: the grid is fluid past 1440, and a
@@ -633,9 +666,6 @@ const moreWork = [
   .cs-pair-narrow-left { grid-column: 1 / 5; }
   .cs-pair-broad-right { grid-column: 5 / 13; aspect-ratio: 856 / 648; }
   .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
-  /* Currency-pattern panel: box matches the asset's exact ratio so cover
-     never crops or edge-samples it. (After .cs-img-wide — later rule wins.) */
-  .cs-currency-panel { aspect-ratio: 2000 / 1123; }
   /* Square pair (Product Design): equal 6-col spans, the left box carries
      the 1:1 ratio and drives the row height — the right stretches to the
      same height and, at equal width, lands square too (one ratio per row,
@@ -687,17 +717,6 @@ const moreWork = [
   }
   /* For captions sitting on light media */
   .cs-caption-dark { color: rgba(0, 0, 0, 0.88); }
-  /* The KG currency mark set inline in running text: sized so the G bowl
-     (y 59.5→222 of the 222-unit viewBox) spans cap height — the K strokes
-     ride above it like the mark's ascender. Bottom on the baseline;
-     currentColor so it dims inside .mut spans. */
-  .cs-kg-mark {
-    display: inline-block;
-    height: 0.98em;
-    width: auto;
-    vertical-align: baseline;
-    margin-inline: 0.05em;
-  }
   /* Before/After chip (Figma 2589:38875) — top-left partner to the caption.
      The file's 36px chip read massive in situ, so it runs at 16px with the
      dev-chip padding rhythm; the fill maps to the charcoal token. */
@@ -745,6 +764,10 @@ const moreWork = [
   .cs-stat-note { max-width: 420px; }
   .cs-stat-note .cs-stat-num { font-size: 16px; } /* trial: headline at body size — delete to revert to 24px */
   .cs-stat-note .cs-stat-sub { line-height: 1.35; }
+  /* Bottom-right tab on the Figma Weave panel (Figma 2654:57228): both
+     lines at 16/1.15, the text block a 174px measure inside the 24/48 box. */
+  .cs-stat-tab { max-width: 246px; }
+  .cs-stat-tab .cs-stat-num { font-size: 16px; }
 
   /* ---- Hover note (bottom-right corner box, shown on panel hover) ----
      Same box language as .cs-stat, but holds a sentence of copy and only
@@ -1025,6 +1048,14 @@ const moreWork = [
   @media (min-width: 1980px) { .cs-rowbody { grid-column: 8 / 13; } }
   @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
   @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
+  /* Two-paragraph body: the file separates them with one blank line at
+     24/1.2, not a spacing token (same recipe as .cs-standfirst). */
+  .cs-rowbody-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
 
   /* ---- Feature rows (My Crow Industries / Streamhub) ---- */
   .cs-feat-img-left { grid-column: 1 / 10; aspect-ratio: 984 / 806; }
@@ -1065,44 +1096,6 @@ const moreWork = [
   .cs-feat-item { display: flex; gap: var(--space-2); align-items: flex-start; }
   .cs-bullet { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px; }
 
-  /* ---- 8 · More work ---- */
-  .cs-more { padding-block-end: var(--space-8); }
-  .cs-more-title {
-    grid-column: 1 / -1;
-    margin: 0 0 var(--space-6);
-    font-size: clamp(34px, 5.4vw, 52px);
-    line-height: 1;
-    letter-spacing: -0.04em;
-    font-weight: 400;
-    color: #fff;
-  }
-  .cs-cards {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4) var(--gutter);
-  }
-  .cs-card { display: flex; flex-direction: column; gap: var(--space-2); color: #fff; }
-  .cs-card-media {
-    position: relative;
-    aspect-ratio: 636 / 551;
-    overflow: hidden;
-    background: #171718;
-  }
-  .cs-card-caption {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-    font-size: 14px;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-  }
-  .cs-card-name { margin: 0; color: #fff; white-space: nowrap; }
-  .cs-card-tags { display: flex; align-items: center; gap: var(--space-1); }
-  .cs-card-tag { margin: 0; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
-  .cs-card-sep { width: 1px; height: 13px; background: rgba(255, 255, 255, 0.1); }
-
   /* ---- Responsive: collapse to single column under 900px ---- */
   @media (max-width: 900px) {
     .cs-info, .cs-standfirst,
@@ -1122,12 +1115,9 @@ const moreWork = [
     .cs-pair-narrow-left, .cs-pair-broad-right,
     .cs-pair-square-left, .cs-pair-fill-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
     .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
-    .cs-currency-panel { height: auto; aspect-ratio: 2000 / 1123; }
     /* The extension composition scales off panel width — keep the file's
        ratio here or the mock loses its bottom breathing room again. */
     .cs-ext-panel { height: auto; aspect-ratio: 746 / 648; }
-    .cs-cards { grid-template-columns: 1fr; }
-    .cs-card-tags { display: none; }
   }
 </style>
 

@@ -42,7 +42,7 @@ export const featuredWork: FeaturedWork[] = [
   {
     slug: "solarshare",
     name: "SolarShare",
-    // href: "/work/solarshare" — add when the page lands.
+    href: "/work/solarshare",
     video: "/solarshare-cover.mp4",
     poster: "/solarshare-poster.jpg",
     tags: ["Brand Identity", "Product Design", "Website Design"],

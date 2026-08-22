@@ -1,0 +1,635 @@
+---
+// SCAFFOLD: hero + About are real; content sections land next, section by
+// section (same drop-in flow as the Crow Industries build — centred intros,
+// media stacks with DEV-ONLY letter slots while assets are pending).
+import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
+import SiteNav from "../../components/SiteNav.astro";
+import GridLines from "../../components/GridLines.astro";
+import DevGrid from "../../components/DevGrid.astro";
+import MoreWork from "../../components/MoreWork.astro";
+// SolarShare case study. Typography and layout follow the shared case-study
+// format (Figma 2548:24573): type recipes copied exactly, spacing and columns
+// mapped onto the site system (1296px container = 12-col macro grid at 1440).
+
+const info = [
+  {
+    label: "Things I Did",
+    values: [
+      "Brand Identity Design",
+      "Product Design",
+      "Website Design",
+      "Website Development",
+      "Document Design",
+    ],
+  },
+  { label: "Company", values: ["SolarShare"] },
+  { label: "Role", values: ["Lead Designer"] },
+  { label: "Year", values: ["2024"] }, // TODO: confirm SolarShare years
+  { label: "Live website", values: [], link: { text: "Visit website", href: "https://www.solarshare.io" } },
+];
+---
+<FullscreenLayout title="SolarShare — Case Study — Neel Sarode">
+  <GridLines />
+
+  <main class="content">
+    <!-- 1 · Hero — full viewport, nav overlaid, title bottom-left. The
+         dashboard cover loop already encoded for the homepage row. -->
+    <section class="cs-hero" data-reveal-group>
+      <video
+        class="cs-hero-img"
+        src="/solarshare-cover.mp4"
+        poster="/solarshare-poster.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        tabindex="-1"
+        data-fade
+      ></video>
+      <div class="cs-hero-scrim" aria-hidden="true"></div>
+      <div class="cs-hero-overlay">
+        <header class="cs-nav"><SiteNav activePath="/" /></header>
+        <h1 class="cs-title">
+          <span class="mask"><span class="line">SolarShare</span></span>
+        </h1>
+      </div>
+    </section>
+
+    <!-- 2 · About — info tiles (cols 1-6) + standfirst (cols 7-13). -->
+    <section class="cs-band cs-about">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="cs-info" data-reveal-group>
+            <div class="cs-tile cs-tile-tall">
+              <span class="mask"><p class="cs-ilabel">{info[0].label}</p></span>
+              <div class="cs-tile-values">
+                {info[0].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile-stack">
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[1].label}</p></span>
+                {info[1].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{info[2].label}</p></span>
+                {info[2].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[3].label}</p></span>
+              {info[3].values.map((v) => (
+                <span class="mask"><p class="cs-ivalue">{v}</p></span>
+              ))}
+            </div>
+            <div class="cs-tile">
+              <span class="mask"><p class="cs-ilabel">{info[4].label}</p></span>
+              <span class="mask">
+                <a class="cs-ivalue cs-ilink" href={info[4].link!.href} target="_blank" rel="noopener">{info[4].link!.text}</a>
+              </span>
+            </div>
+          </div>
+
+          <div class="cs-standfirst" data-reveal-group>
+            <span class="mask"><p class="cs-statement">
+              <span class="mut">SolarShare is a SaaS that gives users fractional
+              ownership in solar energy projects, with returns powered by
+              blockchain.</span>
+            </p></span>
+            <span class="mask"><p class="cs-statement">
+              I came in as lead designer, designed the product end-to-end
+              and revamped the brand around it: the dashboards where users
+              track their panels’ production and returns, the website, and the
+              documents that carry the brand to investors.
+            </p></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Revamping the brand (Figma 2733:27467). Label/body row opening
+         the band (file body measure 588 ≈ the shared 746 rowbody — mapped to
+         the site system like every other label/body row), then a half/half
+         two before-and-after pairs with the TLDR badge chips — the website
+         (NFT-led original beside the clean-energy revamp), then the product
+         dashboard (teal original beside the dark revamp). -->
+    <section class="cs-band cs-band-tight">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Revamping the brand</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">Solarshare already had a website and product
+              design in the work, but wanted an upgrade that looked more
+              professional and established.</span>
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              I revamped the color and type system and introduced a visual
+              language that made a blockchain product feel like a clean energy
+              company instead of a crypto project.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <img src="/solarshare-before.jpg" alt="The original SolarShare site: teal hero with flat illustration, ‘Invest in Solar Energy with SolarShare’, and the NFT-led sections beneath." loading="lazy" decoding="async" />
+            <p class="cs-img-badge">Before</p>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/solarshare-after.jpg" alt="The revamped SolarShare site: photographic sunrise hero over solar farms, ‘Empower Your Future with Solar Energy’, farm cards, and the clean energy visual system." loading="lazy" decoding="async" />
+            <p class="cs-img-badge">After</p>
+          </div>
+        </div>
+      </div>
+      <!-- Second before/after pair: the product dashboard, teal original
+           beside the dark revamp. -->
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <img src="/solarshare-product-before.jpg" alt="The original SolarShare dashboard: teal UI with panel monitoring grid, gold financial bars, and energy production charts." loading="lazy" decoding="async" />
+            <p class="cs-img-badge">Before</p>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <img src="/solarshare-product-after.jpg" alt="The revamped SolarShare dashboard: dark UI with financial and energy production charts, live farm video feed, and NFT capacity remaining." loading="lazy" decoding="async" />
+            <p class="cs-img-badge cs-img-badge-invert">After</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 4 · The Product (Figma 2738:66187). Centred label + body stack
+         (16 apart, body at the file's 718 measure), then a single wide panel —
+         run at 16:9 (per direction; the file's 1296:806 box) holding the
+         dashboard mockup loop. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-intro cs-intro-stack">
+            <span class="mask"><p class="cs-label">The Product</p></span>
+            <span class="mask"><p class="cs-body cs-center">
+              <span class="mut">I redesigned every screen and rethought the
+              experience underneath them: </span>the full process of how someone
+              goes from curious to invested, and what they see once their money
+              is in a farm.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide cs-img-169" data-fade>
+            <video
+              src="/solarshare-dashboard-loop.mp4"
+              poster="/solarshare-dashboard-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+      <!-- Row under the dashboard loop: the 4:3 phone mockup embed beside a
+           1:1 purchase-flow loop. A dual-ratio row can't land both edges on
+           whole column spans (the fixed gutters would leave it ragged), so
+           the row splits by flex proportion instead — widths 4:3, which keeps
+           both aspect ratios exact and the heights equal at any viewport. -->
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-ratio-row">
+            <div class="cs-img cs-flex-43" data-fade>
+              <mockup-player
+                mockup-id="3de5a0fb-8016-486f-b19b-0b24f565bab1"
+                width="100%"
+                aspect-ratio="4 / 3"
+                trigger="inview"
+                trigger-threshold="0"
+                trigger-loop="true"
+                cursor-range="25-26-25-26"
+                click-range="100-100-100-100"
+                zoom-mode="dolly"
+                zoom-amount="50"
+                zoom-duration="400"
+                camera-zoom="36"
+                background-color="#050A0E"
+              ></mockup-player>
+            </div>
+            <div class="cs-img cs-flex-11" data-fade>
+              <video
+                src="/solarshare-purchase-loop.mp4"
+                poster="/solarshare-purchase-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+              <p class="cs-img-caption">Solarshare sequential purchase flow</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Full-width panel: the laptop mockup embed, its own 16:9 box at
+           the full container width. -->
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-img cs-embed-wide" data-fade>
+            <mockup-player
+              mockup-id="a3685c5e-1af0-4916-85a8-4235570ec34d"
+              width="100%"
+              aspect-ratio="16 / 9"
+              trigger="inview"
+              trigger-threshold="0"
+              trigger-loop="true"
+              click-range="52-53-51-51"
+              camera-zoom="41"
+              background-color="#131F1F"
+            ></mockup-player>
+            <p class="cs-img-caption">Blockchain transaction details</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile: the mockup embeds run square — the desktop 4:3 / 16:9
+         scenes get too short at phone widths. Runs before embed.js
+         initializes (inline, ahead of the async tag); re-applies on
+         breakpoint flips for players that observe attribute changes. -->
+    <script is:inline>
+      (function () {
+        var mq = matchMedia("(max-width: 900px)");
+        function apply() {
+          document.querySelectorAll("mockup-player").forEach(function (p) {
+            if (!p.dataset.desktopRatio) p.dataset.desktopRatio = p.getAttribute("aspect-ratio");
+            p.setAttribute("aspect-ratio", mq.matches ? "1 / 1" : p.dataset.desktopRatio);
+          });
+        }
+        apply();
+        mq.addEventListener("change", apply);
+      })();
+    </script>
+    <!-- mckp.live embed runtime for the mockup-player elements above.
+         is:inline so Astro ships the tag untouched. -->
+    <script is:inline src="https://embed.mckp.live/embed.js" async></script>
+
+    <!-- More work — the other featured case studies (shared component). -->
+    <MoreWork current="solarshare" />
+  </main>
+
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
+  <DevGrid ascii={false} bg={false} />
+</FullscreenLayout>
+
+<!-- Same reveal system as the other case studies: masked line rises + media
+     fades per [data-reveal-group], wired to Lenis. gsap.from only —
+     no-JS/reduced-motion visitors simply see the content. -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const wireLenis = () => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+    };
+    (window as any).lenis
+      ? wireLenis()
+      : addEventListener("lenis:init", wireLenis, { once: true });
+
+    // Panel loops autoplay below the fold, and Chrome's offscreen media
+    // optimisation can pause them there without resuming on scroll — gate
+    // each on visibility (same fix as the homepage covers).
+    document
+      .querySelectorAll<HTMLVideoElement>(".cs-img > video")
+      .forEach((v) => {
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) v.play().catch(() => {});
+              else v.pause();
+            });
+          },
+          { rootMargin: "160px" },
+        ).observe(v);
+      });
+
+    gsap.utils.toArray<HTMLElement>("[data-reveal-group]").forEach((group) => {
+      const risers = group.querySelectorAll(".mask > *");
+      const fades = group.querySelectorAll("[data-fade]");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+      if (risers.length) {
+        tl.from(risers, {
+          yPercent: 110,
+          duration: 0.9,
+          ease: "power4.out",
+          stagger: 0.09,
+        });
+      }
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: the hero and panel loops stay on their posters.
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, .cs-img > video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+</script>
+
+<style>
+  .content { position: relative; z-index: 1; }
+
+  /* ---- Masked line reveals (same recipe as the homepage) ---- */
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.14em;
+    margin-block-end: -0.14em;
+  }
+  .line { display: block; }
+
+  /* ============================================================
+     Type recipes — EXACT values from the shared case-study format.
+     All Geist 400.
+       display title    52 / 1    / -0.04em
+       body (24-class)  24 / 1.2  / -0.02em   white, .mut spans 65%
+       about statement  24 / 1.15 / -0.02em
+       row label        16 / 1.2  / -0.01em   65%
+       info label       14 / 1.2  / -0.01em   65%
+       info value       14 / 1.48 / -0.01em   white
+       image caption    14 / 1.2  / -0.01em   88%
+     ============================================================ */
+  .cs-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-body {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-statement {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .mut { color: rgba(255, 255, 255, 0.65); }
+  .cs-center { text-align: center; text-wrap: balance; }
+  .cs-label {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ilabel {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ivalue {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-ilink { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---- 1 · Hero ---- */
+  .cs-hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .cs-hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cs-hero-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 10, 11, 0.25) 0%, rgba(10, 10, 11, 0) 30%, rgba(10, 10, 11, 0) 55%, rgba(10, 10, 11, 0.55) 100%);
+  }
+  /* Edge-hug overlay — the homepage hero's exact padding recipe. */
+  .cs-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+  }
+  .cs-nav { padding: 0; }
+
+  /* ---- Section rhythm (96 into About, 128 between bands, 64 around
+         intros and label/body rows, 24 between media rows). ---- */
+  .cs-band { padding-block-end: var(--space-8); }
+  .cs-about { padding-block: var(--space-7) var(--space-8); }
+  /* Band that hands off to a centred intro: 64 below its last panel so the
+     intro sits evenly (64 / 64) between the media above and below it. */
+  .cs-band-tight { padding-block-end: var(--space-6); }
+  .cs-row { margin-block-start: var(--space-6); }
+  /* Row that OPENS a band (the previous band's 128 already sits above it):
+     no top margin, 64 down to the media that follows. */
+  .cs-row-lead { margin-block-end: var(--space-6); }
+  /* Consecutive media rows in a stack (24 apart, = the gutter). */
+  .cs-stack { margin-block-start: var(--space-3); }
+  .cs-intro {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 702px;
+    margin-block-end: var(--space-6);
+  }
+  /* Intro variant: centred label ABOVE the body (16 apart), body at the
+     file's 718 measure. */
+  .cs-intro-stack {
+    max-width: 718px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    text-align: center;
+  }
+
+  /* ---- 2 · About ---- */
+  .cs-info {
+    grid-column: 1 / 6;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--gutter);
+    align-content: start;
+  }
+  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); align-content: start; }
+  .cs-tile-values { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-tile-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-standfirst {
+    grid-column: 8 / 13;
+    max-width: 680px;
+    text-wrap: balance;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    /* One blank line at 24/1.15 — the format separates the paragraphs with a
+       double break, not a spacing token. */
+    gap: 1.15em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
+
+  /* ---- Media panels (shared vocabulary for the content sections) ----
+     ONE box per row carries the aspect ratio and drives the row height; its
+     partner has no ratio and stretches to match. Pairs are 648 tall at 1440,
+     wides 806 (whole column spans of the 12-col macro grid). ---- */
+  .cs-img {
+    position: relative;
+    overflow: hidden;
+    background: #171718;
+  }
+  .cs-img > img,
+  .cs-img > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Per-panel focal point: panels whose subject sits off-centre set
+       --focus-x/--focus-y on the .cs-img to re-centre the crop. */
+    object-position: var(--focus-x, 50%) var(--focus-y, 50%);
+    display: block;
+  }
+  .cs-pair-a-left { grid-column: 1 / 8; aspect-ratio: 746 / 648; }
+  .cs-pair-b-right { grid-column: 8 / 13; }
+  .cs-pair-b-left { grid-column: 1 / 6; }
+  .cs-pair-a-right { grid-column: 6 / 13; aspect-ratio: 746 / 648; }
+  .cs-pair-half-left { grid-column: 1 / 7; aspect-ratio: 636 / 648; }
+  /* Dual-ratio row (4:3 beside 1:1): flex proportions instead of column
+     spans — see the markup comment. Both children keep exact ratios and
+     land at the same height. */
+  .cs-ratio-row {
+    grid-column: 1 / 13;
+    display: flex;
+    gap: var(--gutter);
+  }
+  .cs-ratio-row > * { min-width: 0; }
+  .cs-flex-43 { flex: 4 0 0; aspect-ratio: 4 / 3; }
+  .cs-flex-11 { flex: 3 0 0; aspect-ratio: 1 / 1; }
+  /* Full-width embed panel: the player's own aspect box sets the height. */
+  .cs-embed-wide { grid-column: 1 / 13; }
+  /* The embeds size themselves off the panel width and their aspect box. */
+  .cs-img > mockup-player { display: block; width: 100%; }
+  .cs-pair-half-right { grid-column: 7 / 13; }
+  .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
+  /* 16:9 wide variant (after .cs-img-wide — later rule wins). */
+  .cs-img-169 { aspect-ratio: 16 / 9; }
+  .cs-img-caption {
+    position: absolute;
+    left: var(--space-2);
+    bottom: var(--space-2);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  /* Before/After chip (Figma 2589:38875) — top-left partner to the caption.
+     Same recipe as the TLDR page: 14px in a pill on the charcoal token. */
+  .cs-img-badge {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-radius: 999px;
+    background: var(--charcoal);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: #fff;
+  }
+  /* Inverted chip for panels whose corner is near-black — white pill,
+     dark text — so the badge stays legible. */
+  .cs-img-badge-invert { background: #fff; color: var(--charcoal); }
+
+  /* ---- Label / body rows: label cols 1-6, body cols 6-13. ---- */
+  .cs-rowlabel { grid-column: 1 / 6; align-self: start; }
+  .cs-rowbody { grid-column: 6 / 13; text-wrap: balance; }
+  /* Step the body's start line right as the fluid grid outgrows a
+     comfortable measure (same thresholds as the other case studies). */
+  @media (min-width: 1650px) { .cs-rowbody { grid-column: 7 / 13; } }
+  @media (min-width: 1980px) { .cs-rowbody { grid-column: 8 / 13; } }
+  @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
+  @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
+  /* Two-paragraph body: one blank line at 24/1.2, not a spacing token. */
+  .cs-rowbody-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
+
+  /* ---- Responsive: collapse to single column under 900px ---- */
+  @media (max-width: 900px) {
+    .cs-info, .cs-standfirst,
+    .cs-rowlabel, .cs-rowbody,
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-img-wide { grid-column: 1 / -1; }
+    .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
+    .cs-pair-half-left, .cs-pair-half-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
+    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
+    .cs-img-169 { height: auto; aspect-ratio: 16 / 9; }
+    .cs-ratio-row { flex-direction: column; }
+    .cs-flex-43, .cs-flex-11 { flex: none; height: auto; }
+    /* The square mobile player sets the panel height itself. */
+    .cs-flex-43 { aspect-ratio: auto; }
+  }
+</style>
+
+<style is:global>
+  /* Case-study selection tint (SolarShare solar gold): overrides the
+     site-wide charcoal band — page CSS loads after global.css, so this wins
+     here and ships only with this page. */
+  ::selection {
+    background: #262008;
+    color: #f2cd5e;
+    text-shadow: 0 0 12px rgba(242, 205, 94, 0.4);
+  }
+</style>

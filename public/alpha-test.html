@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- TEMPORARY diagnostic page for the intro-reel transparency issue.
+     Round 2: site background (#0a0a0b) with hairlines BEHIND each video —
+     lines visible through the gaps = transparent; a solid black rectangle
+     hiding the lines = opaque. Delete once resolved. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>alpha test</title>
+<style>
+  body { margin: 0; background: #0a0a0b; font: 14px/1.5 monospace; color: #fff; }
+  section { padding: 12px; }
+  h2 { margin: 0 0 4px; font-size: 14px; }
+  /* Hairlines sit on the WRAPPER, behind the transparent video. */
+  .wrap {
+    background:
+      repeating-linear-gradient(
+        to right,
+        transparent 0 calc(25% - 1px),
+        rgba(255, 255, 255, 0.35) calc(25% - 1px) 25%
+      );
+  }
+  video { display: block; width: 100%; height: auto; }
+  pre { background: rgba(255,255,255,0.08); padding: 8px; white-space: pre-wrap; word-break: break-all; }
+</style>
+</head>
+<body>
+<section>
+  <p>Background is the site's black. The thin vertical lines are BEHIND each
+  video. Lines showing through around the ring = transparent. A solid black
+  rectangle wiping the lines out = opaque.</p>
+</section>
+
+<section>
+  <h2>1 · MOV forced (HEVC alpha)</h2>
+  <div class="wrap"><video id="v1" src="/intro-reel.mov" autoplay muted loop playsinline preload="auto"></video></div>
+</section>
+
+<section>
+  <h2>2 · WEBM forced (VP9 alpha)</h2>
+  <div class="wrap"><video id="v2" src="/intro-reel.webm" autoplay muted loop playsinline preload="auto"></video></div>
+</section>
+
+<section>
+  <h2>3 · Source cascade (same as homepage)</h2>
+  <div class="wrap"><video id="v3" autoplay muted loop playsinline preload="auto">
+    <source src="/intro-reel.mov" type='video/mp4; codecs="hvc1"'>
+    <source src="/intro-reel.webm" type="video/webm">
+  </video></div>
+</section>
+
+<section>
+  <pre id="out">collecting…</pre>
+</section>
+
+<script>
+  function report() {
+    var t = document.createElement("video");
+    var lines = [
+      "UA: " + navigator.userAgent,
+      "canPlayType mp4/hvc1 (bare): '" + t.canPlayType('video/mp4; codecs="hvc1"') + "'",
+      "canPlayType webm/vp9: '" + t.canPlayType('video/webm; codecs="vp9"') + "'",
+    ];
+    ["v1", "v2", "v3"].forEach(function (id) {
+      var v = document.getElementById(id);
+      lines.push(
+        id + ": src=" + (v.currentSrc ? v.currentSrc.split("/").pop() : "(none)") +
+        " ready=" + v.readyState +
+        " err=" + (v.error ? v.error.code + "/" + (v.error.message || "") : "none")
+      );
+    });
+    document.getElementById("out").textContent = lines.join("\n");
+  }
+  setInterval(report, 1000);
+  report();
+</script>
+</body>
+</html>

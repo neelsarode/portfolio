@@ -1313,7 +1313,26 @@ const dumpItems = [
   @media (max-width: 640px) {
     .fw-media, .fw-flip .fw-media { grid-column: 1 / -1; }
     .fw-meta, .fw-flip .fw-meta { grid-column: 1 / -1; grid-row: auto; }
-    .fw-line { flex-basis: var(--space-6); }
+    /* Mobile meta: one compact typographic block under the cover. The
+       elastic connector segments exist to stretch the rail to the media's
+       height BESIDE it on desktop — stacked underneath, they read as dead
+       space, so they go. The note keeps its spark as the bullet. */
+    .fw-line { display: none; }
+    .fw-note { margin-inline-start: 0; width: 100%; }
+    /* Roles: the tall one-per-line list (7 rows on TLDR) compresses into a
+       wrapped inline run with dot separators — same content, 2-3 lines. */
+    .fw-roles { margin-block-start: var(--space-2); }
+    .fw-roles-list {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: var(--space-1);
+    }
+    .fw-roles-list .mask { display: inline-block; }
+    .fw-roles-list .mask:not(:last-child) p::after {
+      content: "·";
+      margin-inline-start: var(--space-1);
+      color: rgba(255, 255, 255, 0.35);
+    }
   }
 
   /* ---- Work Dump (Figma 2186:11689) ---- */

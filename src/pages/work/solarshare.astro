@@ -266,6 +266,32 @@ const info = [
       </div>
     </section>
 
+    <!-- 5 · Whitepaper Design (Figma 2772:36654). Label/body row opening
+         the band (file body 804 → the shared rowbody mapping, like every
+         other label/body row), then one full-width panel at the file's
+         1296:507 box — the whitepaper spreads montage. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Whitepaper Design</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">For the whitepaper design, I created a system
+            that uses a </span>light color-system<span class="mut"> for
+            displaying </span>information<span class="mut">, and a
+            </span>dark color-system<span class="mut"> for displaying
+            </span>data<span class="mut">.</span>
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-img-wide cs-img-wp" data-fade>
+            <img src="/solarshare-whitepaper.jpg" alt="SolarShare whitepaper spreads fanned out: light pages — the cover, problem statements and solution, risk factors and mitigation strategies, and the team — around the dark data pages showing $SOLAR tokenomics, vesting schedules, and the vesting timeline." loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Mobile: the mockup embeds run square — the desktop 4:3 / 16:9
          scenes get too short at phone widths. Runs before embed.js
          initializes (inline, ahead of the async tag); re-applies on
@@ -559,6 +585,8 @@ const info = [
   .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
   /* 16:9 wide variant (after .cs-img-wide — later rule wins). */
   .cs-img-169 { aspect-ratio: 16 / 9; }
+  /* Whitepaper montage variant — the file's 1296:507 box. */
+  .cs-img-wp { aspect-ratio: 1296 / 507; }
   .cs-img-caption {
     position: absolute;
     left: var(--space-2);
@@ -616,6 +644,8 @@ const info = [
     .cs-pair-half-left, .cs-pair-half-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
     .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
     .cs-img-169 { height: auto; aspect-ratio: 16 / 9; }
+    /* The montage is a composed graphic — keep it uncropped on mobile. */
+    .cs-img-wp { height: auto; aspect-ratio: 1296 / 507; }
     .cs-ratio-row { flex-direction: column; }
     .cs-flex-43, .cs-flex-11 { flex: none; height: auto; }
     /* The square mobile player sets the panel height itself. */

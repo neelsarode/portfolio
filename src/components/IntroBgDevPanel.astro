@@ -1,0 +1,292 @@
+---
+// DEV-ONLY tweak panel for the homepage intro carousel's MOBILE geometry.
+//
+// Renders NOTHING in production: markup, styles and script all sit inside the
+// import.meta.env.DEV conditional, and the styles are is:inline so Astro does
+// not hoist them into the CSS bundle when the markup never renders — same
+// approach as DevGrid.astro / AsciifyDevPanel.astro.
+//
+// Drives the --intro-bg-* override vars that index.astro's ≤640px rules
+// consume (their fallbacks are the committed values), so tweaks apply live on
+// a mobile viewport and desktop is untouched by construction. The services
+// clearance margin re-derives from the same numbers as the committed calc,
+// so the "8 years" block tracks the ring's depth while you drag.
+//
+// Values are NOT persisted across reloads on purpose: a reload should always
+// show what is actually committed in the code. Copy writes the values to
+// paste back into the conversation / source.
+const dev = import.meta.env.DEV;
+
+// [key, label, min, max, step] — all integer %.
+const SLIDERS: [string, string, number, number, number][] = [
+  ["w", "Width", 100, 260, 2],
+  ["l", "Left", -160, 20, 2],
+  ["d", "Down", 0, 60, 1],
+];
+---
+
+{dev && (
+  <>
+    <div class="vp" id="vp" hidden>
+      <div class="vp-head">
+        <span class="vp-title mono-label">Intro video (mobile)</span>
+        <button class="vp-act mono-label" id="vp-copy" type="button">Copy</button>
+        <button class="vp-act mono-label" id="vp-reset" type="button">Reset</button>
+        <button class="vp-act vp-x" id="vp-close" type="button" title="Close">✕</button>
+      </div>
+
+      <div class="vp-rows">
+        {SLIDERS.map(([key, label, min, max, step]) => (
+          <div class="vp-row" data-k={key}>
+            <button class="vp-step" type="button" data-dir="-1" aria-label={`${label} down`}>−</button>
+            <label class="vp-bar">
+              <span class="vp-fill"></span>
+              <span class="vp-name">{label}</span>
+              <span class="vp-val">–</span>
+              <input type="range" min={min} max={max} step={step} />
+            </label>
+            <button class="vp-step" type="button" data-dir="1" aria-label={`${label} up`}>+</button>
+          </div>
+        ))}
+      </div>
+
+      <p class="vp-note" id="vp-note">–</p>
+    </div>
+
+    <style is:inline>
+      .vp {
+        position: fixed;
+        left: var(--space-2);
+        bottom: calc(var(--space-2) + 44px + env(safe-area-inset-bottom, 0px));
+        z-index: 9992;
+        width: 230px;
+        display: flex;
+        flex-direction: column;
+        padding: var(--space-2);
+        gap: 6px;
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius);
+        background: rgba(10, 10, 11, 0.94);
+        backdrop-filter: blur(8px);
+      }
+      .vp[hidden] { display: none; }
+      /* On phones the bottom edge belongs to browser toolbars — anchor the
+         panel to the TOP so it is always visible while the intro section
+         (mid/low on screen) stays watchable during tweaks. */
+      @media (max-width: 640px) {
+        .vp { top: var(--space-2); bottom: auto; }
+      }
+
+      .vp-head { display: flex; align-items: center; gap: 6px; }
+      .vp-title { color: var(--cream); font-size: 11px; flex: 1; }
+      .vp-act {
+        padding: 3px 7px;
+        font-size: 10px;
+        border: 1px solid var(--hairline);
+        border-radius: 5px;
+        background: transparent;
+        color: var(--cream-60);
+        cursor: pointer;
+      }
+      .vp-act:hover { color: var(--cream); border-color: var(--hairline-hover); }
+      .vp-x { padding: 3px 6px; }
+
+      .vp-rows { display: flex; flex-direction: column; gap: 4px; }
+
+      .vp-row { display: flex; align-items: stretch; gap: 4px; }
+
+      /* Touch steppers: tap to step, hold to repeat — mobile browsers make
+         the invisible-range drag unusable, so these are the primary control
+         on device. 34px hit targets. */
+      .vp-step {
+        flex: none;
+        width: 34px;
+        border: 1px solid var(--hairline);
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--cream);
+        font-size: 15px;
+        line-height: 1;
+        cursor: pointer;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .vp-step:active { background: rgba(255, 255, 255, 0.16); }
+
+      /* The filled bar doubles as a desktop control: a real range input sits
+         invisibly on top so keyboard and drag behaviour stay native there. */
+      .vp-bar {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        height: 34px;
+        padding-inline: 8px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        cursor: ew-resize;
+      }
+      .vp-fill {
+        position: absolute;
+        inset: 0;
+        width: calc(var(--v, 0) * 100%);
+        background: rgba(255, 255, 255, 0.14);
+        pointer-events: none;
+      }
+      .vp-name {
+        position: relative;
+        flex: 1;
+        font-family: var(--font-geist-mono);
+        font-size: 10px;
+        color: var(--cream);
+        pointer-events: none;
+      }
+      .vp-val {
+        position: relative;
+        font-family: var(--font-geist-mono);
+        font-size: 10px;
+        color: var(--cream-60);
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+      .vp-row input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: ew-resize;
+      }
+
+      .vp-note {
+        margin: 0;
+        font-family: var(--font-geist-mono);
+        font-size: 9px;
+        line-height: 1.4;
+        color: var(--cream-39);
+      }
+    </style>
+
+    <script is:inline>
+      (function () {
+        var panel = document.getElementById("vp");
+        var btn = document.getElementById("dev-vid-btn");
+        if (!panel) return;
+
+        var rows = [].slice.call(panel.querySelectorAll(".vp-row"));
+        var note = document.getElementById("vp-note");
+        var rootStyle = document.documentElement.style;
+
+        // Committed values — keep in sync with index.astro's ≤640px fallbacks.
+        var DEFAULTS = { w: 198, l: -72, d: 0 };
+        var cur = {};
+
+        function depthVw() {
+          // Mirrors the committed clearance derivation:
+          // (down + 81.9% content) × (w × 3:4 box height).
+          return (cur.d / 100 + 0.819) * 0.75 * cur.w;
+        }
+
+        function paintRow(row) {
+          var input = row.querySelector("input");
+          var min = +input.min, max = +input.max, v = +input.value;
+          row.style.setProperty("--v", (v - min) / (max - min || 1));
+          row.querySelector(".vp-val").textContent = v + "%";
+          cur[row.dataset.k] = v;
+        }
+
+        function push() {
+          rootStyle.setProperty("--intro-bg-w", cur.w + "%");
+          rootStyle.setProperty("--intro-bg-l", cur.l + "%");
+          rootStyle.setProperty("--intro-bg-lift", -cur.d + "%");
+          rootStyle.setProperty("--intro-bg-depth", depthVw().toFixed(1) + "vw");
+          var v = document.querySelector(".intro-bg video");
+          var src = v && v.currentSrc ? v.currentSrc.split("/").pop() : "…";
+          note.textContent =
+            "≤640px only · right edge " + (cur.l + cur.w) +
+            "vw · depth " + depthVw().toFixed(1) + "vw · src " + src;
+        }
+
+        function seed(vals) {
+          rows.forEach(function (row) {
+            row.querySelector("input").value = vals[row.dataset.k];
+            paintRow(row);
+          });
+          push();
+        }
+
+        rows.forEach(function (row) {
+          var input = row.querySelector("input");
+          input.addEventListener("input", function () {
+            paintRow(row);
+            push();
+          });
+
+          // Steppers: tap = one step, hold = repeat. pointerdown drives both;
+          // the click that follows a pointer tap is swallowed so keyboard
+          // activation (which fires click alone) still steps exactly once.
+          [].forEach.call(row.querySelectorAll(".vp-step"), function (b) {
+            var dir = +b.dataset.dir;
+            var holdT = null, holdI = null, fromPointer = false;
+            function stepOnce() {
+              var step = +input.step || 1;
+              var v = Math.min(+input.max, Math.max(+input.min, +input.value + dir * step));
+              input.value = v;
+              paintRow(row);
+              push();
+            }
+            function stop() { clearTimeout(holdT); clearInterval(holdI); }
+            b.addEventListener("pointerdown", function () {
+              fromPointer = true;
+              stepOnce();
+              holdT = setTimeout(function () { holdI = setInterval(stepOnce, 70); }, 450);
+            });
+            b.addEventListener("pointerup", stop);
+            b.addEventListener("pointercancel", stop);
+            b.addEventListener("pointerleave", stop);
+            b.addEventListener("click", function () {
+              if (fromPointer) { fromPointer = false; return; }
+              stepOnce();
+            });
+          });
+        });
+
+        document.getElementById("vp-reset").addEventListener("click", function () {
+          seed(DEFAULTS);
+        });
+
+        document.getElementById("vp-copy").addEventListener("click", function (e) {
+          var text =
+            "width: " + cur.w + "%; left: " + cur.l + "%; " +
+            "--bg-lift: " + -cur.d + "%; /* depth " + depthVw().toFixed(1) + "vw */";
+          navigator.clipboard.writeText(text).then(function () {
+            var t = e.target;
+            t.textContent = "Copied";
+            setTimeout(function () { t.textContent = "Copy"; }, 1200);
+          });
+        });
+
+        function open(on) {
+          panel.hidden = !on;
+          if (btn) btn.setAttribute("aria-pressed", String(on));
+        }
+        document.getElementById("vp-close").addEventListener("click", function () { open(false); });
+        if (btn) btn.addEventListener("click", function () { open(panel.hidden); });
+
+        seed(DEFAULTS);
+
+        // The src readout is empty until the video commits to a source —
+        // refresh the note once it does.
+        var vEl = document.querySelector(".intro-bg video");
+        if (vEl) vEl.addEventListener("loadedmetadata", push);
+
+        // Chip-independent entry for phones where the fixed bottom chip row
+        // hides behind browser toolbars: load the page with #vid to auto-open.
+        if (location.hash.indexOf("vid") !== -1) open(true);
+      })();
+    </script>
+  </>
+)}

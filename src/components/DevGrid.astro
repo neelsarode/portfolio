@@ -12,11 +12,12 @@
 // Toggle: the "Grid" chip (bottom-right) or press `g`. State persists in
 // localStorage across reloads.
 //
-// The Ascii and BG chips only make sense where their targets exist (the
-// contact asciify panel and the homepage fixed-scene manager) — pages
-// without them opt out via props. The grid chip renders everywhere.
+// The Ascii, BG and Vid chips only make sense where their targets exist (the
+// contact asciify panel, the homepage fixed-scene manager, and the homepage
+// intro-video tweak panel) — pages without them opt out via props. The grid
+// chip renders everywhere.
 const dev = import.meta.env.DEV;
-const { ascii = true, bg = true } = Astro.props;
+const { ascii = true, bg = true, vid = false } = Astro.props;
 ---
 {dev && (
   <>
@@ -41,6 +42,15 @@ const { ascii = true, bg = true } = Astro.props;
           aria-pressed="false"
           title="Toggle fixed background scene"
         >BG</button>
+      )}
+      {vid && (
+        <button
+          class="dev-chip mono-label"
+          id="dev-vid-btn"
+          type="button"
+          aria-pressed="false"
+          title="Intro video tweak panel (mobile geometry)"
+        >Vid</button>
       )}
       <button
         class="dev-chip mono-label"
@@ -74,7 +84,10 @@ const { ascii = true, bg = true } = Astro.props;
       .dev-chips {
         position: fixed;
         right: var(--space-2);
-        bottom: var(--space-2);
+        /* Real phones overlay the bottom edge with browser toolbars / the
+           home-bar — keep the chips above the safe area so they stay
+           reachable on device, not just in emulators. */
+        bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
         z-index: 9991;
         display: flex;
         gap: var(--space-1);

@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- TEMPORARY diagnostic page for the intro-reel transparency issue.
+     Delete once resolved. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>alpha test</title>
+<style>
+  body { margin: 0; background: #16a34a; font: 14px/1.5 monospace; color: #fff; }
+  section { padding: 12px; }
+  video { display: block; width: 100%; height: auto; }
+  h2 { margin: 0 0 4px; font-size: 14px; }
+  pre { background: rgba(0,0,0,0.55); padding: 8px; white-space: pre-wrap; word-break: break-all; }
+  p.hint { margin: 4px 0 0; }
+</style>
+</head>
+<body>
+<section>
+  <p>Background is <b>GREEN</b>. If a video below is transparent, green shows around/behind the ring. A black box = no alpha.</p>
+</section>
+
+<section>
+  <h2>1 · MOV forced (HEVC alpha)</h2>
+  <video id="v1" src="/intro-reel.mov" autoplay muted loop playsinline preload="auto"></video>
+</section>
+
+<section>
+  <h2>2 · WEBM forced (VP9 alpha)</h2>
+  <video id="v2" src="/intro-reel.webm" autoplay muted loop playsinline preload="auto"></video>
+</section>
+
+<section>
+  <h2>3 · Source cascade (same as homepage)</h2>
+  <video id="v3" autoplay muted loop playsinline preload="auto">
+    <source src="/intro-reel.mov" type='video/mp4; codecs="hvc1"'>
+    <source src="/intro-reel.webm" type="video/webm">
+  </video>
+</section>
+
+<section>
+  <pre id="out">collecting…</pre>
+</section>
+
+<script>
+  function report() {
+    var t = document.createElement("video");
+    var lines = [
+      "UA: " + navigator.userAgent,
+      "canPlayType mp4/hvc1 (bare): '" + t.canPlayType('video/mp4; codecs="hvc1"') + "'",
+      "canPlayType mp4/hvc1.1.6.L93.B0: '" + t.canPlayType('video/mp4; codecs="hvc1.1.6.L93.B0"') + "'",
+      "canPlayType webm/vp9: '" + t.canPlayType('video/webm; codecs="vp9"') + "'",
+    ];
+    ["v1", "v2", "v3"].forEach(function (id) {
+      var v = document.getElementById(id);
+      lines.push(
+        id + ": src=" + (v.currentSrc ? v.currentSrc.split("/").pop() : "(none)") +
+        " ready=" + v.readyState +
+        " err=" + (v.error ? v.error.code + "/" + (v.error.message || "") : "none")
+      );
+    });
+    document.getElementById("out").textContent = lines.join("\n");
+  }
+  setInterval(report, 1000);
+  report();
+</script>
+</body>
+</html>

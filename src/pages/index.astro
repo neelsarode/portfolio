@@ -3,6 +3,7 @@ import FullscreenLayout from "../layouts/FullscreenLayout.astro";
 import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
 import AsciifyDevPanel from "../components/AsciifyDevPanel.astro";
+import IntroBgDevPanel from "../components/IntroBgDevPanel.astro";
 import GridLines from "../components/GridLines.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
 import ContactSection from "../components/ContactSection.astro";
@@ -251,8 +252,13 @@ const dumpItems = [
            edge). VP9 webm re-encoded from the 57MB original (CRF 38 / 30fps
            → 2.8MB); the old still serves as the poster frame. -->
       <div class="intro-bg" aria-hidden="true">
+        <!-- Two sources: Safari (iOS/macOS) plays VP9 webm but DROPS its
+             alpha channel (black box), so it gets HEVC-with-alpha first.
+             The bare `hvc1` codec string is deliberate: Chrome answers
+             canPlayType("") for it (it only claims fully-qualified HEVC
+             strings), so Chrome skips to the transparent webm, while
+             Safari accepts and takes the mov. -->
         <video
-          src="/intro-reel.webm"
           poster="/intro-reel.png"
           autoplay
           muted
@@ -260,7 +266,10 @@ const dumpItems = [
           playsinline
           preload="metadata"
           tabindex="-1"
-        ></video>
+        >
+          <source src="/intro-reel.mov" type='video/mp4; codecs="hvc1"' />
+          <source src="/intro-reel.webm" type="video/webm" />
+        </video>
       </div>
       <div class="content-grid">
         <div class="full-composed">
@@ -490,8 +499,9 @@ const dumpItems = [
   </main>
 
   <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
-  <DevGrid />
+  <DevGrid vid />
   <AsciifyDevPanel />
+  <IntroBgDevPanel />
 </FullscreenLayout>
 
 <!-- Unicorn Studio — self-loading vanilla snippet (SDK v2.2.8, loads on demand,
@@ -1050,10 +1060,52 @@ const dumpItems = [
   .intro-extras { color: rgba(255, 255, 255, 0.4); }
 
   @media (max-width: 640px) {
+    /* The enlarged video's right edge runs past the screen (126vw), and iOS
+       Safari ignores the body's overflow-x for touch panning — so clip at
+       the band, the only right-overflowing box. clip (not hidden) keeps
+       overflow-y visible; the hidden first line is the iOS 15 fallback,
+       harmless here because on mobile the video box stays inside the band
+       vertically (unlike desktop, where the bottom bleed must stay uncut —
+       hence mobile-only). */
+    .section.intro-band { overflow-x: hidden; overflow-x: clip; }
     .intro-frame { grid-column: 1 / -1; padding: var(--space-5) var(--space-4); }
-    .intro-services { grid-column: 1 / -1; padding-block-start: 0; }
+    /* Below the enlarged carousel, not behind it: the blurb + About Me drop
+       under the front row's bottom edge. The video's height tracks viewport
+       width while the text stack is fixed px, so the clearance must be
+       width-derived (same vocabulary as the band's 48vw min-height):
+         visible bottom = (0 push + 81.9% content) × 148.5vw box = 121.6vw
+         natural flow top = 128 band pad + 214 three-line frame + 24 row gap
+                          = 366px
+       margin = the difference + space-6 rhythm gap, floored at space-6 for
+       narrow screens where the calc collapses. A wrapped statement (≲410px)
+       only ADDS flow height, so clearance never shrinks below the gap. */
+    .intro-services {
+      grid-column: 1 / -1;
+      padding-block-start: 0;
+      margin-block-start: max(var(--space-6), calc(var(--intro-bg-depth, 121.6vw) - 366px + var(--space-6)));
+    }
     /* Frame spans all 12 cols here, so the 6-col offset no longer applies. */
     .corner-br { right: 0; }
+    /* Enlarged for mobile (values hand-tuned on device via IntroBgDevPanel):
+       198% wide, slid left so most of the growth extends the LEFT bleed
+       while the right edge runs 26vw off-screen (-72 + 198 = 126vw). The
+       ring's arc sweeps down behind the statement toward the lower right.
+       The var() indirection is the dev tweak-panel hook (IntroBgDevPanel):
+       the fallbacks ARE the committed values; the panel sets --intro-bg-*
+       overrides on <html> at runtime, dev builds only. */
+    .intro-bg {
+      width: var(--intro-bg-w, 198%);
+      left: var(--intro-bg-l, -72%);
+    }
+    /* No lift on mobile (also device-tuned): the 198% box is tall enough
+       that its top-anchored ring already sits behind the statement — the
+       desktop lift would strand it above. Zero shift also means nothing
+       can paint over the hero, so no clip needed. */
+    .intro-bg img,
+    .intro-bg video {
+      --bg-lift: var(--intro-bg-lift, 0%);
+      clip-path: none;
+    }
   }
 
   /* ---- Featured Work (Figma 2167:11568) ---- */

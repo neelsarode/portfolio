@@ -1,0 +1,37 @@
+---
+// Swaps any `video[data-mobile-src]` between its desktop and mobile sources
+// at the site's 640px mobile breakpoint. Videos opt in by carrying all four
+// data attributes (data-desktop-src/-poster, data-mobile-src/-poster); their
+// SSR src/poster stay the desktop files so no-JS gets the desktop cut.
+//
+// is:inline and placed by each page AFTER its opted-in videos, so the swap
+// runs at parse time — before preload/autoplay commit to the wrong file in
+// any meaningful way, and before the play-gating observers unpause anything.
+// Re-applies on breakpoint flips; load()+play() covers a flip while a video
+// is on screen (autoplay does not re-fire on src changes in Safari).
+//
+// Used by the homepage Featured Work covers and the case-study heroes, which
+// swap to the square 1080² mobile cuts (the 16:9 masters crop to a ~quarter
+// slice inside a portrait 100dvh hero).
+---
+<script is:inline>
+  (function () {
+    if (window.__mobileVideoSwap) return;
+    window.__mobileVideoSwap = true;
+    var mq = matchMedia("(max-width: 640px)");
+    function apply() {
+      document.querySelectorAll("video[data-mobile-src]").forEach(function (v) {
+        var src = mq.matches ? v.dataset.mobileSrc : v.dataset.desktopSrc;
+        var poster = mq.matches ? v.dataset.mobilePoster : v.dataset.desktopPoster;
+        if (v.getAttribute("src") !== src) {
+          v.setAttribute("poster", poster);
+          v.setAttribute("src", src);
+          v.load();
+          v.play().catch(function () {});
+        }
+      });
+    }
+    apply();
+    mq.addEventListener("change", apply);
+  })();
+</script>

@@ -4,6 +4,7 @@ import SiteNav from "../components/SiteNav.astro";
 import DevGrid from "../components/DevGrid.astro";
 import AsciifyDevPanel from "../components/AsciifyDevPanel.astro";
 import IntroBgDevPanel from "../components/IntroBgDevPanel.astro";
+import MobileVideoSwap from "../components/MobileVideoSwap.astro";
 import GridLines from "../components/GridLines.astro";
 import ExperienceTimeline from "../components/ExperienceTimeline.astro";
 import ContactSection from "../components/ContactSection.astro";
@@ -28,6 +29,8 @@ const fwRows = [
     href: "/work/tldr",
     video: "/tldr-dashboard.mp4",
     poster: "/tldr-dashboard-poster.jpg",
+    videoMobile: "/tldr-dashboard-mobile.mp4",
+    posterMobile: "/tldr-dashboard-poster-mobile.jpg",
     desc: "Co-founder and founding designer. Created brand, product design, and user experience from scratch.",
     note: "TL;DR is a first-of-its-kind clipping software that generates clips of a livestream during the livestream, not after.",
     label: "Founding Design Engineer",
@@ -48,6 +51,8 @@ const fwRows = [
     href: "/work/usdkg",
     video: "/gold-dollar-cover.mp4",
     poster: "/gold-dollar-poster.jpg",
+    videoMobile: "/gold-dollar-cover-mobile.mp4",
+    posterMobile: "/gold-dollar-poster-mobile.jpg",
     desc: "Founding designer and creative lead at USDKG (Gold Dollar). Brand created from scratch.",
     note: "USDKG is a enterprise solution for stablecoin payments with liquidity backed by the gold-reserves of the Ministry of Finance of Kyrgyzstan.",
     label: "Founding Designer",
@@ -66,6 +71,8 @@ const fwRows = [
     href: "/work/crow-industries",
     video: "/crow-cover.mp4",
     poster: "/crow-poster.jpg",
+    videoMobile: "/crow-cover-mobile.mp4",
+    posterMobile: "/crow-poster-mobile.jpg",
     desc: "Early stage designer. Revamped brand and designed and developed new website. Created system for generating AI imagery and video of product.",
     note: "Crow Industries creates unmanned ground vehicles with applications in defense, mining, and space.",
     label: "Head of Design",
@@ -85,6 +92,8 @@ const fwRows = [
     href: "/work/solarshare",
     video: "/solarshare-cover.mp4",
     poster: "/solarshare-poster.jpg",
+    videoMobile: "/solarshare-cover-mobile.mp4",
+    posterMobile: "/solarshare-poster-mobile.jpg",
     desc: "Designed product and revamped brand for SolarShare",
     note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
     label: "Lead Designer",
@@ -309,8 +318,9 @@ const dumpItems = [
               <span class="mask"><p class="skills-label">Skills:</p></span>
               <div class="skills-list">
                 <span class="mask"><p>Product UI/UX</p></span>
-                <span class="mask"><p>Website Development</p></span>
                 <span class="mask"><p>Product Front-End Code</p></span>
+                <span class="mask"><p>Website Design</p></span>
+                <span class="mask"><p>Website Development</p></span>
                 <span class="mask"><p>Brand Identity Design</p></span>
                 <span class="mask"><p class="intro-extras">Extras: Documents, print, creative direction</p></span>
               </div>
@@ -350,6 +360,10 @@ const dumpItems = [
                         class="fw-video"
                         src={row.video}
                         poster={row.poster}
+                        data-desktop-src={row.video}
+                        data-desktop-poster={row.poster}
+                        data-mobile-src={row.videoMobile}
+                        data-mobile-poster={row.posterMobile}
                         muted
                         loop
                         playsinline
@@ -436,6 +450,11 @@ const dumpItems = [
         </div>
       </div>
     </section>
+
+    <!-- Mobile: the featured covers swap to square 1080² cuts (the 1035:576
+         desktop crops lose too much at phone widths). Shared swap script —
+         see MobileVideoSwap.astro. -->
+    <MobileVideoSwap />
 
     <!-- More Work (Figma 2186:11689): header + 3-up grid of project tiles.
          Video tiles are lazy (preload=none) and viewport-gated — they only
@@ -1312,26 +1331,35 @@ const dumpItems = [
 
   @media (max-width: 640px) {
     .fw-media, .fw-flip .fw-media { grid-column: 1 / -1; }
+    /* Square panel for the square mobile cuts (swapped in by the inline
+       script above the Work Dump section), bled to the screen edges —
+       the negative inline margin exactly cancels .full-composed's
+       --margin padding, so the panel lands ON the viewport edge (no
+       overflow) while the meta below keeps the normal margins. */
+    .fw-media {
+      aspect-ratio: 1 / 1;
+      margin-inline: calc(-1 * var(--margin));
+    }
     .fw-meta, .fw-flip .fw-meta { grid-column: 1 / -1; grid-row: auto; }
     /* Mobile meta: one compact typographic block under the cover. The
        elastic connector segments exist to stretch the rail to the media's
        height BESIDE it on desktop — stacked underneath, they read as dead
        space, so they go. The note keeps its spark as the bullet. */
     .fw-line { display: none; }
+    /* Description carries the row's voice on mobile — full white. */
+    .fw-desc { color: #fff; }
+    /* Note matches the description's size; no spark on mobile — the text
+       sits flush-left like the rest of the block. */
     .fw-note { margin-inline-start: 0; width: 100%; }
-    /* Roles: the tall one-per-line list (7 rows on TLDR) compresses into a
-       wrapped inline run with dot separators — same content, 2-3 lines. */
+    .fw-note-spark { display: none; }
+    .fw-note p { font-size: 14px; letter-spacing: -0.01em; }
+    /* Roles: the tall one-per-line list (7 rows on TLDR) folds into two
+       columns — half the height, still scannable top-to-bottom. */
     .fw-roles { margin-block-start: var(--space-2); }
     .fw-roles-list {
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: var(--space-1);
-    }
-    .fw-roles-list .mask { display: inline-block; }
-    .fw-roles-list .mask:not(:last-child) p::after {
-      content: "·";
-      margin-inline-start: var(--space-1);
-      color: rgba(255, 255, 255, 0.35);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-1) var(--gutter);
     }
   }
 
@@ -1441,6 +1469,10 @@ const dumpItems = [
   @media (max-width: 900px) {
     .wd-grid { grid-template-columns: 1fr; }
     .wd-tags { display: none; } /* keep captions to name + category on small screens */
+    /* Caption is the name alone here, and the stacked tiles have room —
+       hold it at the site's standard 14px instead of the desktop clamp's
+       11px floor (that floor exists for 3-up tiles, not full-width ones). */
+    .wd-caption { font-size: 14px; }
   }
 
   /* ---- Masked line reveals ----

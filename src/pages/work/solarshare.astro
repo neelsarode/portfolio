@@ -7,6 +7,7 @@ import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
 import MoreWork from "../../components/MoreWork.astro";
+import MobileVideoSwap from "../../components/MobileVideoSwap.astro";
 // SolarShare case study. Typography and layout follow the shared case-study
 // format (Figma 2548:24573): type recipes copied exactly, spacing and columns
 // mapped onto the site system (1296px container = 12-col macro grid at 1440).
@@ -37,8 +38,12 @@ const info = [
     <section class="cs-hero" data-reveal-group>
       <video
         class="cs-hero-img"
-        src="/solarshare-cover.mp4"
+        src="/solarshare-cover.mp4" width="1920" height="1080"
         poster="/solarshare-poster.jpg"
+        data-desktop-src="/solarshare-cover.mp4"
+        data-desktop-poster="/solarshare-poster.jpg"
+        data-mobile-src="/solarshare-cover-mobile.mp4"
+        data-mobile-poster="/solarshare-poster-mobile.jpg"
         autoplay
         muted
         loop
@@ -47,6 +52,9 @@ const info = [
         tabindex="-1"
         data-fade
       ></video>
+      <!-- Mobile: the square 1080² cut — a portrait 100dvh cover-crop keeps
+           roughly half of a square frame vs a quarter of the 16:9 master. -->
+      <MobileVideoSwap />
       <div class="cs-hero-scrim" aria-hidden="true"></div>
       <div class="cs-hero-overlay">
         <header class="cs-nav"><SiteNav activePath="/" /></header>
@@ -141,11 +149,11 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/solarshare-before.jpg" alt="The original SolarShare site: teal hero with flat illustration, ‘Invest in Solar Energy with SolarShare’, and the NFT-led sections beneath." loading="lazy" decoding="async" />
+            <img src="/solarshare-before.jpg" width="1296" height="1296" alt="The original SolarShare site: teal hero with flat illustration, ‘Invest in Solar Energy with SolarShare’, and the NFT-led sections beneath." loading="lazy" decoding="async" />
             <p class="cs-img-badge">Before</p>
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/solarshare-after.jpg" alt="The revamped SolarShare site: photographic sunrise hero over solar farms, ‘Empower Your Future with Solar Energy’, farm cards, and the clean energy visual system." loading="lazy" decoding="async" />
+            <img src="/solarshare-after.jpg" width="1296" height="1296" alt="The revamped SolarShare site: photographic sunrise hero over solar farms, ‘Empower Your Future with Solar Energy’, farm cards, and the clean energy visual system." loading="lazy" decoding="async" />
             <p class="cs-img-badge">After</p>
           </div>
         </div>
@@ -155,11 +163,11 @@ const info = [
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/solarshare-product-before.jpg" alt="The original SolarShare dashboard: teal UI with panel monitoring grid, gold financial bars, and energy production charts." loading="lazy" decoding="async" />
+            <img src="/solarshare-product-before.jpg" width="1296" height="1296" alt="The original SolarShare dashboard: teal UI with panel monitoring grid, gold financial bars, and energy production charts." loading="lazy" decoding="async" />
             <p class="cs-img-badge">Before</p>
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/solarshare-product-after.jpg" alt="The revamped SolarShare dashboard: dark UI with financial and energy production charts, live farm video feed, and NFT capacity remaining." loading="lazy" decoding="async" />
+            <img src="/solarshare-product-after.jpg" width="1296" height="1296" alt="The revamped SolarShare dashboard: dark UI with financial and energy production charts, live farm video feed, and NFT capacity remaining." loading="lazy" decoding="async" />
             <p class="cs-img-badge cs-img-badge-invert">After</p>
           </div>
         </div>
@@ -189,7 +197,7 @@ const info = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide cs-img-169" data-fade>
             <video
-              src="/solarshare-dashboard-loop.mp4"
+              src="/solarshare-dashboard-loop.mp4" width="1920" height="1080"
               poster="/solarshare-dashboard-poster.jpg"
               autoplay
               muted
@@ -229,7 +237,7 @@ const info = [
             </div>
             <div class="cs-img cs-flex-11" data-fade>
               <video
-                src="/solarshare-purchase-loop.mp4"
+                src="/solarshare-purchase-loop.mp4" width="1080" height="1080"
                 poster="/solarshare-purchase-poster.jpg"
                 autoplay
                 muted
@@ -286,7 +294,14 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide cs-img-wp" data-fade>
-            <img src="/solarshare-whitepaper.jpg" alt="SolarShare whitepaper spreads fanned out: light pages — the cover, problem statements and solution, risk factors and mitigation strategies, and the team — around the dark data pages showing $SOLAR tokenomics, vesting schedules, and the vesting timeline." loading="lazy" decoding="async" />
+            {/* Phones get a portrait recomposition of the same montage —
+                the panorama reads as a sliver at stacked widths. <picture>
+                swaps it natively; each source carries its own dimensions so
+                the ratio is right before load at every width. */}
+            <picture>
+              <source media="(max-width: 640px)" srcset="/solarshare-whitepaper-mobile.jpg" width="1333" height="1916" />
+              <img src="/solarshare-whitepaper.jpg" width="2000" height="782" alt="SolarShare whitepaper spreads fanned out: light pages — the cover, problem statements and solution, risk factors and mitigation strategies, and the team — around the dark data pages showing $SOLAR tokenomics, vesting schedules, and the vesting timeline." loading="lazy" decoding="async" />
+            </picture>
           </div>
         </div>
       </div>
@@ -550,6 +565,7 @@ const info = [
     background: #171718;
   }
   .cs-img > img,
+  .cs-img > picture > img,
   .cs-img > video {
     position: absolute;
     inset: 0;
@@ -640,12 +656,21 @@ const info = [
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
     .cs-pair-half-left, .cs-pair-half-right,
     .cs-img-wide { grid-column: 1 / -1; }
+    /* Native ratio, never cropped (site rule for work-page panels): each
+       stacked panel takes its media's intrinsic ratio — the medium flows
+       in-layout instead of cover-filling an imposed box. Every panel
+       img/video carries real width/height attrs, so the ratio is known
+       before load and nothing shifts. The mockup-player panels are
+       untouched (they size themselves off their own aspect boxes). */
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
-    .cs-pair-half-left, .cs-pair-half-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
-    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
-    .cs-img-169 { height: auto; aspect-ratio: 16 / 9; }
-    /* The montage is a composed graphic — keep it uncropped on mobile. */
-    .cs-img-wp { height: auto; aspect-ratio: 1296 / 507; }
+    .cs-pair-half-left, .cs-pair-half-right,
+    .cs-img-wide { height: auto; aspect-ratio: auto; }
+    .cs-img > img,
+    .cs-img > picture > img,
+    .cs-img > video {
+      position: static;
+      height: auto;
+    }
     .cs-ratio-row { flex-direction: column; }
     .cs-flex-43, .cs-flex-11 { flex: none; height: auto; }
     /* The square mobile player sets the panel height itself. */

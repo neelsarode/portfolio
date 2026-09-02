@@ -558,8 +558,13 @@ const experience = [
      than the band. The header scrolls away above it, handing its ~116px back
      to the entries — enough at 900px tall to take them from 936px to their
      1048px cap. Above this height there is room for both, so the band pins
-     whole and the header stays put, as before. */
-  @media (max-height: 949px) {
+     whole and the header stays put, as before.
+     min-width guard is load-bearing: phones are ALSO under 949px tall, and
+     without it this fixed one-screen stage capped the stacked mobile layout
+     at 100svh — the entries overflowed the band and the contact section
+     painted over them. The pin never runs below 900px, so neither should
+     its sizing. */
+  @media (min-width: 900px) and (max-height: 949px) {
     /* display:block, not flex, is load-bearing here. GSAP reserves a pin's
        scroll distance as padding-bottom on its spacer — but when the pinned
        element's parent is a flex container it takes a different path and

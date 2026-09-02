@@ -8,6 +8,7 @@ import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
 import MoreWork from "../../components/MoreWork.astro";
+import MobileVideoSwap from "../../components/MobileVideoSwap.astro";
 // USDKG case study (Figma 2548:24573). Typography is copied EXACTLY from the
 // file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
 // spacing and columns are mapped onto the site system — the design's 1296px
@@ -61,8 +62,12 @@ const info = [
     <section class="cs-hero" data-reveal-group>
       <video
         class="cs-hero-img"
-        src="/gold-dollar-cover.mp4"
+        src="/gold-dollar-cover.mp4" width="1920" height="1080"
         poster="/gold-dollar-poster.jpg"
+        data-desktop-src="/gold-dollar-cover.mp4"
+        data-desktop-poster="/gold-dollar-poster.jpg"
+        data-mobile-src="/gold-dollar-cover-mobile.mp4"
+        data-mobile-poster="/gold-dollar-poster-mobile.jpg"
         autoplay
         muted
         loop
@@ -71,6 +76,9 @@ const info = [
         tabindex="-1"
         data-fade
       ></video>
+      <!-- Mobile: the square 1080² cut — a portrait 100dvh cover-crop keeps
+           roughly half of a square frame vs a quarter of the 16:9 master. -->
+      <MobileVideoSwap />
       <div class="cs-hero-scrim" aria-hidden="true"></div>
       <div class="cs-hero-overlay">
         <header class="cs-nav"><SiteNav activePath="/" /></header>
@@ -145,10 +153,10 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-pair-b-left" data-fade>
-            <img src="/usdkg-brand.jpg" alt="The Gold Dollar mark and logotype centered on a gold-lit dark backdrop." loading="lazy" decoding="async" />
+            <img src="/usdkg-brand.jpg" width="1080" height="1326" alt="The Gold Dollar mark and logotype centered on a gold-lit dark backdrop." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-a-right" data-fade>
-            <img src="/usdkg-government-meeting.jpg" alt="An official meeting room of the Kyrgyz Republic: delegates at a long table beneath the state emblem and national flags." loading="lazy" decoding="async" />
+            <img src="/usdkg-government-meeting.jpg" width="1600" height="978" alt="An official meeting room of the Kyrgyz Republic: delegates at a long table beneath the state emblem and national flags." loading="lazy" decoding="async" />
             <div class="cs-stat cs-stat-note">
               <p class="cs-stat-num">November, 2025</p>
               <p class="cs-stat-sub">Launched at a state ceremony attended by the President of the Kyrgyz Republic</p>
@@ -185,11 +193,11 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide cs-currency-panel" data-fade>
-            <img src="/usdkg-currency.jpg" alt="Brand pattern: the Gold Dollar KG mark set among dollar, euro, pound, and yen symbols over prismatic gold light." loading="lazy" decoding="async" />
+            <img src="/usdkg-currency.jpg" width="2000" height="1123" alt="Brand pattern: the Gold Dollar KG mark set among dollar, euro, pound, and yen symbols over prismatic gold light." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-square-left" data-fade>
             <video
-              src="/usdkg-product-loop.mp4"
+              src="/usdkg-product-loop.mp4" width="1080" height="1080"
               poster="/usdkg-product-poster.jpg"
               autoplay
               muted
@@ -202,7 +210,7 @@ const info = [
           </div>
           <div class="cs-img cs-pair-fill-right" data-fade>
             <video
-              src="/usdkg-convention-loop.mp4"
+              src="/usdkg-convention-loop.mp4" width="1080" height="1080"
               poster="/usdkg-convention-poster.jpg"
               autoplay
               muted
@@ -245,7 +253,7 @@ const info = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/gold-dollar-cover.mp4"
+              src="/gold-dollar-cover.mp4" width="1920" height="1080"
               poster="/gold-dollar-poster.jpg"
               autoplay
               muted
@@ -257,11 +265,11 @@ const info = [
             ></video>
           </div>
           <div class="cs-img cs-pair-a-left" data-fade>
-            <img src="/usdkg-website-pages.jpg" alt="Gold Dollar website pages: the hero with 'The Future of Finance, Fully Backed by Gold', the stability statement, and the FAQ beside the gold monolith." loading="lazy" decoding="async" />
+            <img src="/usdkg-website-pages.jpg" width="1080" height="937" alt="Gold Dollar website pages: the hero with 'The Future of Finance, Fully Backed by Gold', the stability statement, and the FAQ beside the gold monolith." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-b-right" data-fade>
             <video
-              src="/usdkg-timeline-loop.mp4"
+              src="/usdkg-timeline-loop.mp4" width="1440" height="1920"
               poster="/usdkg-timeline-poster.jpg"
               autoplay
               muted
@@ -274,7 +282,7 @@ const info = [
           </div>
           <div class="cs-img cs-pair-square-left cs-btn-panel" data-fade>
             <video
-              src="/usdkg-button-loop.mp4"
+              src="/usdkg-button-loop.mp4" width="1440" height="1440"
               poster="/usdkg-button-poster.jpg"
               autoplay
               muted
@@ -288,7 +296,7 @@ const info = [
           </div>
           <div class="cs-img cs-pair-fill-right" data-fade>
             <video
-              src="/usdkg-mobile-loop.mp4"
+              src="/usdkg-mobile-loop.mp4" width="1440" height="1440"
               poster="/usdkg-mobile-poster.jpg"
               autoplay
               muted
@@ -322,7 +330,7 @@ const info = [
         <div class="full-composed cs-row" data-reveal-group>
           <div class="cs-img cs-exp-media" data-fade>
             <video
-              src="/usdkg-hero-showcase-loop.mp4"
+              src="/usdkg-hero-showcase-loop.mp4" width="1920" height="1440"
               poster="/usdkg-hero-showcase-poster.jpg"
               autoplay
               muted
@@ -335,7 +343,7 @@ const info = [
           </div>
           <div class="cs-exp-side">
             <div class="cs-img cs-exp-code" data-fade>
-              <img src="/usdkg-gpu-code.jpg" alt="The GPU-detection script: checkGPUPerformance() probes the WebGL renderer string for high-end NVIDIA, AMD, and Apple Silicon GPUs." loading="lazy" decoding="async" />
+              <img src="/usdkg-gpu-code.jpg" width="1080" height="844" alt="The GPU-detection script: checkGPUPerformance() probes the WebGL renderer string for high-end NVIDIA, AMD, and Apple Silicon GPUs." loading="lazy" decoding="async" />
             </div>
             <div class="cs-exp-text">
               <span class="mask"><p class="cs-exp-label">Optimizing Hero Section per Device</p></span>
@@ -366,10 +374,10 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/usdkg-deck.jpg" alt="Gold Dollar pitch deck: an open spread on global commerce and reserve management beside the 'Future of Finance, Fully Backed by Gold' cover." loading="lazy" decoding="async" />
+            <img src="/usdkg-deck.jpg" width="1080" height="1080" alt="Gold Dollar pitch deck: an open spread on global commerce and reserve management beside the 'Future of Finance, Fully Backed by Gold' cover." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/usdkg-whitepaper.jpg" alt="The USDKG whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
+            <img src="/usdkg-whitepaper.jpg" width="1080" height="1080" alt="The USDKG whitepaper suite: gold covers and open spreads covering the legal framework, technical development, and gold transparency." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -1089,12 +1097,36 @@ const info = [
     .cs-feat-col-left, .cs-feat-col-right { grid-column: 1 / -1; }
     .cs-feat-col-left { grid-row: auto; }
     .cs-feat-body { max-width: none; }
+    /* Native ratio, never cropped (site rule for work-page panels): each
+       stacked panel takes its media's intrinsic ratio — the medium flows
+       in-layout instead of cover-filling an imposed box. Every panel
+       img/video carries real width/height attrs, so the ratio is known
+       before load and nothing shifts. Composed panels (the extension mock
+       with its bg loop) keep their own boxes via the :not()s. */
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
     .cs-pair-half-left, .cs-pair-half-right,
     .cs-pair-narrow-left, .cs-pair-broad-right,
-    .cs-pair-square-left, .cs-pair-fill-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
-    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
-    .cs-currency-panel { height: auto; aspect-ratio: 2000 / 1123; }
+    .cs-pair-square-left, .cs-pair-fill-right,
+    .cs-feat-img-left, .cs-feat-img-right,
+    .cs-exp-media,
+    .cs-img-wide,
+    .cs-currency-panel { height: auto; aspect-ratio: auto; }
+    .cs-img:not(.cs-ext-panel) > img,
+    .cs-img:not(.cs-ext-panel) > video {
+      position: static;
+      height: auto;
+    }
+    /* The launch note covered half the meeting photo as an overlay — run it
+       as a caption UNDER the image instead (the panel wraps both now that
+       its media flows in-layout). */
+    .cs-stat-note {
+      position: static;
+      max-width: none;
+      padding: var(--space-2) 0 0;
+    }
+    /* The GPU-script paragraph runs at the desktop side-column's fixed 24px —
+       match the shared body recipe so it sizes like the copy around it. */
+    .cs-exp-body { font-size: clamp(18px, 1.67vw, 24px); }
     /* The extension composition scales off panel width — keep the file's
        ratio here or the mock loses its bottom breathing room again. */
     .cs-ext-panel { height: auto; aspect-ratio: 746 / 648; }

@@ -8,6 +8,7 @@ import SiteNav from "../../components/SiteNav.astro";
 import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
 import MoreWork from "../../components/MoreWork.astro";
+import MobileVideoSwap from "../../components/MobileVideoSwap.astro";
 // Crow Industries case study (Figma 2548:24573). Typography is copied EXACTLY from the
 // file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
 // spacing and columns are mapped onto the site system — the design's 1296px
@@ -62,8 +63,12 @@ const info = [
     <section class="cs-hero" data-reveal-group>
       <video
         class="cs-hero-img"
-        src="/crow-cover.mp4"
+        src="/crow-cover.mp4" width="1920" height="1080"
         poster="/crow-poster.jpg"
+        data-desktop-src="/crow-cover.mp4"
+        data-desktop-poster="/crow-poster.jpg"
+        data-mobile-src="/crow-cover-mobile.mp4"
+        data-mobile-poster="/crow-poster-mobile.jpg"
         autoplay
         muted
         loop
@@ -72,6 +77,9 @@ const info = [
         tabindex="-1"
         data-fade
       ></video>
+      <!-- Mobile: the square 1080² cut — a portrait 100dvh cover-crop keeps
+           roughly half of a square frame vs a quarter of the 16:9 master. -->
+      <MobileVideoSwap />
       <div class="cs-hero-scrim" aria-hidden="true"></div>
       <div class="cs-hero-overlay">
         <header class="cs-nav"><SiteNav activePath="/" /></header>
@@ -172,7 +180,7 @@ const info = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/crow-weave-loop.mp4"
+              src="/crow-weave-loop.mp4" width="1920" height="1162"
               poster="/crow-weave-poster.jpg"
               autoplay
               muted
@@ -202,7 +210,7 @@ const info = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/crow-desert-loop.mp4"
+              src="/crow-desert-loop.mp4" width="1280" height="720"
               poster="/crow-desert-poster.jpg"
               autoplay
               muted
@@ -219,7 +227,7 @@ const info = [
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade style="--focus-x: 68%">
             <video
-              src="/crow-quarry-loop.mp4"
+              src="/crow-quarry-loop.mp4" width="1920" height="1080"
               poster="/crow-quarry-poster.jpg"
               autoplay
               muted
@@ -232,7 +240,7 @@ const info = [
           </div>
           <div class="cs-img cs-pair-half-right" data-fade style="--focus-x: 66%">
             <video
-              src="/crow-night-loop.mp4"
+              src="/crow-night-loop.mp4" width="1920" height="1080"
               poster="/crow-night-poster.jpg"
               autoplay
               muted
@@ -248,7 +256,7 @@ const info = [
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
-            <img src="/crow-fenris-v2.jpg" alt="Fenris V2 with a mounted turret rolling through a ruined city street at dusk, headlights cutting through the haze." loading="lazy" decoding="async" />
+            <img src="/crow-fenris-v2.jpg" width="1376" height="768" alt="Fenris V2 with a mounted turret rolling through a ruined city street at dusk, headlights cutting through the haze." loading="lazy" decoding="async" />
             <p class="cs-img-caption">Fenris V2 Model</p>
           </div>
         </div>
@@ -256,11 +264,11 @@ const info = [
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/crow-fenris-gurney.jpg" alt="Fenris V2 carrying a casualty on a gurney attachment across a scorched field as explosions go off behind it." loading="lazy" decoding="async" />
+            <img src="/crow-fenris-gurney.jpg" width="1024" height="1024" alt="Fenris V2 carrying a casualty on a gurney attachment across a scorched field as explosions go off behind it." loading="lazy" decoding="async" />
             <p class="cs-img-caption">Fenris V2 + Gurney attatchment</p>
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/crow-fenris-units.jpg" alt="Three Fenris units in convoy through a dim mine tunnel, headlights on, dust hanging in the air." loading="lazy" decoding="async" />
+            <img src="/crow-fenris-units.jpg" width="2000" height="2000" alt="Three Fenris units in convoy through a dim mine tunnel, headlights on, dust hanging in the air." loading="lazy" decoding="async" />
             <p class="cs-img-caption">Showcasing multiple units in one image</p>
           </div>
         </div>
@@ -269,7 +277,7 @@ const info = [
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/crow-hero-loop.mp4"
+              src="/crow-hero-loop.mp4" width="1920" height="1080"
               poster="/crow-hero-poster.jpg"
               autoplay
               muted
@@ -303,7 +311,7 @@ const info = [
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/crow-timeline-loop.mp4"
+              src="/crow-timeline-loop.mp4" width="1920" height="1080"
               poster="/crow-timeline-poster.jpg"
               autoplay
               muted
@@ -320,7 +328,7 @@ const info = [
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
             <video
-              src="/crow-button-loop.mp4"
+              src="/crow-button-loop.mp4" width="1296" height="1296"
               poster="/crow-button-poster.jpg"
               autoplay
               muted
@@ -332,7 +340,7 @@ const info = [
             ></video>
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/crow-site-defense.jpg" alt="Two Defense pages of the Crow Industries site side by side: the Fenris hero, “The Ultimate Battlefield Assistant”, and the logistics, counter-UAS, medical evacuation and command-and-control sections." loading="lazy" decoding="async" />
+            <img src="/crow-site-defense.jpg" width="1080" height="1080" alt="Two Defense pages of the Crow Industries site side by side: the Fenris hero, “The Ultimate Battlefield Assistant”, and the logistics, counter-UAS, medical evacuation and command-and-control sections." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -340,7 +348,7 @@ const info = [
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
             <video
-              src="/crow-cover.mp4"
+              src="/crow-cover.mp4" width="1920" height="1080"
               poster="/crow-poster.jpg"
               autoplay
               muted
@@ -356,10 +364,10 @@ const info = [
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/crow-site-mining.jpg" alt="Two Mining pages of the Crow Industries site: “Redefining Resource Extraction on Earth”, the fleet control room, precision surveying, extreme environment access, and the demo call-to-action." loading="lazy" decoding="async" />
+            <img src="/crow-site-mining.jpg" width="1080" height="1080" alt="Two Mining pages of the Crow Industries site: “Redefining Resource Extraction on Earth”, the fleet control room, precision surveying, extreme environment access, and the demo call-to-action." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/crow-site-space.jpg" alt="Two Space pages of the Crow Industries site: “Pioneering Humanity’s Future Beyond Earth”, a Fenris fleet on the lunar surface, resource extraction, logistics, and off-world operations." loading="lazy" decoding="async" />
+            <img src="/crow-site-space.jpg" width="1080" height="1080" alt="Two Space pages of the Crow Industries site: “Pioneering Humanity’s Future Beyond Earth”, a Fenris fleet on the lunar surface, resource extraction, logistics, and off-world operations." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -382,17 +390,17 @@ const info = [
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
           <div class="cs-img cs-pair-half-left" data-fade>
-            <img src="/crow-print-briefing.jpg" alt="Crow Industries government briefing document: the Luxembourg NATO defense-investment cover with Fenris beneath state flags, and the open spread with specifications, customers, and the Israel partnership page." loading="lazy" decoding="async" />
+            <img src="/crow-print-briefing.jpg" width="1080" height="1080" alt="Crow Industries government briefing document: the Luxembourg NATO defense-investment cover with Fenris beneath state flags, and the open spread with specifications, customers, and the Israel partnership page." loading="lazy" decoding="async" />
           </div>
           <div class="cs-img cs-pair-half-right" data-fade>
-            <img src="/crow-print-catalog.jpg" alt="Crow Industries product catalog spreads: Fenris Kinetic (The Breacher) and Fenris Guardian (The Squadmate) pages with mission profiles and operational specs, beside the photo-led cover." loading="lazy" decoding="async" />
+            <img src="/crow-print-catalog.jpg" width="1080" height="1080" alt="Crow Industries product catalog spreads: Fenris Kinetic (The Breacher) and Fenris Guardian (The Squadmate) pages with mission profiles and operational specs, beside the photo-led cover." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-img cs-img-wide" data-fade>
-            <img src="/crow-print-banners.jpg" alt="Three Crow Industries roll-up banners in a marble lobby: Fenris units in desert, Mars-colony, and ruined-city scenes, each with the Crow logotype and website URL." loading="lazy" decoding="async" />
+            <img src="/crow-print-banners.jpg" width="2000" height="1333" alt="Three Crow Industries roll-up banners in a marble lobby: Fenris units in desert, Mars-colony, and ruined-city scenes, each with the Crow logotype and website URL." loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -1110,11 +1118,32 @@ const info = [
     .cs-feat-col-left, .cs-feat-col-right { grid-column: 1 / -1; }
     .cs-feat-col-left { grid-row: auto; }
     .cs-feat-body { max-width: none; }
+    /* Native ratio, never cropped (site rule for work-page panels): each
+       stacked panel takes its media's intrinsic ratio — the medium flows
+       in-layout instead of cover-filling an imposed box. Every panel
+       img/video carries real width/height attrs, so the ratio is known
+       before load and nothing shifts. Composed panels (the extension mock
+       with its bg loop) keep their own boxes via the :not()s. */
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
     .cs-pair-half-left, .cs-pair-half-right,
     .cs-pair-narrow-left, .cs-pair-broad-right,
-    .cs-pair-square-left, .cs-pair-fill-right { height: clamp(280px, 60vw, 480px); aspect-ratio: auto; }
-    .cs-img-wide { height: clamp(300px, 64vw, 520px); aspect-ratio: auto; }
+    .cs-pair-square-left, .cs-pair-fill-right,
+    .cs-feat-img-left, .cs-feat-img-right,
+    .cs-exp-media,
+    .cs-img-wide { height: auto; aspect-ratio: auto; }
+    .cs-img:not(.cs-ext-panel) > img,
+    .cs-img:not(.cs-ext-panel) > video {
+      position: static;
+      height: auto;
+    }
+    /* The Figma Weave tab covered too much of the canvas loop — run it as a
+       caption UNDER the video instead (the panel wraps both now that its
+       media flows in-layout). */
+    .cs-stat-tab {
+      position: static;
+      max-width: none;
+      padding: var(--space-2) 0 0;
+    }
     /* The extension composition scales off panel width — keep the file's
        ratio here or the mock loses its bottom breathing room again. */
     .cs-ext-panel { height: auto; aspect-ratio: 746 / 648; }

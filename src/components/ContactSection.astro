@@ -14,9 +14,8 @@
 const COPIES = 6; // see --cs-shift: (COPIES - 1) × pitch must exceed any viewport
 
 const socials = [
-  // TODO: real destinations — placeholders until confirmed.
-  { label: "Instagram", href: "#" },
-  { label: "Linkedin", href: "#" },
+  { label: "Instagram", href: "https://www.instagram.com/neelsarode/" },
+  { label: "Linkedin", href: "https://www.linkedin.com/in/neelsarode/" },
   { label: "Email", href: "mailto:neel@conversiondesigner.co" },
 ];
 
@@ -93,7 +92,10 @@ const actions = [
           <div class="cs-actions" data-fade>
             {actions.map((a) => (
               <a class="cs-btn" href={a.href} data-cursor-label={`${a.label} →`}>
-                <span class="cs-btn-label">{a.label}</span>
+                <span class="cs-btn-label cs-scramble">
+                  <span class="cs-scramble-ghost" aria-hidden="true">{a.label}</span>
+                  <span class="cs-scramble-live">{a.label}</span>
+                </span>
                 <span class="corner cs-c1"></span>
                 <span class="corner cs-c2"></span>
                 <span class="corner cs-c3"></span>
@@ -107,8 +109,16 @@ const actions = [
           {socials.map((s) => (
             <li>
               <span class="mask">
-                <a href={s.href} data-cursor-label={`${s.label} →`}>
-                  {s.label}<span class="cs-arrow"> →</span>
+                <a
+                  href={s.href}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noopener" : undefined}
+                  data-cursor-label={`${s.label} →`}
+                >
+                  <span class="cs-scramble">
+                    <span class="cs-scramble-ghost" aria-hidden="true">{s.label}</span>
+                    <span class="cs-scramble-live">{s.label}</span>
+                  </span> <span class="cs-arrow">→</span>
                 </a>
               </span>
             </li>
@@ -362,7 +372,9 @@ const actions = [
   .cs-btn .cs-c3 { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
   .cs-btn .cs-c4 { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
 
-  .cs-btn:hover { color: var(--ember); }
+  /* Hover: the label holds white (the scramble is the text's own event);
+     only the corner brackets take the ember. */
+  .cs-btn:hover { color: #fff; }
   .cs-btn:hover .corner { border-color: var(--ember); }
 
   .cs-links {
@@ -376,10 +388,47 @@ const actions = [
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
-  .cs-links a { color: #fff; }
-  .cs-arrow { color: rgba(255, 255, 255, 0.5); }
-  .cs-links a:hover,
-  .cs-links a:hover .cs-arrow { color: var(--ember); }
+  /* Hover: no color shift — an underline draws in from the left and
+     retracts back to it on exit (background-position stays left, so the
+     transition reverses along the same edge). Painted as a background
+     rather than an ::after so the mask's overflow clip can't cut it off;
+     the 0.14em pad drops the line clear of descenders (same slack constant
+     the masks use). */
+  .cs-links a {
+    color: #fff;
+    padding-block-end: 0.14em;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 0 1px;
+    transition: background-size var(--dur-ui) ease;
+  }
+  .cs-links a:hover { color: #fff; background-size: 100% 1px; }
+  /* Arrow pivots to point top-right on hover (→ becomes ↗). */
+  .cs-arrow {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.5);
+    transition: transform var(--dur-ui) ease;
+  }
+  .cs-links a:hover .cs-arrow { transform: rotate(-45deg); }
+
+  /* ---- Scramble hover (ported from the Hyperiux scramble-link piece,
+     minus its hover color): the ghost copy is invisible but holds the
+     label's true width, so the proportional glyphs cycling in the live
+     layer never jitter the layout. Driven by the script below. ---- */
+  .cs-scramble { position: relative; display: inline-block; }
+  .cs-scramble-ghost {
+    visibility: hidden;
+    white-space: pre;
+    font-variant-ligatures: none;
+  }
+  .cs-scramble-live {
+    position: absolute;
+    inset: 0;
+    white-space: pre;
+    text-align: left;
+    font-variant-ligatures: none;
+  }
 
   /* ---- Composed layout: copy and links flank the portrait --------------- */
   @media (min-width: 900px) {
@@ -479,4 +528,55 @@ const actions = [
     );
     io.observe(host);
   }
+</script>
+
+<script>
+  // Scramble hover for the contact links + action buttons (ported from the
+  // Hyperiux scramble-link piece): on enter, the label cycles random glyphs
+  // and resolves left-to-right over ~500ms. The ghost/live span pair in the
+  // markup keeps the width stable while glyphs cycle. Reduced motion: no-op
+  // (the label simply stays put).
+  const GLYPHS = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const DURATION = 500;
+  const STEP = 30;
+
+  const timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+
+  const scramble = (live: HTMLElement, final: string) => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const prev = timers.get(live);
+    if (prev) clearTimeout(prev);
+
+    const maxIterations = Math.max(1, Math.floor(DURATION / STEP));
+    let iteration = 0;
+
+    const tick = () => {
+      if (iteration >= maxIterations) {
+        live.textContent = final;
+        return;
+      }
+      let out = "";
+      for (let i = 0; i < final.length; i++) {
+        const ch = final[i];
+        if (ch === " ") { out += ch; continue; }
+        // Each character resolves once the iteration passes its position's
+        // share of the run — the reveal sweeps left to right.
+        out += iteration >= ((i + 1) / final.length) * maxIterations
+          ? ch
+          : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+      live.textContent = out;
+      iteration += 1;
+      timers.set(live, setTimeout(tick, STEP));
+    };
+
+    tick();
+  };
+
+  document.querySelectorAll<HTMLElement>(".cs-links a, .cs-btn").forEach((host) => {
+    const live = host.querySelector<HTMLElement>(".cs-scramble-live");
+    if (!live) return;
+    const final = live.textContent ?? "";
+    host.addEventListener("mouseenter", () => scramble(live, final));
+  });
 </script>

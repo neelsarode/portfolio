@@ -241,8 +241,8 @@ const dumpItems = [
 
         <div class="hero-bottom">
           <h1 class="hero-title">
-            <span class="mask"><span class="line">Founding</span></span>
-            <span class="mask"><span class="line">Design Engineer</span></span>
+            <span class="mask"><span class="line hero-swap">Web <span class="hero-swap-dim">/</span> Product</span></span>
+            <span class="mask"><span class="line">Designer &amp; Builder</span></span>
           </h1>
           <div class="mask mask-desc">
             <p class="hero-desc">
@@ -895,6 +895,72 @@ const dumpItems = [
   }
 </script>
 
+<!-- The hero's first line periodically re-scrambles between "Web / Product"
+     and "Product / Web", reusing the contact links' glyph-cycle treatment
+     (see ContactSection's scramble hover). Waits for the hero entrance to
+     finish before the first flip. Reduced motion: never starts — the guard
+     below, plus hero:intro-done only fires from the motion branch. -->
+<script>
+  const SWAP_A = "Web / Product";
+  const SWAP_B = "Product / Web";
+  const SWAP_EVERY = 4000; // rest between flips
+  const SWAP_GLYPHS = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const SWAP_DURATION = 500;
+  const SWAP_STEP = 30;
+
+  const swapLine = document.querySelector<HTMLElement>(".hero-swap");
+  if (swapLine && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let swapTimer: ReturnType<typeof setTimeout> | undefined;
+
+    // The slash renders at reduced opacity: rebuild the line with each "/"
+    // wrapped in the dim span (matched via :global() in the page styles).
+    // Cycle output is only [a-z0-9 /], so innerHTML is safe here.
+    const renderSwap = (text: string) => {
+      swapLine.innerHTML = text.replace(
+        /\//g,
+        '<span class="hero-swap-dim">/</span>'
+      );
+    };
+
+    const scrambleTo = (final: string) => {
+      if (swapTimer) clearTimeout(swapTimer);
+      const maxIterations = Math.max(1, Math.floor(SWAP_DURATION / SWAP_STEP));
+      let iteration = 0;
+      const tick = () => {
+        if (iteration >= maxIterations) {
+          renderSwap(final);
+          return;
+        }
+        let out = "";
+        for (let i = 0; i < final.length; i++) {
+          const ch = final[i];
+          if (ch === " ") { out += ch; continue; }
+          out += iteration >= ((i + 1) / final.length) * maxIterations
+            ? ch
+            : SWAP_GLYPHS[Math.floor(Math.random() * SWAP_GLYPHS.length)];
+        }
+        renderSwap(out);
+        iteration += 1;
+        swapTimer = setTimeout(tick, SWAP_STEP);
+      };
+      tick();
+    };
+
+    let showing = SWAP_A;
+    const flip = () => {
+      if (document.hidden) return; // don't churn in a background tab
+      showing = showing === SWAP_A ? SWAP_B : SWAP_A;
+      scrambleTo(showing);
+    };
+    const start = () => {
+      setInterval(flip, SWAP_EVERY);
+    };
+    (window as any).__heroIntroDone
+      ? start()
+      : addEventListener("hero:intro-done", start, { once: true });
+  }
+</script>
+
 <style is:global>
   /* Pre-paint gate for the HERO entrance only (sections handle their own
      from-state via gsap.from). Global because .mask children include the
@@ -965,6 +1031,16 @@ const dumpItems = [
     letter-spacing: -0.04em; /* -2.08px @ 52px */
     font-weight: 400;
     color: #fff;
+  }
+  /* The periodic scramble cycles arbitrary glyphs through this line —
+     ligature substitution mid-cycle would shift its width. */
+  .hero-swap {
+    font-variant-ligatures: none;
+  }
+  /* The separator sits back from the words. :global() because the scramble
+     re-injects this span at runtime, without Astro's scope attribute. */
+  .hero-swap :global(.hero-swap-dim) {
+    opacity: 0.35;
   }
   /* Layout lives on the mask (the flex item); typography on the text. */
   .mask-desc {

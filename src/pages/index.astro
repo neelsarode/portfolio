@@ -309,7 +309,9 @@ const dumpItems = [
                 to visually competing with others that are
                 <span class="hl">10x their size.</span>
               </p></span>
-              <span class="mask"><a class="intro-about" href="/info">About Me →</a></span>
+              {/* About Me link removed for now (2026-09-04, Neel) — restore
+                  by un-commenting. */}
+              {/* <span class="mask"><a class="intro-about" href="/info">About Me →</a></span> */}
             </div>
             <div class="rail-rule" aria-hidden="true">
               <div class="hseg h-r1"></div><div class="hseg h-r2 hseg-end"></div>
@@ -451,11 +453,6 @@ const dumpItems = [
       </div>
     </section>
 
-    <!-- Mobile: the featured covers swap to square 1080² cuts (the 1035:576
-         desktop crops lose too much at phone widths). Shared swap script —
-         see MobileVideoSwap.astro. -->
-    <MobileVideoSwap />
-
     <!-- More Work (Figma 2186:11689): header + 3-up grid of project tiles.
          Video tiles are lazy (preload=none) and viewport-gated — they only
          play while on screen, so the grid can hold 15-20 loops without
@@ -511,6 +508,78 @@ const dumpItems = [
         </div>
       </div>
     </section>
+
+    <!-- Testimonial (surface: V2 corner brackets, section-scale — the
+         contact buttons' bracket motif framing the WHOLE composition:
+         quote card and embed both sit inside the corners, which ride just
+         outside the macro grid's content edges). -->
+    <section class="section tm-band">
+      <div class="content-grid">
+        <div class="full-composed tm-frame" data-reveal-group>
+          <span class="tm-corner tm-c1" aria-hidden="true"></span>
+          <span class="tm-corner tm-c2" aria-hidden="true"></span>
+          <span class="tm-corner tm-c3" aria-hidden="true"></span>
+          <span class="tm-corner tm-c4" aria-hidden="true"></span>
+          <div class="tm-card">
+            <blockquote class="tm-quote-wrap">
+              <span class="mask"><p class="tm-quote">
+                “Neel led the design of our brand, dApp, and website, and his
+                work played a crucial role in our launch and early traction.
+                Users found our dApp easier to navigate than competitors’,
+                and our domain minting service quickly became the market
+                leader. His cohesive design even caught the attention of our
+                eventual acquirer, who began tracking us after noticing how
+                modern our brand looked next to competitors. Neel is the only
+                designer your brand will need if you can get him.”
+              </p></span>
+              <footer class="tm-author">
+                <span class="tm-avatar">
+                  <img src="/testimonial-micah.jpg" width="92" height="92" alt="Micah Canfield" loading="lazy" decoding="async" />
+                </span>
+                <span class="tm-who">
+                  <span class="mask"><p class="tm-name">Micah Canfield</p></span>
+                  <span class="mask"><p class="tm-role">Real Estate &amp; Tech Entrepreneur</p></span>
+                </span>
+              </footer>
+            </blockquote>
+            <div class="tm-rule" aria-hidden="true"></div>
+            <div class="tm-stats">
+              <div class="tm-stat">
+                <span class="mask"><p class="tm-num">3,900</p></span>
+                <span class="mask"><p class="tm-label">Users generated</p></span>
+              </div>
+              <div class="tm-stat">
+                <span class="mask"><p class="tm-num">$500k</p></span>
+                <span class="mask"><p class="tm-label">Acquisition amount</p></span>
+              </div>
+            </div>
+          </div>
+          <div class="tm-img" data-fade>
+            {/* mckp.live embed (same runtime the SolarShare page uses) —
+                its square box rides centred in the stretch panel. */}
+            <mockup-player
+              mockup-id="f1c40184-5142-4103-a7b6-7beffb3f8369"
+              width="100%"
+              aspect-ratio="1 / 1"
+              trigger="inview"
+              trigger-threshold="0"
+              cursor-range="17-56-14-55"
+              click-range="12-12-11-11"
+              camera-zoom="25"
+            ></mockup-player>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- mckp.live embed runtime for the mockup-player above. is:inline so
+         Astro ships the tag untouched. -->
+    <script is:inline src="https://embed.mckp.live/embed.js" async></script>
+
+    <!-- Mobile video swap (fw covers → square 1080² cuts at ≤640).
+         Parse-time script, so it sits BELOW every opted-in video; all of
+         them are preload=none, so the placement costs no wasted fetch.
+         See MobileVideoSwap.astro. -->
+    <MobileVideoSwap />
 
     <ExperienceTimeline />
 
@@ -1473,6 +1542,128 @@ const dumpItems = [
        hold it at the site's standard 14px instead of the desktop clamp's
        11px floor (that floor exists for 3-up tiles, not full-width ones). */
     .wd-caption { font-size: 14px; }
+  }
+
+  /* ---- Testimonial band (TRIAL) ----
+     Two macro-grid halves: charcoal quote/stats card beside a cover photo.
+     Sharp corners and monochrome per the site's panel language; the photo
+     panel stretches to the card's height (same grid row). */
+  .section.tm-band {
+    position: relative;
+    min-height: 0;
+    padding-block: 0 var(--space-8);
+  }
+  /* Bracket corners frame the WHOLE composition: absolute against the
+     composed row, riding --tm-out outside the macro grid's content edges
+     (horizontally: the row's padding box is the viewport, so the content
+     edge sits at --margin) and the same distance above/below the row. */
+  .tm-frame {
+    position: relative;
+    --tm-out: var(--space-4);
+  }
+  .tm-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 0 solid var(--cream);
+  }
+  .tm-c1 { top: calc(-1 * var(--tm-out)); left: calc(var(--margin) - var(--tm-out)); border-top-width: 1px; border-left-width: 1px; }
+  .tm-c2 { top: calc(-1 * var(--tm-out)); right: calc(var(--margin) - var(--tm-out)); border-top-width: 1px; border-right-width: 1px; }
+  .tm-c3 { bottom: calc(-1 * var(--tm-out)); left: calc(var(--margin) - var(--tm-out)); border-bottom-width: 1px; border-left-width: 1px; }
+  .tm-c4 { bottom: calc(-1 * var(--tm-out)); right: calc(var(--margin) - var(--tm-out)); border-bottom-width: 1px; border-right-width: 1px; }
+  /* No fill — the quote sits directly on the page ground inside the
+     section frame. */
+  .tm-card {
+    grid-column: 1 / 7;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-5) var(--space-5) var(--space-5) 0;
+  }
+  .tm-quote-wrap {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .tm-quote {
+    font-size: clamp(24px, 2.2vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    text-wrap: pretty;
+  }
+  .tm-author { display: flex; align-items: center; gap: var(--space-2); }
+  /* Headshot slot — a filled circle until the real photo drops in. */
+  .tm-avatar {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .tm-avatar :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .tm-who { display: flex; flex-direction: column; }
+  .tm-name, .tm-role {
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .tm-name { color: var(--cream); }
+  .tm-role { color: var(--cream-60); }
+  .tm-rule { height: 1px; background: var(--hairline-soft); }
+  .tm-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gutter);
+  }
+  .tm-stat { display: flex; flex-direction: column; gap: var(--space-1); }
+  .tm-num {
+    font-size: clamp(28px, 2.5vw, 36px);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--cream);
+  }
+  .tm-label {
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--cream-60);
+  }
+  .tm-img {
+    grid-column: 7 / 13;
+    position: relative;
+    overflow: hidden;
+    background: var(--placeholder);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tm-img > mockup-player { display: block; width: 100%; }
+  /* Desktop: the panel stretches to the card's height, which outgrows a
+     width-sized square as the card narrows and the quote wraps taller —
+     so size the square off the LARGER panel dimension (container units)
+     and let the panel crop the overflow: object-fit cover, for an embed.
+     Scoped ≥901px because container-type:size would collapse the
+     content-sized mobile panel. !important beats the width the embed
+     writes inline from its width="100%" attribute. */
+  @media (min-width: 901px) {
+    .tm-img { container-type: size; }
+    .tm-img > mockup-player {
+      flex: 0 0 auto;
+      width: max(100cqw, 100cqh) !important;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .tm-card, .tm-img { grid-column: 1 / -1; }
+    .tm-card { padding: var(--space-4) 0; gap: var(--space-5); }
+    /* Stacked: the embed's own square box sets the panel height. The
+       brackets pull in — a 32px reach outside a 20px page margin would
+       poke past the screen edge. */
+    .tm-frame { --tm-out: var(--space-1); }
   }
 
   /* ---- Masked line reveals ----

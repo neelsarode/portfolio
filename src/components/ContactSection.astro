@@ -20,9 +20,13 @@ const socials = [
 ];
 
 const actions = [
-  { label: "Hire Fractionally", href: "#" },
-  { label: "Work With Me", href: "#" },
+  // Hidden for now (2026-09-05, Neel) — restore by un-commenting.
+  // { label: "Hire Fractionally", href: "#" },
+  { label: "Work With Me", href: "mailto:neel@conversiondesigner.co" },
 ];
+
+// Footer year — baked at build time, so it refreshes with every deploy.
+const year = new Date().getFullYear();
 ---
 
 <section class="section contact-band">
@@ -126,6 +130,12 @@ const actions = [
         </ul>
       </div>
     </div>
+
+    {/* Footer line — the page's sign-off, spread across the margins. */}
+    <footer class="full cs-footer" data-reveal-group>
+      <span class="mask"><p>© {year} Neel Sarode</p></span>
+      <span class="mask"><p>All Rights Reserved</p></span>
+    </footer>
   </div>
 </section>
 
@@ -376,6 +386,20 @@ const actions = [
      only the corner brackets take the ember. */
   .cs-btn:hover { color: #fff; }
   .cs-btn:hover .corner { border-color: var(--ember); }
+
+  /* Footer sign-off: name left, rights right, at the page margins. */
+  .cs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-inline: var(--margin);
+    margin-block-start: var(--space-7);
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--cream-39);
+  }
 
   .cs-links {
     list-style: none;

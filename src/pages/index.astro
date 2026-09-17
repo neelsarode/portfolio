@@ -555,14 +555,15 @@ const dumpItems = [
             </div>
           </div>
           <div class="tm-img" data-fade>
-            {/* 4:3 laptop loop: cover-fills the stretch panel on desktop,
-                sits in-flow at its native ratio when stacked. */}
+            {/* 4:3 laptop clip: cover-fills the stretch panel on desktop,
+                sits in-flow at its native ratio when stacked. Plays ONCE
+                when scrolled into view (see the .tm-video observer) and
+                rests on its final frame — no autoplay, no loop. */}
             <video
+              class="tm-video"
               src="/testimonial-micah-loop.mp4" width="1920" height="1440"
               poster="/testimonial-micah-poster.jpg"
-              autoplay
               muted
-              loop
               playsinline
               preload="metadata"
               tabindex="-1"
@@ -856,6 +857,33 @@ const dumpItems = [
           if (v.paused && nearViewport(v)) tryPlay(v);
         });
       });
+    }
+
+    // Testimonial clip: play ONCE the first time it scrolls into view, then
+    // leave it — with no loop attribute a finished video holds its final
+    // frame, which is the resting state we want. Same retry-on-reject
+    // reasoning as the gated loops above (background tabs refuse play()).
+    const onceVideos = document.querySelectorAll<HTMLVideoElement>(".tm-video");
+    if (onceVideos.length) {
+      const playOnce = (v: HTMLVideoElement, attempt = 0) => {
+        if (!v.isConnected) return;
+        v.play().catch(() => {
+          if (attempt < 4) {
+            setTimeout(() => playOnce(v, attempt + 1), 300 * 2 ** attempt);
+          }
+        });
+      };
+      const onceIo = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            onceIo.unobserve(e.target);
+            playOnce(e.target as HTMLVideoElement);
+          }
+        },
+        { threshold: 0.4 } // fire once a real share of the panel is on screen
+      );
+      onceVideos.forEach((v) => onceIo.observe(v));
     }
 
     // :not(.exp-band) — the Experience timeline reveals its entries from their

@@ -210,8 +210,8 @@ const info = [
           </div>
         </div>
       </div>
-      <!-- Row under the dashboard loop: the 4:3 phone mockup embed beside a
-           1:1 purchase-flow loop. A dual-ratio row can't land both edges on
+      <!-- Row under the dashboard loop: the 4:3 phone analytics loop beside
+           a 1:1 purchase-flow loop. A dual-ratio row can't land both edges on
            whole column spans (the fixed gutters would leave it ragged), so
            the row splits by flex proportion instead — widths 4:3, which keeps
            both aspect ratios exact and the heights equal at any viewport. -->
@@ -219,21 +219,17 @@ const info = [
         <div class="full-composed cs-stack" data-reveal-group>
           <div class="cs-ratio-row">
             <div class="cs-img cs-flex-43" data-fade>
-              <mockup-player
-                mockup-id="3de5a0fb-8016-486f-b19b-0b24f565bab1"
-                width="100%"
-                aspect-ratio="4 / 3"
-                trigger="inview"
-                trigger-threshold="0"
-                trigger-loop="true"
-                cursor-range="25-26-25-26"
-                click-range="100-100-100-100"
-                zoom-mode="dolly"
-                zoom-amount="50"
-                zoom-duration="400"
-                camera-zoom="36"
-                background-color="#050A0E"
-              ></mockup-player>
+              <video
+                src="/solarshare-analytics-loop.mp4" width="1920" height="1440"
+                poster="/solarshare-analytics-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
             </div>
             <div class="cs-img cs-flex-11" data-fade>
               <video
@@ -252,22 +248,22 @@ const info = [
           </div>
         </div>
       </div>
-      <!-- Full-width panel: the laptop mockup embed, its own 16:9 box at
-           the full container width. -->
+      <!-- Full-width panel: the laptop transactions loop at its native 4:3
+           (the mockup export is 4:3 — a 16:9 box would crop the screen). -->
       <div class="content-grid">
         <div class="full-composed cs-stack" data-reveal-group>
-          <div class="cs-img cs-embed-wide" data-fade>
-            <mockup-player
-              mockup-id="a3685c5e-1af0-4916-85a8-4235570ec34d"
-              width="100%"
-              aspect-ratio="16 / 9"
-              trigger="inview"
-              trigger-threshold="0"
-              trigger-loop="true"
-              click-range="52-53-51-51"
-              camera-zoom="41"
-              background-color="#131F1F"
-            ></mockup-player>
+          <div class="cs-img cs-img-wide cs-img-43" data-fade>
+            <video
+              src="/solarshare-transactions-loop.mp4" width="1920" height="1440"
+              poster="/solarshare-transactions-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
             <p class="cs-img-caption">Blockchain transaction details</p>
           </div>
         </div>
@@ -306,27 +302,6 @@ const info = [
         </div>
       </div>
     </section>
-
-    <!-- Mobile: the mockup embeds run square — the desktop 4:3 / 16:9
-         scenes get too short at phone widths. Runs before embed.js
-         initializes (inline, ahead of the async tag); re-applies on
-         breakpoint flips for players that observe attribute changes. -->
-    <script is:inline>
-      (function () {
-        var mq = matchMedia("(max-width: 900px)");
-        function apply() {
-          document.querySelectorAll("mockup-player").forEach(function (p) {
-            if (!p.dataset.desktopRatio) p.dataset.desktopRatio = p.getAttribute("aspect-ratio");
-            p.setAttribute("aspect-ratio", mq.matches ? "1 / 1" : p.dataset.desktopRatio);
-          });
-        }
-        apply();
-        mq.addEventListener("change", apply);
-      })();
-    </script>
-    <!-- mckp.live embed runtime for the mockup-player elements above.
-         is:inline so Astro ships the tag untouched. -->
-    <script is:inline src="https://embed.mckp.live/embed.js" async></script>
 
     <!-- More work — the other featured case studies (shared component). -->
     <MoreWork current="solarshare" />
@@ -593,14 +568,12 @@ const info = [
   .cs-ratio-row > * { min-width: 0; }
   .cs-flex-43 { flex: 4 0 0; aspect-ratio: 4 / 3; }
   .cs-flex-11 { flex: 3 0 0; aspect-ratio: 1 / 1; }
-  /* Full-width embed panel: the player's own aspect box sets the height. */
-  .cs-embed-wide { grid-column: 1 / 13; }
-  /* The embeds size themselves off the panel width and their aspect box. */
-  .cs-img > mockup-player { display: block; width: 100%; }
   .cs-pair-half-right { grid-column: 7 / 13; }
   .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
   /* 16:9 wide variant (after .cs-img-wide — later rule wins). */
   .cs-img-169 { aspect-ratio: 16 / 9; }
+  /* 4:3 wide variant — the transactions laptop loop's native ratio. */
+  .cs-img-43 { aspect-ratio: 4 / 3; }
   /* Whitepaper montage variant — the file's 1296:507 box. */
   .cs-img-wp { aspect-ratio: 1296 / 507; }
   .cs-img-caption {
@@ -660,8 +633,7 @@ const info = [
        stacked panel takes its media's intrinsic ratio — the medium flows
        in-layout instead of cover-filling an imposed box. Every panel
        img/video carries real width/height attrs, so the ratio is known
-       before load and nothing shifts. The mockup-player panels are
-       untouched (they size themselves off their own aspect boxes). */
+       before load and nothing shifts. */
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
     .cs-pair-half-left, .cs-pair-half-right,
     .cs-img-wide { height: auto; aspect-ratio: auto; }
@@ -673,7 +645,6 @@ const info = [
     }
     .cs-ratio-row { flex-direction: column; }
     .cs-flex-43, .cs-flex-11 { flex: none; height: auto; }
-    /* The square mobile player sets the panel height itself. */
     .cs-flex-43 { aspect-ratio: auto; }
   }
 </style>

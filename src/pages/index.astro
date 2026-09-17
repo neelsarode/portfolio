@@ -555,26 +555,23 @@ const dumpItems = [
             </div>
           </div>
           <div class="tm-img" data-fade>
-            {/* mckp.live embed (same runtime the SolarShare page uses) —
-                its square box rides centred in the stretch panel. */}
-            <mockup-player
-              mockup-id="f1c40184-5142-4103-a7b6-7beffb3f8369"
-              width="100%"
-              aspect-ratio="1 / 1"
-              trigger="inview"
-              trigger-threshold="0"
-              cursor-range="17-56-14-55"
-              click-range="12-12-11-11"
-              camera-zoom="25"
-            ></mockup-player>
+            {/* 4:3 laptop loop: cover-fills the stretch panel on desktop,
+                sits in-flow at its native ratio when stacked. */}
+            <video
+              src="/testimonial-micah-loop.mp4" width="1920" height="1440"
+              poster="/testimonial-micah-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
           </div>
         </div>
       </div>
     </section>
-    <!-- mckp.live embed runtime for the mockup-player above. is:inline so
-         Astro ships the tag untouched. -->
-    <script is:inline src="https://embed.mckp.live/embed.js" async></script>
-
     <!-- Mobile video swap (fw covers → square 1080² cuts at ≤640).
          Parse-time script, so it sits BELOW every opted-in video; all of
          them are preload=none, so the placement costs no wasted fetch.
@@ -1713,32 +1710,27 @@ const dumpItems = [
     position: relative;
     overflow: hidden;
     background: var(--placeholder);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
-  .tm-img > mockup-player { display: block; width: 100%; }
-  /* Desktop: the panel stretches to the card's height, which outgrows a
-     width-sized square as the card narrows and the quote wraps taller —
-     so size the square off the LARGER panel dimension (container units)
-     and let the panel crop the overflow: object-fit cover, for an embed.
-     Scoped ≥901px because container-type:size would collapse the
-     content-sized mobile panel. !important beats the width the embed
-     writes inline from its width="100%" attribute. */
-  @media (min-width: 901px) {
-    .tm-img { container-type: size; }
-    .tm-img > mockup-player {
-      flex: 0 0 auto;
-      width: max(100cqw, 100cqh) !important;
-    }
+  /* Desktop: the panel stretches to the card's height, which outgrows the
+     4:3 loop as the card narrows and the quote wraps taller — the video
+     cover-fills the panel and the laptop stays centred in the crop. */
+  .tm-img > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   @media (max-width: 900px) {
     .tm-card, .tm-img { grid-column: 1 / -1; }
     .tm-card { padding: var(--space-4) 0; gap: var(--space-5); }
-    /* Stacked: the embed's own square box sets the panel height. The
+    /* Stacked: the loop flows at its native 4:3 and sets the panel height
+       (width/height attrs on the video → no shift before load). The
        brackets pull in — a 32px reach outside a 20px page margin would
        poke past the screen edge. */
+    .tm-img > video { position: static; height: auto; }
     .tm-frame { --tm-out: var(--space-1); }
   }
 

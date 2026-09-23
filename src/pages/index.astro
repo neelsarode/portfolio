@@ -19,8 +19,10 @@ const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background — managed at
 // runtime by the scene-manager script below (default OFF; dev "BG" chip
 // toggles it). Flip DEFAULT_ON in that script when the decision is final.
 
-// Featured Work rows (Figma 2167:11568): TL;DR, Gold Dollar (USDKG), and
-// Crow Industries. `note` is the company blurb riding the connector's spark.
+// Featured Work rows (Figma 2167:11568): TL;DR, SolarShare, Gold Dollar
+// (USDKG), and Crow Industries — `flip` alternates by position so the rows
+// mirror left/right down the page. `note` is the company blurb riding the
+// connector's spark.
 const fwRows = [
   {
     flip: false,
@@ -46,6 +48,26 @@ const fwRows = [
   },
   {
     flip: true,
+    logo: "solarshare",
+    name: "SolarShare",
+    href: "/work/solarshare",
+    video: "/solarshare-cover.mp4",
+    poster: "/solarshare-poster.jpg",
+    videoMobile: "/solarshare-cover-mobile.mp4",
+    posterMobile: "/solarshare-poster-mobile.jpg",
+    desc: "Designed product and revamped brand for SolarShare",
+    note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
+    label: "Lead Designer",
+    roles: [
+      "Brand Identity Design",
+      "Product Design",
+      "Website Design",
+      "Website Development",
+      "Document Design",
+    ],
+  },
+  {
+    flip: false,
     logo: "gold",
     name: "Gold Dollar",
     href: "/work/usdkg",
@@ -65,7 +87,7 @@ const fwRows = [
     ],
   },
   {
-    flip: false,
+    flip: true,
     logo: "crow",
     name: "Crow Industries",
     href: "/work/crow-industries",
@@ -83,26 +105,6 @@ const fwRows = [
       "AI-Generated Video",
       "Document Design",
       "Deck Design",
-    ],
-  },
-  {
-    flip: true,
-    logo: "solarshare",
-    name: "SolarShare",
-    href: "/work/solarshare",
-    video: "/solarshare-cover.mp4",
-    poster: "/solarshare-poster.jpg",
-    videoMobile: "/solarshare-cover-mobile.mp4",
-    posterMobile: "/solarshare-poster-mobile.jpg",
-    desc: "Designed product and revamped brand for SolarShare",
-    note: "Solarshare is a SAAS that gives users fractional ownership in solar energy projects through blockchain-powered returns.",
-    label: "Lead Designer",
-    roles: [
-      "Brand Identity Design",
-      "Product Design",
-      "Website Design",
-      "Website Development",
-      "Document Design",
     ],
   },
 ];

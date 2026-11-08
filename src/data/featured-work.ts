@@ -24,6 +24,14 @@ export const featuredWork: FeaturedWork[] = [
     tags: ["Brand Identity", "Product UI/UX", "Website Design"],
   },
   {
+    slug: "liquidacre",
+    name: "LiquidAcre",
+    href: "/work/liquidacre",
+    video: "/liquidacre-cover.mp4",
+    poster: "/liquidacre-poster.jpg",
+    tags: ["Product Design", "Design System", "Prototyping"],
+  },
+  {
     slug: "usdkg",
     name: "Gold Dollar",
     href: "/work/usdkg",

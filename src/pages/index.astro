@@ -19,8 +19,8 @@ const BG_PROJECT = "BUheAkQsKZMgqGU2BVrJ";   // fixed background — managed at
 // runtime by the scene-manager script below (default OFF; dev "BG" chip
 // toggles it). Flip DEFAULT_ON in that script when the decision is final.
 
-// Featured Work rows (Figma 2167:11568): TL;DR, SolarShare, Gold Dollar
-// (USDKG), and Crow Industries — `flip` alternates by position so the rows
+// Featured Work rows (Figma 2167:11568): TL;DR, SolarShare, LiquidAcre, Gold
+// Dollar (USDKG), and Crow Industries — `flip` alternates by position so the rows
 // mirror left/right down the page. `note` is the company blurb riding the
 // connector's spark.
 const fwRows = [
@@ -68,6 +68,27 @@ const fwRows = [
   },
   {
     flip: false,
+    logo: "liquidacre",
+    name: "LiquidAcre",
+    href: "/work/liquidacre",
+    video: "/liquidacre-cover.mp4",
+    poster: "/liquidacre-poster.jpg",
+    videoMobile: "/liquidacre-cover-mobile.mp4",
+    posterMobile: "/liquidacre-poster-mobile.jpg",
+    desc: "Designed LiquidAcre’s investing app end-to-end, from the trust rules to a working prototype.",
+    note: "LiquidAcre lets everyday investors buy $50 shares of rental homes and commercial buildings, and earn their part of the rent every month.",
+    label: "Product Designer",
+    roles: [
+      "Product Design",
+      "UX Strategy",
+      "Design System",
+      "Interaction Design",
+      "Motion Design",
+      "Prototype Development",
+    ],
+  },
+  {
+    flip: true,
     logo: "gold",
     name: "Gold Dollar",
     href: "/work/usdkg",
@@ -87,7 +108,7 @@ const fwRows = [
     ],
   },
   {
-    flip: true,
+    flip: false,
     logo: "crow",
     name: "Crow Industries",
     href: "/work/crow-industries",
@@ -398,6 +419,15 @@ const dumpItems = [
                             <path fill="white" d="M10.1426 7.69005L10.1622 7.65782L8.25982 9.85997V12.1568H6.64947V4.6168H8.25982V7.66075L10.7637 4.6168H12.7481L10.1426 7.69005Z" />
                           </svg>
                           Gold Dollar
+                        </span>
+                      ) : row.logo === "liquidacre" ? (
+                        <span class="fw-liquidacre">
+                          <svg viewBox="0 0 26.271 26.271" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="3.8475" y="3.8475" width="18.576" height="18.576" rx="3.463" fill="#1EAB88" transform="rotate(45 13.1355 13.1355)" />
+                            <rect x="9.2065" y="5.7865" width="7.855" height="7.855" rx="1.862" fill="#FFFFFF" transform="rotate(45 13.134 9.714)" />
+                            <rect x="10.326" y="16.346" width="5.628" height="5.628" rx="1.862" fill="#FFFFFF" fill-opacity="0.55" transform="rotate(45 13.14 19.16)" />
+                          </svg>
+                          LiquidAcre
                         </span>
                       ) : row.logo === "crow" ? (
                         <img
@@ -1490,6 +1520,21 @@ const dumpItems = [
 
   /* SolarShare wordmark (white-fill SVG from Figma). */
   .fw-solarshare { display: block; width: 91px; height: 14px; }
+
+  /* LiquidAcre lockup — the app's sidebar lockup (Mint mark from the
+     product's brand assets); wordmark in Geist 600 standing in for Satoshi
+     Bold, same approach as the Gold Dollar lockup above. */
+  .fw-liquidacre {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .fw-liquidacre svg { width: 20px; height: 20px; flex: 0 0 auto; }
   .fw-roles {
     display: flex;
     flex-direction: column;

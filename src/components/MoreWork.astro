@@ -2,6 +2,9 @@
 // "More work" — the foot of every case study (Figma 2548:24573 §8). Lists the
 // other featured case studies as a 3-up row of cards: looping cover on top,
 // name + tags beneath. Pass the current page's slug so it excludes itself.
+// With more than four featured studies the row would orphan a card, so it
+// shows the THREE that follow the current page in the list, wrapping around
+// (each page points onward; every study still gets linked from somewhere).
 // Entries without an href (page not built yet) render as plain tiles — no
 // link, no cursor label, no hover zoom.
 //
@@ -15,7 +18,12 @@ interface Props {
   current: string;
 }
 const { current } = Astro.props;
-const cards = featuredWork.filter((w) => w.slug !== current);
+const at = featuredWork.findIndex((w) => w.slug === current);
+const others = featuredWork.length - (at === -1 ? 0 : 1);
+const cards = Array.from(
+  { length: Math.min(3, others) },
+  (_, k) => featuredWork[(at + 1 + k) % featuredWork.length],
+);
 ---
 <section class="more">
   <div class="content-grid">

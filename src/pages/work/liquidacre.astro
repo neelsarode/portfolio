@@ -1,0 +1,1258 @@
+---
+import FullscreenLayout from "../../layouts/FullscreenLayout.astro";
+import SiteNav from "../../components/SiteNav.astro";
+import GridLines from "../../components/GridLines.astro";
+import DevGrid from "../../components/DevGrid.astro";
+import MoreWork from "../../components/MoreWork.astro";
+import MobileVideoSwap from "../../components/MobileVideoSwap.astro";
+// LiquidAcre case study — the product-design one. Same shared case-study
+// format as SolarShare / TL;DR (type recipes copied exactly, label/body rows,
+// centred intros, media on the 12-col macro grid), plus a few composed
+// blocks the product story needs: the trust rules, the interactive parcel
+// grid, the palette, the naming table and the motion table.
+//
+// Screen panels: the product media are flat recordings of a LIGHT UI, so
+// rather than full-bleed slabs they sit inset on the cover's own Forest plat
+// backdrop (public/liquidacre-panel-bg.jpg — the Ultramock background) and
+// size themselves from the media (width/height attrs), which also means they
+// never crop at any width (site rule for work-page panels).
+
+const info = [
+  {
+    label: "Things I Did",
+    values: [
+      "Product Design",
+      "UX Strategy",
+      "Design System",
+      "Interaction & Motion Design",
+      "Prototype Development",
+    ],
+  },
+  { label: "Company", values: ["LiquidAcre"] },
+  { label: "Role", values: ["Product Designer"] },
+  { label: "Year", values: ["2026"] }, // TODO: confirm LiquidAcre year
+  { label: "Platform", values: ["Desktop web app"] },
+];
+
+// "Where trust gets lost" — the rules the design had to keep.
+const rules = [
+  {
+    title: "Ownership you can see",
+    body: "100 shares of a 25,000-share villa is 0.4% of it. That’s hard to picture, so ownership is drawn as lots on a plat.",
+  },
+  {
+    title: "Returns that sound like real estate",
+    body: "A triple-digit return reads as a warning, not a pitch. Projected returns stay in the range a rental property can plausibly earn.",
+  },
+  {
+    title: "No surprises where money moves",
+    body: "Fees, totals and your balance appear before you commit, never after a payment fails.",
+  },
+];
+
+const dashboardNotes = [
+  { title: "The number people come for", body: "Portfolio value leads, with a 12-month chart beneath it drawn to scale." },
+  { title: "Income in its own colour", body: "Rent is Harvest everywhere it appears: the monthly figure, the income chart and every payout." },
+  { title: "Setup that asks for one thing", body: "A compact card names only the next step, so finishing setup never competes with your portfolio." },
+];
+
+const marketplaceNotes = [
+  { title: "Filters that say what they do", body: "Search, type, price and status filters, a sort, and a result count that updates as you filter." },
+  { title: "Returns you can believe", body: "Projected 1-year returns of 8.9% to 14.1% and rental yields of 6.0% to 9.2%, all from the same dataset as the dashboard." },
+  { title: "One quiet action", body: "Instead of a bright Invest button on every card, a quiet “View property” lets the photos and numbers do the selling." },
+];
+
+// Parcel grid: 100 lots for Verbena Coastal Villa — 1 lot = 1% = 250 shares,
+// 72 funded, the default 100-share order shown as one lot. The script below
+// keeps this in step with the slider; SSR renders the default state.
+const PLAT_FUNDED = 72;
+const plat = Array.from({ length: 100 }, (_, i) =>
+  i < PLAT_FUNDED ? "is-funded" : i === PLAT_FUNDED ? "is-mine" : "",
+);
+// One-row strips (20 cells): f = funded, m = yours, "" = available.
+const strip = (f: number, m: number, mineFirst = false) => {
+  const funded = Array(f).fill("is-funded");
+  const mine = Array(m).fill("is-mine");
+  return [...(mineFirst ? [...mine, ...funded] : [...funded, ...mine]), ...Array(20 - f - m).fill("")];
+};
+const uses = [
+  { title: "Marketplace cards", body: "A one-row strip shows how funded each property is.", strip: strip(13, 0) },
+  { title: "Your properties", body: "Owned cards show your share of the building in Mint.", strip: strip(14, 2, true) },
+  { title: "Checkout and selling", body: "Lots fill as you change the quantity, and release when you sell.", strip: strip(14, 2) },
+];
+
+const swatches = [
+  { name: "Forest", hex: "#0F2A23", ink: "#EAF2EE", body: "The sidebar and dark surfaces, so the frame itself belongs to the brand." },
+  { name: "Evergreen", hex: "#0D6F5B", ink: "#FFFFFF", body: "Primary actions, links and funded lots. White on it is 6.10:1." },
+  { name: "Mint", hex: "#1EAB88", ink: "#0F2A23", body: "Chart lines and your lots. Never text on white, at 2.90:1." },
+  { name: "Harvest", hex: "#C98A2E", ink: "#12201C", body: "Rental income and payouts, and nothing else." },
+  { name: "Ink", hex: "#12201C", ink: "#EAF2EE", body: "Primary text, at 16.8:1. Neutrals lean slightly green." },
+  { name: "Canvas", hex: "#F6F8F7", ink: "#12201C", body: "The app background: a cool off-white, not cream." },
+];
+
+const words = [
+  { label: "The thing you buy", now: "Shares", was: "fractional tokens" },
+  { label: "Money in your account", now: "LiquidAcre balance", was: "LiquidAcre Wallet" },
+  { label: "The deposit button", now: "Add funds", was: "Connect Wallet" },
+  { label: "The history page", now: "Transactions", was: "Order History" },
+];
+
+const motion = [
+  { screen: "Dashboard", moves: "The value counts up, the line draws, the income bars rise", why: "Your money arrives as a story: what it’s worth, how it got there, what it earns" },
+  { screen: "Listing", moves: "The parcel fills lot by lot, your lot last", why: "Teaches the grid before the legend" },
+  { screen: "Marketplace", moves: "Each card’s strip fills in reading order", why: "Shows at a glance which properties are selling fastest" },
+  { screen: "Everywhere else", moves: "Lots fill as quantity changes, tab indicators slide, dialogs scale in from 98%", why: "Confirms that an action landed" },
+];
+---
+<FullscreenLayout title="LiquidAcre — Case Study — Neel Sarode">
+  <GridLines />
+
+  <!-- Shared radial fill for the spark bullets (same gradient as the other
+       case studies: white core to #999 tips). -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <radialGradient id="cs-spark-grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(7.5 7.5) rotate(90) scale(7.5)">
+        <stop stop-color="white" />
+        <stop offset="1" stop-color="#999999" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <main class="content">
+    <!-- 1 · Hero — full viewport, nav overlaid, title bottom-left. The
+         Ultramock cover (dashboard → listing → marketplace on the Forest
+         plat), same loop as the homepage Featured Work row. -->
+    <section class="cs-hero" data-reveal-group>
+      <video
+        class="cs-hero-img"
+        src="/liquidacre-cover.mp4" width="1920" height="1080"
+        poster="/liquidacre-poster.jpg"
+        data-desktop-src="/liquidacre-cover.mp4"
+        data-desktop-poster="/liquidacre-poster.jpg"
+        data-mobile-src="/liquidacre-cover-mobile.mp4"
+        data-mobile-poster="/liquidacre-poster-mobile.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        tabindex="-1"
+        data-fade
+      ></video>
+      <!-- Mobile: the square 1080² centre cut of the 4K master. -->
+      <MobileVideoSwap />
+      <div class="cs-hero-scrim" aria-hidden="true"></div>
+      <div class="cs-hero-overlay">
+        <header class="cs-nav"><SiteNav activePath="/" /></header>
+        <h1 class="cs-title">
+          <span class="mask"><span class="line">LiquidAcre</span></span>
+        </h1>
+      </div>
+    </section>
+
+    <!-- 2 · About — info tiles (cols 1-6) + standfirst (cols 8-13). -->
+    <section class="cs-band cs-about">
+      <div class="content-grid">
+        <div class="full-composed">
+          <div class="cs-info" data-reveal-group>
+            <div class="cs-tile cs-tile-tall">
+              <span class="mask"><p class="cs-ilabel">{info[0].label}</p></span>
+              <div class="cs-tile-values">
+                {info[0].values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            </div>
+            <div class="cs-tile-stack">
+              {[info[1], info[2]].map((t) => (
+                <div class="cs-tile">
+                  <span class="mask"><p class="cs-ilabel">{t.label}</p></span>
+                  {t.values.map((v) => (
+                    <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                  ))}
+                </div>
+              ))}
+            </div>
+            {[info[3], info[4]].map((t) => (
+              <div class="cs-tile">
+                <span class="mask"><p class="cs-ilabel">{t.label}</p></span>
+                {t.values.map((v) => (
+                  <span class="mask"><p class="cs-ivalue">{v}</p></span>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div class="cs-standfirst" data-reveal-group>
+            <span class="mask"><p class="cs-statement">
+              <span class="mut">LiquidAcre lets everyday investors buy $50
+              shares of a house, a cabin or a warehouse, earn their part of the
+              rent every month, and sell when they’re ready.</span>
+            </p></span>
+            <span class="mask"><p class="cs-statement">
+              I designed the product end-to-end for first-time property
+              investors, with one job: make a fraction of a building feel
+              tangible, and every number on screen trustworthy.
+            </p></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Where trust gets lost. Label/body row opening the band, then the
+         rules as a 3-up row of Onyx cards. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Where trust gets lost</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">An investing app is only as convincing as its
+              least believable number.</span>
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              Before drawing any screens, I listed the moments where a
+              first-time investor would hesitate, and turned each one into a
+              rule the design had to keep.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          {rules.map((r, i) => (
+            <div class="cs-card cs-rule" data-fade>
+              <p class="cs-card-num">{String(i + 1).padStart(2, "0")}</p>
+              <div class="cs-card-text">
+                <span class="mask"><p class="cs-feat-title">{r.title}</p></span>
+                <span class="mask"><p class="cs-feat-body">{r.body}</p></span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · The Product. Centred label + body stack, then two mirrored
+         feature rows (TL;DR's Feature Builds layout): dashboard screen left
+         with its notes right, marketplace notes left with its screen right. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-intro cs-intro-stack">
+            <span class="mask"><p class="cs-label">The Product</p></span>
+            <span class="mask"><p class="cs-body cs-center">
+              <span class="mut">Twelve screens, six payment dialogs and the
+              sell flow. </span>Each main screen is built around the one
+              question people bring to it.
+            </p></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard — screen left, notes right. -->
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-screen cs-feat-left" data-fade>
+            <div class="cs-screen-frame">
+              <video
+                src="/liquidacre-dashboard-loop.mp4" width="1920" height="1200"
+                poster="/liquidacre-dashboard-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+            </div>
+            <p class="cs-img-caption">The dashboard on arrival, once per session</p>
+          </div>
+          <div class="cs-feat-col cs-feat-col-right">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">Dashboard</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                The dashboard answers three questions in the order people ask
+                them. What is my money worth? What is it earning? What should
+                I do next?
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              {dashboardNotes.map((n) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <div class="cs-feat-note">
+                    <p class="cs-feat-lead">{n.title}</p>
+                    <p class="cs-feat-body">{n.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketplace — notes left, screen right. -->
+      <div class="content-grid">
+        <div class="full-composed cs-feature" data-reveal-group>
+          <div class="cs-feat-col cs-feat-col-left">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">Marketplace</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                Browsing should feel like looking at properties, not at
+                buttons. Each card leads with the photo, the name and the
+                returns, and the whole card is clickable.
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              {marketplaceNotes.map((n) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <div class="cs-feat-note">
+                    <p class="cs-feat-lead">{n.title}</p>
+                    <p class="cs-feat-body">{n.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="cs-screen cs-feat-right" data-fade>
+            <div class="cs-screen-frame">
+              <video
+                src="/liquidacre-marketplace-loop.mp4" width="1920" height="1200"
+                poster="/liquidacre-marketplace-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+            </div>
+            <p class="cs-img-caption">Each card’s strip fills in reading order, like a row of plots selling out</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · The parcel grid — the product's signature. Label/body row, then
+         the grid REBUILT AS HTML on the Forest plat backdrop: drag the slider
+         and the order's lots fill (product-mock internals keep the app's own
+         lot geometry, like the TL;DR extension mock), then the three places
+         the grid appears as one-row strips. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Land you can subdivide</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">An acre is land you can split into lots, and
+              that idea gave the product its signature: </span>a parcel grid.
+              Each property is drawn as a simple plat. Funded lots are filled,
+              available lots are outlined, and yours are Mint.
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              <span class="mut">A figure like 0.4% is hard to picture. A lot on
+              a plat is something you can point at.</span> Try it on the villa
+              below.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-plat" data-fade>
+            <div
+              class="cs-plat-grid"
+              id="plat-grid"
+              role="img"
+              aria-label="Parcel grid for Verbena Coastal Villa: 72 lots funded, 1 lot for this order, 27 available"
+            >
+              {plat.map((c) => <i class={c || undefined}></i>)}
+            </div>
+            <div class="cs-plat-side">
+              <div class="cs-plat-head">
+                <p class="cs-plat-title">72% funded</p>
+                <p class="cs-plat-sub">Verbena Coastal Villa: 18,000 of 25,000 shares sold, $50 a share.</p>
+              </div>
+              <div class="cs-plat-control">
+                <label class="cs-plat-label" for="plat-qty">
+                  Shares to buy <output id="plat-qty-out" for="plat-qty">100</output>
+                </label>
+                <input type="range" id="plat-qty" min="50" max="2500" step="50" value="100" />
+              </div>
+              <p class="cs-plat-read" id="plat-read" aria-live="polite">
+                <span class="cs-plat-strong">100 shares</span> for $5,000 is
+                0.4% of the property, shown as 1 lot. One lot is 250 shares.
+              </p>
+              <ul class="cs-plat-legend">
+                <li><i class="is-funded"></i>Funded</li>
+                <li><i class="is-mine"></i>This order</li>
+                <li><i></i>Available</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row-tight" data-reveal-group>
+          {uses.map((u) => (
+            <div class="cs-use">
+              <div class="cs-strip" aria-hidden="true" data-fade>
+                {u.strip.map((c) => <i class={c || undefined}></i>)}
+              </div>
+              <span class="mask"><p class="cs-feat-title">{u.title}</p></span>
+              <span class="mask"><p class="cs-feat-body">{u.body}</p></span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Listing. Centred label + body stack, then one wide screen panel:
+         the listing's arrival, the invest card's grid filling to 72%. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-intro cs-intro-stack">
+            <span class="mask"><p class="cs-label">Listing</p></span>
+            <span class="mask"><p class="cs-body cs-center">
+              <span class="mut">The listing is where people decide, so the page
+              is built around that decision. </span>The photo and three key
+              figures lead, and the invest card stays in view as you scroll,
+              carrying the full parcel grid.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-screen cs-screen-wide" data-fade>
+            <div class="cs-screen-frame">
+              <video
+                src="/liquidacre-listing-loop.mp4" width="1920" height="1200"
+                poster="/liquidacre-listing-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+            </div>
+            <p class="cs-img-caption">The parcel fills lot by lot to 72%, and your order’s lot appears last</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · Buying. Label/body row, the full buy flow as a wide screen
+         panel, then the two checkout details half/half. -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Buying, from listing to first payout</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">Buying is where money moves, so nothing should
+              come as a surprise.</span> The checkout shows the whole order
+              before you commit: shares times price, the fee and the total.
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              <span class="mut">Your balance sits on the payment option.</span>
+              If it’s too low, you see “Not enough for this order” with Add
+              funds right beside it, before you choose it rather than after a
+              payment fails.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-screen cs-screen-wide" data-fade>
+            <div class="cs-screen-frame">
+              <video
+                src="/liquidacre-buyflow-loop.mp4" width="1920" height="1200"
+                poster="/liquidacre-buyflow-poster.jpg"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                tabindex="-1"
+                aria-hidden="true"
+              ></video>
+            </div>
+            <p class="cs-img-caption">Buying 100 shares of Verbena Coastal Villa for $5,075, from the listing to the confirmation</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-stack" data-reveal-group>
+          <div class="cs-screen cs-screen-half-left" data-fade>
+            <div class="cs-screen-frame">
+              <img src="/liquidacre-checkout-shares.jpg" width="1971" height="1100" alt="Choosing how many shares: options for 10, 50 and 100 shares and a custom amount, with 50 shares for $2,500 selected. Five lots fill on the strip below, and the order is 0.20% of the property, earning an estimated $15.42 a month." loading="lazy" decoding="async" />
+            </div>
+            <p class="cs-img-caption">Lots fill as you pick a quantity</p>
+          </div>
+          <div class="cs-screen cs-screen-half-right" data-fade>
+            <div class="cs-screen-frame">
+              <img src="/liquidacre-checkout-pay.jpg" width="1260" height="704" alt="Pay with: the LiquidAcre balance shows $1,240.50 available and is flagged Not enough for this order, with an Add funds button. Visa ending in 4242 is selected, with a 1.5% fee." loading="lazy" decoding="async" />
+            </div>
+            <p class="cs-img-caption">A short balance is flagged on the option itself</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · The system. Label/body row, the palette as six paint chips,
+         then a second label/body row and the naming table (4-up). -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed cs-row-lead" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">A system taken from the land</p></span>
+          <div class="cs-rowbody cs-rowbody-stack">
+            <span class="mask"><p class="cs-body">
+              <span class="mut">My first instinct was near-black with a bright
+              mint accent, the default look of every fintech app.</span> I
+              chose Forest and Evergreen instead, colours that come from the
+              land itself, and gave income its own colour so rent has a visual
+              story.
+            </p></span>
+            <span class="mask"><p class="cs-body">
+              <span class="mut">Mint stays a graphic colour only, because it
+              can’t carry text on white.</span> The interface is set in Satoshi
+              on one scale from 12 to 48px, with tabular figures for every
+              number that moves.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          {swatches.map((s) => (
+            <div class="cs-swatch">
+              <div class="cs-swatch-chip" style={`background:${s.hex};color:${s.ink}`} data-fade>
+                <span>{s.name}</span>
+              </div>
+              <span class="mask"><p class="cs-swatch-hex">{s.hex}</p></span>
+              <span class="mask"><p class="cs-feat-body">{s.body}</p></span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Plain names</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">The words got the same care.</span> Each thing
+            has one name that says what it does, chosen over the crypto and
+            brokerage jargon this category tends to borrow.
+          </p></span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <dl class="full-composed cs-row-tight" data-reveal-group>
+          {words.map((w) => (
+            <div class="cs-word">
+              <dt><span class="mask"><p class="cs-ilabel">{w.label}</p></span></dt>
+              <dd class="cs-word-dd">
+                <span class="mask"><p class="cs-word-now">{w.now}</p></span>
+                <span class="mask"><p class="cs-word-was"><s>{w.was}</s></p></span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- 9 · Motion. Centred label + body stack, then the screen-by-screen
+         table across the macro grid (3 / 4 / 5 cols). -->
+    <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-intro cs-intro-stack">
+            <span class="mask"><p class="cs-label">One moment of motion per screen</p></span>
+            <span class="mask"><p class="cs-body cs-center">
+              <span class="mut">Motion here explains rather than decorates.
+              </span>Each main screen gets one arrival moment, the first time
+              you see it in a session. Everything else answers something you
+              did, in 150 to 250 milliseconds.
+            </p></span>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <table class="cs-motion">
+            <thead>
+              <tr>
+                <th scope="col"><span class="mask"><p class="cs-ilabel">Screen</p></span></th>
+                <th scope="col"><span class="mask"><p class="cs-ilabel">What moves</p></span></th>
+                <th scope="col"><span class="mask"><p class="cs-ilabel">Why</p></span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {motion.map((m) => (
+                <tr>
+                  <th scope="row"><span class="mask"><p class="cs-motion-screen">{m.screen}</p></span></th>
+                  <td><span class="mask"><p class="cs-motion-cell cs-motion-mut">{m.moves}</p></span></td>
+                  <td><span class="mask"><p class="cs-motion-cell">{m.why}</p></span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- More work — the other featured case studies (shared component). -->
+    <MoreWork current="liquidacre" />
+  </main>
+
+  <!-- Dev-only 12-col grid overlay (toggle: "Grid" chip or press `g`). -->
+  <DevGrid ascii={false} bg={false} />
+</FullscreenLayout>
+
+<!-- Same reveal system as the other case studies: masked line rises + media
+     fades per [data-reveal-group], wired to Lenis. gsap.from only —
+     no-JS/reduced-motion visitors simply see the content. The parcel grid
+     runs for everyone (reduced motion just drops the fill stagger). -->
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const panelVideos = document.querySelectorAll<HTMLVideoElement>(".cs-screen video");
+
+  if (!reduce) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const wireLenis = () => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.on("scroll", ScrollTrigger.update);
+    };
+    (window as any).lenis
+      ? wireLenis()
+      : addEventListener("lenis:init", wireLenis, { once: true });
+
+    // Panel loops autoplay below the fold, and Chrome's offscreen media
+    // optimisation can pause them there without resuming on scroll — gate
+    // each on visibility (same fix as the other case studies).
+    panelVideos.forEach((v) => {
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) v.play().catch(() => {});
+            else v.pause();
+          });
+        },
+        { rootMargin: "160px" },
+      ).observe(v);
+    });
+
+    gsap.utils.toArray<HTMLElement>("[data-reveal-group]").forEach((group) => {
+      const risers = group.querySelectorAll(".mask > *");
+      const fades = group.querySelectorAll("[data-fade]");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: group, start: "top 82%", once: true },
+      });
+      if (risers.length) {
+        tl.from(risers, {
+          yPercent: 110,
+          duration: 0.9,
+          ease: "power4.out",
+          stagger: 0.09,
+        });
+      }
+      if (fades.length) {
+        tl.from(fades, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0.1);
+      }
+    });
+  } else {
+    // Reduced motion: the hero and panel loops stay on their posters.
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, .cs-screen video").forEach((v) => {
+      v.removeAttribute("autoplay");
+      v.pause();
+      v.currentTime = 0;
+    });
+  }
+
+  // ---- Parcel grid: 100 lots, 1 lot = 1% = 250 shares, 72 funded. The
+  // order is always drawn as at least one lot; lots fill outward from the
+  // edge of the funded block (same timing as the prototype). ----
+  const grid = document.getElementById("plat-grid");
+  const qty = document.getElementById("plat-qty") as HTMLInputElement | null;
+  const out = document.getElementById("plat-qty-out");
+  const read = document.getElementById("plat-read");
+  if (grid && qty && out && read) {
+    const TOTAL = 25000;
+    const PRICE = 50;
+    const PER_LOT = 250;
+    const FUNDED = 72;
+    const lots = Array.from(grid.children) as HTMLElement[];
+    const fmt = new Intl.NumberFormat("en-US");
+    let shown = 1;
+    const update = () => {
+      const n = Number(qty.value);
+      const mine = Math.max(1, Math.ceil(n / PER_LOT));
+      const pct = (n / TOTAL) * 100;
+      const lotWord = mine === 1 ? "lot" : "lots";
+      lots.forEach((el, i) => {
+        const isMine = i >= FUNDED && i < FUNDED + mine;
+        if (isMine !== el.classList.contains("is-mine")) {
+          const step = Math.abs(i - (FUNDED + Math.min(shown, mine)));
+          el.style.transitionDelay = reduce ? "0ms" : `${Math.min(step * 22, 220)}ms`;
+          el.classList.toggle("is-mine", isMine);
+        }
+      });
+      shown = mine;
+      out.textContent = fmt.format(n);
+      grid.setAttribute(
+        "aria-label",
+        `Parcel grid for Verbena Coastal Villa: ${FUNDED} lots funded, ${mine} ${lotWord} for this order, ${100 - FUNDED - mine} available`,
+      );
+      const pctText = pct < 1 ? pct.toFixed(1) : fmt.format(Math.round(pct * 10) / 10);
+      read.innerHTML =
+        `<span class="cs-plat-strong">${fmt.format(n)} shares</span> for $${fmt.format(n * PRICE)} is ` +
+        `${pctText}% of the property, shown as ${mine} ${lotWord}. One lot is 250 shares.`;
+    };
+    qty.addEventListener("input", update);
+  }
+</script>
+
+<style>
+  .content { position: relative; z-index: 1; }
+
+  /* ---- Masked line reveals (same recipe as the homepage) ---- */
+  .mask {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.14em;
+    margin-block-end: -0.14em;
+  }
+  .line { display: block; }
+
+  /* ============================================================
+     Type recipes — EXACT values from the shared case-study format.
+     All Geist 400.
+       display title    52 / 1    / -0.04em
+       body (24-class)  24 / 1.2  / -0.02em   white, .mut spans 65%
+       about statement  24 / 1.15 / -0.02em
+       row label        16 / 1.2  / -0.01em   65%
+       info label       14 / 1.2  / -0.01em   65%
+       info value       14 / 1.48 / -0.01em   white
+       image caption    14 / 1.2  / -0.01em   88%
+       feature title    18 / 1.48 / -0.01em   white
+       feature body     14 / 1.2  / -0.01em   65%
+     ============================================================ */
+  .cs-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-body {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-statement {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .mut { color: rgba(255, 255, 255, 0.65); }
+  .cs-center { text-align: center; text-wrap: balance; }
+  .cs-label {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ilabel {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-ivalue {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+
+  /* ---- 1 · Hero ---- */
+  .cs-hero {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--placeholder);
+  }
+  .cs-hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cs-hero-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(10, 10, 11, 0.25) 0%, rgba(10, 10, 11, 0) 30%, rgba(10, 10, 11, 0) 55%, rgba(10, 10, 11, 0.55) 100%);
+  }
+  /* Edge-hug overlay — the homepage hero's exact padding recipe. */
+  .cs-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(16px, 1.2vw, 20px);
+  }
+  .cs-nav { padding: 0; }
+
+  /* ---- Section rhythm (96 into About, 128 between bands, 64 around
+         intros and label/body rows, 24 between media rows). ---- */
+  .cs-band { padding-block-end: var(--space-8); }
+  .cs-about { padding-block: var(--space-7) var(--space-8); }
+  .cs-row { margin-block-start: var(--space-6); }
+  /* Row that OPENS a band: no top margin, 64 down to what follows. */
+  .cs-row-lead { margin-block-end: var(--space-6); }
+  /* A text row (label/body) hands off to its composed block 48 below. */
+  .cs-row-tight { margin-block-start: var(--space-5); }
+  /* Consecutive media rows in a stack (24 apart, = the gutter). */
+  .cs-stack { margin-block-start: var(--space-3); }
+  .cs-feature { margin-block-start: var(--space-6); }
+  .cs-intro {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 702px;
+    margin-block-end: var(--space-6);
+  }
+  /* Intro variant: centred label ABOVE the body (16 apart), body at the
+     file's 718 measure. */
+  .cs-intro-stack {
+    max-width: 718px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    text-align: center;
+  }
+
+  /* ---- 2 · About ---- */
+  .cs-info {
+    grid-column: 1 / 6;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--gutter);
+    align-content: start;
+  }
+  .cs-tile { display: flex; flex-direction: column; gap: var(--space-1); align-content: start; }
+  .cs-tile-values { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-tile-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-standfirst {
+    grid-column: 8 / 13;
+    max-width: 680px;
+    text-wrap: balance;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    /* One blank line at 24/1.15 — the format separates the paragraphs with a
+       double break, not a spacing token. */
+    gap: 1.15em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
+
+  /* ---- Label / body rows: label cols 1-6, body cols 6-13. ---- */
+  .cs-rowlabel { grid-column: 1 / 6; align-self: start; }
+  .cs-rowbody { grid-column: 6 / 13; text-wrap: balance; }
+  /* Step the body's start line right as the fluid grid outgrows a
+     comfortable measure (same thresholds as the other case studies). */
+  @media (min-width: 1650px) { .cs-rowbody { grid-column: 7 / 13; } }
+  @media (min-width: 1980px) { .cs-rowbody { grid-column: 8 / 13; } }
+  @media (min-width: 2340px) { .cs-rowbody { grid-column: 9 / 13; } }
+  @media (min-width: 2880px) { .cs-rowbody { grid-column: 10 / 13; } }
+  /* Two-paragraph body: one blank line at 24/1.2, not a spacing token. */
+  .cs-rowbody-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    font-size: clamp(18px, 1.67vw, 24px);
+  }
+
+  /* ---- Feature rows (TL;DR's layout: 9-col media + 3-col notes) ---- */
+  .cs-feat-left { grid-column: 1 / 10; }
+  .cs-feat-right { grid-column: 4 / 13; }
+  .cs-feat-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .cs-feat-col-right { grid-column: 10 / 13; }
+  .cs-feat-col-left { grid-column: 1 / 4; grid-row: 1; }
+  .cs-feat-head { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cs-feat-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: #fff;
+  }
+  .cs-feat-body {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-feat-lead {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-feat-list { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-feat-item { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .cs-feat-note { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-bullet { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px; }
+
+  /* ---- Screen panels — light product recordings inset on the cover's
+         Forest plat backdrop. No imposed ratio: the frame sizes from the
+         medium's width/height attrs, so nothing ever crops. The caption
+         rides the bottom padding, clear of the screen. ---- */
+  .cs-screen {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    background: #0a1e19 url("/liquidacre-panel-bg.jpg") center / cover no-repeat;
+  }
+  .cs-screen-frame {
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow:
+      0 0 0 1px rgba(234, 242, 238, 0.14),
+      0 30px 80px -20px rgba(0, 0, 0, 0.55);
+  }
+  .cs-screen-frame > img,
+  .cs-screen-frame > video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cs-screen-wide { grid-column: 1 / 13; }
+  /* Wide screens: a narrower inset so a 16:10 recording doesn't tower over
+     the page (frame ≈ 10 cols, centred on the 12-col panel). */
+  .cs-screen-wide .cs-screen-frame { width: 84%; }
+  .cs-screen-half-left { grid-column: 1 / 7; }
+  .cs-screen-half-right { grid-column: 7 / 13; }
+  .cs-img-caption {
+    position: absolute;
+    left: var(--space-2);
+    bottom: var(--space-2);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  /* ---- 3 · Trust rules (Onyx cards) ---- */
+  .cs-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-3);
+    background: var(--onyx);
+  }
+  .cs-card-text { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-card-num {
+    margin: 0;
+    font-family: var(--font-geist-mono);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.75px;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  /* Titles share a top line across the row (bodies run ragged below). */
+  .cs-rule { grid-column: span 4; justify-content: flex-start; }
+
+  /* ---- 5 · Parcel grid (product-mock internals: the lot geometry and
+         dark-theme lot colours come from the app itself) ---- */
+  .cs-plat {
+    grid-column: 1 / 13;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7);
+    align-items: center;
+    padding: var(--space-7);
+    background: #0a1e19 url("/liquidacre-panel-bg.jpg") center / cover no-repeat;
+    --lot-funded: #0d6f5b;
+    --lot-mine: #2bc59e;
+    --lot-empty: rgba(234, 242, 238, 0.04);
+    --lot-line: rgba(169, 195, 185, 0.24);
+  }
+  .cs-plat-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: clamp(3px, 0.45vw, 6px);
+  }
+  .cs-plat-grid i,
+  .cs-plat-legend i {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    background: var(--lot-empty);
+    box-shadow: inset 0 0 0 1px var(--lot-line);
+    transition:
+      background-color 200ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .cs-plat i.is-funded { background: var(--lot-funded); box-shadow: none; }
+  .cs-plat i.is-mine {
+    background: repeating-linear-gradient(135deg, var(--lot-mine) 0 3px, color-mix(in srgb, var(--lot-mine) 55%, #13221e) 3px 6px);
+    box-shadow: none;
+  }
+  .cs-plat-side { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+  .cs-plat-head { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-plat-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .cs-plat-sub,
+  .cs-plat-read {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Two lines reserved so the legend doesn't jump as the readout rewraps. */
+  .cs-plat-read { min-height: 2.7em; }
+  .cs-plat-read :global(.cs-plat-strong) { color: #fff; }
+  .cs-plat-control { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-plat-label {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-plat-label output { color: rgba(255, 255, 255, 0.65); font-variant-numeric: tabular-nums; }
+  .cs-plat-control input[type="range"] {
+    width: 100%;
+    min-height: 32px;
+    margin: 0;
+    accent-color: var(--lot-mine);
+    cursor: pointer;
+  }
+  .cs-plat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-plat-legend li { display: inline-flex; align-items: center; gap: var(--space-1); }
+  .cs-plat-legend i { width: 14px; height: 14px; border-radius: 3px; }
+  .cs-plat-legend i.is-mine {
+    background: repeating-linear-gradient(135deg, var(--lot-mine) 0 2px, color-mix(in srgb, var(--lot-mine) 55%, #13221e) 2px 4px);
+  }
+
+  /* Where the grid shows up: one-row strips, 3-up. */
+  .cs-use {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .cs-strip {
+    display: grid;
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+    gap: 2px;
+    margin-block-end: var(--space-1);
+  }
+  .cs-strip i {
+    height: 8px;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+  .cs-strip i.is-funded { background: #0d6f5b; box-shadow: none; }
+  .cs-strip i.is-mine { background: #2bc59e; box-shadow: none; }
+
+  /* ---- 8 · System: palette chips (6-up) + naming table (4-up) ---- */
+  .cs-swatch {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .cs-swatch-chip {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-2);
+    margin-block-end: var(--space-1);
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+  .cs-swatch-hex {
+    margin: 0;
+    font-family: var(--font-geist-mono);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.75px;
+    color: #fff;
+  }
+  .cs-word {
+    grid-column: span 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--hairline);
+  }
+  .cs-word-dd { margin: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-word-now {
+    margin: 0;
+    font-size: clamp(18px, 1.67vw, 24px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cs-word-was {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--cream-39);
+    text-decoration-thickness: 1px;
+  }
+
+  /* ---- 9 · Motion table — 3 / 4 / 5 of the macro grid ---- */
+  .cs-motion {
+    grid-column: 1 / 13;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .cs-motion th,
+  .cs-motion td {
+    text-align: left;
+    vertical-align: top;
+    font-weight: 400;
+    padding: var(--space-3) var(--space-3) var(--space-3) 0;
+    border-block-end: 1px solid var(--hairline);
+  }
+  .cs-motion thead th { padding-block: 0 var(--space-2); }
+  .cs-motion th:first-child { width: 25%; }
+  .cs-motion td:nth-child(2), .cs-motion thead th:nth-child(2) { width: 33.333%; }
+  .cs-motion-screen {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-motion-cell {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .cs-motion-mut { color: rgba(255, 255, 255, 0.65); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cs-plat-grid i { transition: none; }
+  }
+
+  /* ---- Responsive: collapse to single column under 900px ---- */
+  @media (max-width: 900px) {
+    .cs-info, .cs-standfirst,
+    .cs-rowlabel, .cs-rowbody,
+    .cs-feat-left, .cs-feat-right,
+    .cs-feat-col-left, .cs-feat-col-right,
+    .cs-screen-wide, .cs-screen-half-left, .cs-screen-half-right,
+    .cs-rule, .cs-use, .cs-plat { grid-column: 1 / -1; }
+    .cs-feat-col-left { grid-row: auto; }
+    /* Media leads the stacked feature rows (image-right features carry
+       their screen second in DOM). */
+    .cs-feat-right { order: -1; }
+    /* Screens fill the panel; the caption drops into flow beneath. */
+    .cs-screen { flex-direction: column; padding: var(--space-3); }
+    .cs-screen-wide .cs-screen-frame { width: 100%; }
+    .cs-img-caption { position: static; align-self: flex-start; margin-block-start: var(--space-2); }
+    .cs-card { gap: var(--space-4); }
+    .cs-plat {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+      padding: var(--space-3);
+    }
+    .cs-swatch { grid-column: span 4; }
+    .cs-word { grid-column: span 6; }
+    /* Motion table → stacked rows: screen name over its two lines. */
+    .cs-motion thead { display: none; }
+    .cs-motion, .cs-motion tbody, .cs-motion tr, .cs-motion th, .cs-motion td { display: block; width: auto !important; }
+    .cs-motion tr { padding-block: var(--space-3); border-block-end: 1px solid var(--hairline); }
+    .cs-motion th, .cs-motion td { padding: 0; border: 0; }
+    .cs-motion td { margin-block-start: var(--space-1); }
+  }
+  @media (max-width: 640px) {
+    .cs-swatch { grid-column: span 6; }
+    .cs-word { grid-column: 1 / -1; }
+  }
+</style>
+
+<style is:global>
+  /* Case-study selection tint (LiquidAcre Forest + Mint): overrides the
+     site-wide charcoal band — page CSS loads after global.css, so this wins
+     here and ships only with this page. */
+  ::selection {
+    background: #0f2a23;
+    color: #2bc59e;
+    text-shadow: 0 0 12px rgba(43, 197, 158, 0.4);
+  }
+</style>

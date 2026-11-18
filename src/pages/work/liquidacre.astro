@@ -200,7 +200,7 @@ const motion = [
     </section>
 
     <!-- 3 · Where trust gets lost. Label/body row opening the band, then the
-         rules as a 3-up row of Onyx cards. -->
+         rules as index rows on the same label/body columns. -->
     <section class="cs-band">
       <div class="content-grid">
         <div class="full-composed cs-row-lead" data-reveal-group>
@@ -220,15 +220,17 @@ const motion = [
       </div>
       <div class="content-grid">
         <div class="full-composed" data-reveal-group>
-          {rules.map((r, i) => (
-            <div class="cs-card cs-rule" data-fade>
-              <p class="cs-card-num">{String(i + 1).padStart(2, "0")}</p>
-              <div class="cs-card-text">
-                <span class="mask"><p class="cs-feat-title">{r.title}</p></span>
-                <span class="mask"><p class="cs-feat-body">{r.body}</p></span>
-              </div>
-            </div>
-          ))}
+          <ol class="cs-index">
+            {rules.map((r, i) => (
+              <li class="cs-index-row" data-fade>
+                <p class="cs-rowlabel cs-index-label">
+                  <span class="cs-index-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span>{r.title}</span>
+                </p>
+                <p class="cs-rowbody cs-index-body">{r.body}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -984,18 +986,44 @@ const motion = [
     color: rgba(255, 255, 255, 0.88);
   }
 
-  /* ---- 3 · Trust rules (Onyx cards) ---- */
-  .cs-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--space-5);
-    padding: var(--space-3);
-    background: var(--onyx);
-  }
-  .cs-card-text { display: flex; flex-direction: column; gap: var(--space-1); }
-  .cs-card-num {
+  /* ---- 3 · Trust rules: an index on the page's own label/body columns.
+         Each row is a subgrid of the 12 columns, so .cs-rowlabel and
+         .cs-rowbody (and their wide-screen steps) place it unchanged. ---- */
+  .cs-index {
+    grid-column: 1 / -1;
     margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: subgrid;
+    border-block-end: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .cs-index-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-block-start: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .cs-index-label,
+  .cs-index-body {
+    margin: 0;
+    align-self: baseline;
+    display: flex;
+    align-items: baseline;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .cs-index-label { gap: var(--space-3); color: #fff; }
+  .cs-index-body {
+    justify-content: space-between;
+    gap: var(--space-3);
+    text-wrap: pretty; /* .cs-rowbody balances, which halves short lines */
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-index-num {
     font-family: var(--font-geist-mono);
     font-weight: 300;
     font-size: 12px;
@@ -1003,8 +1031,6 @@ const motion = [
     letter-spacing: 0.75px;
     color: rgba(255, 255, 255, 0.65);
   }
-  /* Titles share a top line across the row (bodies run ragged below). */
-  .cs-rule { grid-column: span 4; justify-content: flex-start; }
 
   /* ---- 5 · Parcel grid (product-mock internals: the lot geometry and
          dark-theme lot colours come from the app itself) ---- */
@@ -1216,7 +1242,7 @@ const motion = [
     .cs-feat-left, .cs-feat-right,
     .cs-feat-col-left, .cs-feat-col-right,
     .cs-screen-wide, .cs-screen-half-left, .cs-screen-half-right,
-    .cs-rule, .cs-use, .cs-plat { grid-column: 1 / -1; }
+    .cs-use, .cs-plat { grid-column: 1 / -1; }
     .cs-feat-col-left { grid-row: auto; }
     /* Media leads the stacked feature rows (image-right features carry
        their screen second in DOM). */
@@ -1225,7 +1251,8 @@ const motion = [
     .cs-screen { flex-direction: column; padding: var(--space-3); }
     .cs-screen-wide .cs-screen-frame { width: 100%; }
     .cs-img-caption { position: static; align-self: flex-start; margin-block-start: var(--space-2); }
-    .cs-card { gap: var(--space-4); }
+    /* Index rows stack number over title over body. */
+    .cs-index-label { flex-direction: column; gap: var(--space-1); }
     .cs-plat {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-5);

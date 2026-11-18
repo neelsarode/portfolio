@@ -5,20 +5,26 @@ import GridLines from "../../components/GridLines.astro";
 import DevGrid from "../../components/DevGrid.astro";
 import MoreWork from "../../components/MoreWork.astro";
 import MobileVideoSwap from "../../components/MobileVideoSwap.astro";
-// TL;DR case study (Figma 2548:24573). Typography is copied EXACTLY from the
-// file (sizes, line-heights, tracking, the muted/white emphasis rhythm);
-// spacing and columns are mapped onto the site system — the design's 1296px
-// container IS the 12-col macro grid at 1440 (col 86 + gutter 24), so every
-// media width in the file lands on a whole column span:
-//   746 = 7 cols · 526 = 5 cols · 636 = 6 cols · wide = 12 cols.
-// The one exception is the TwitchCon pair (360/912), which sits off-grid in
-// the file and is approximated to 4/8 cols.
+// TL;DR case study. The hero, About, Front-End Builds and Brand & Marketing
+// bands come from Figma 2548:24573: typography copied exactly, spacing and
+// columns mapped onto the site's 12-col macro grid. The page is split into
+// three chapters under a sticky tab bar (Overview · Product Design ·
+// Front-End Builds · Brand & Marketing):
 //
-// Media policy: the Brand row is real — left panel is an exported image, the
-// right panel is the Twitch extension REBUILT AS HTML over the prism
-// backdrop (interim image; swap in the background video when supplied).
-// Every other panel is a placeholder slot (the file leaves them empty)
-// awaiting real screenshots/loops — same drop-in flow as the homepage covers.
+//   Product Design   — the product case study Neel supplied (tldr-case-study
+//                      .zip): three calls, the dashboard, live clipping, the
+//                      product's visual language, clip-to-post. Replaces the
+//                      old Product Design band.
+//   Front-End Builds — the old Feature Builds band, unchanged.
+//   Brand & Marketing — the old Brand, Website and TwitchCon bands, unchanged.
+//
+// Product UI panels: the screens are snapshots of the TL;DR prototype's own
+// markup + CSS (public/tldr-ui/*.html), fetched on approach and mounted in a
+// shadow root so neither stylesheet leaks into the other, then scaled from
+// their 1600px layout to the panel width via --k. Each screen sits on a
+// TL;DR pixel-texture panel (public/tldr-panel-bg-*.jpg). These are composed
+// panels: the app window deliberately runs off the panel edge, so they keep
+// their 4:3 box on mobile like the extension mock does.
 
 const info = [
   {
@@ -51,6 +57,51 @@ const streamhubFeatures = [
   "Drag and drop canvas to position and resize sub account livestreams",
   "Manual clipping button per sub account livestream",
   "Ability to toggle on & off subaccounts in the canvas view",
+];
+
+// ---- Product Design chapter (copy from the supplied case study) ----
+// The three calls; each card jumps to its section.
+const calls = [
+  { id: "d-rhythm", title: "Built for the minutes around a stream", body: "Every question in a fixed place, for quick check-ins." },
+  { id: "d-live", title: "Clips arrive while you’re still live", body: "Each clip shows up as it lands, not after the VOD." },
+  { id: "d-twitch", title: "At home next to Twitch", body: "Twitch’s visual language, with a mark of its own." },
+];
+
+// The dashboard's four questions — numbered to match the pins on the screen.
+const dashQuestions = [
+  { q: "Is TL;DR seeing my stream?", a: "Before going live, the status banner says so, with support one click away." },
+  { q: "What posts when I go live?", a: "StreamSignal shows the post and where it goes." },
+  { q: "How did that one go?", a: "Views, clips and chat activity from the last stream." },
+  { q: "What’s going out next?", a: "Upcoming posts, by day." },
+];
+
+// Where each question lives on the dashboard: % of the app window, measured
+// from the snapshot. r is the card's corner radius in cqw of the window
+// (1cqw = 16px at the snapshot's 1600px width). spotVars feeds the spotlight.
+const dashRegions = [
+  { l: 3.06, t: 13.7, w: 42.55, h: 13.29, r: 1 }, // status banner
+  { l: 48.67, t: 11.2, w: 49.84, h: 25.34, r: 1.5 }, // StreamSignal
+  { l: 3.06, t: 28.99, w: 42.55, h: 46.05, r: 1 }, // stat tiles + chat activity
+  { l: 48.67, t: 38.94, w: 49.84, h: 38.6, r: 1.5 }, // upcoming posts
+];
+const spotVars = (r: (typeof dashRegions)[number]) =>
+  `--l:${r.l}%;--t:${r.t}%;--w:${r.w}%;--h:${r.h}%;--r:${r.r}cqw`;
+
+const libraryNotes = [
+  { title: "A score on every clip", body: "Clip Score, 0 to 100, so the best moments stand out." },
+  { title: "How it was caught", body: "AI Clip, or Voice Clip with the words that triggered it, like “Clip that”." },
+  { title: "Straight to editing", body: "Edit Clip sits on every card." },
+];
+
+// Product palette — fills/ink are the product's own colours, not site tokens.
+const swatches = [
+  { name: "Primary", fill: "#9851FB", ink: "#FFFFFF", hex: "#9851FB", use: "Actions, selection and Pro. A neighbour of Twitch’s #9146FF." },
+  { name: "Lilac", fill: "#C197FF", ink: "#15131A", hex: "#C197FF", use: "The logo’s pixels, the one break from white." },
+  // The product's bg-fancy-gradient-2, copied exactly (the You're Live badge).
+  { name: "Gradient", fill: "radial-gradient(60% 140% at 70% 125%, #3112f5 0%, rgba(0, 0, 0, 0) 80%), radial-gradient(59.09% 164.65% at -20% 10%, #3a33ff 10%, rgba(0, 0, 0, 0) 100%), radial-gradient(57.81% 391.02% at 25.57% 34.38%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%), #c262fd", ink: "#FFFFFF", hex: "#C262FD #3A33FF #3112F5", use: "Moments worth celebrating, like the You’re Live badge." },
+  { name: "Live", fill: "#F03D3D", ink: "#FFFFFF", hex: "#F03D3D", use: "Live badges and errors, and nothing else." },
+  { name: "Surface", fill: "#070707", ink: "#FFFFFF", ring: "rgba(255,255,255,0.12)", hex: "#070707 to #272727", use: "Five steps from the page up to modals. Never pure black." },
+  { name: "Text", fill: "#FFFFFF", ink: "#15131A", ring: "rgba(21,19,26,0.12)", hex: "100 72 48 32%", use: "White at four levels of emphasis instead of extra greys." },
 ];
 
 ---
@@ -101,8 +152,31 @@ const streamhubFeatures = [
       </div>
     </section>
 
+
+    <!-- Chapters wrapper: holds the tab bar and everything it indexes, so the
+         sticky bar lets go when the chapters end (before More Work). -->
+    <div class="cs-chapters">
+      <!-- Section tabs — in flow under the hero, then sticky at the top.
+           The sentinel tells the script when the bar has stuck (the project
+           name fades in then). Short labels swap in on narrow screens. -->
+      <div class="cs-tabs-sentinel" aria-hidden="true"></div>
+      <nav class="cs-tabs" aria-label="Case study sections">
+        <div class="content-grid">
+          <div class="full-composed cs-tabs-row">
+            <p class="cs-tabs-name" aria-hidden="true">TL;DR</p>
+            <div class="cs-tabs-list">
+              <a class="cs-tab" href="#overview" aria-current="true">Overview</a>
+              <a class="cs-tab" href="#product"><span class="cs-tab-long">Product Design</span><span class="cs-tab-short">Product</span></a>
+              <a class="cs-tab" href="#builds"><span class="cs-tab-long">Front-End Builds</span><span class="cs-tab-short">Front-End</span></a>
+              <a class="cs-tab" href="#brand"><span class="cs-tab-long">Brand &amp; Marketing</span><span class="cs-tab-short">Brand</span></a>
+              <span class="cs-tabs-ink" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
     <!-- 2 · About — info tiles (cols 1-6) + standfirst (cols 7-13). -->
-    <section class="cs-band cs-about">
+    <section class="cs-band cs-about" id="overview" aria-label="Overview">
       <div class="content-grid">
         <div class="full-composed">
           <div class="cs-info" data-reveal-group>
@@ -158,6 +232,482 @@ const streamhubFeatures = [
       </div>
     </section>
 
+
+    <!-- ================================================================
+         CHAPTER · Product Design — the supplied product case study.
+         ================================================================ -->
+    <section class="cs-chapter" id="product" aria-labelledby="ch-product">
+      <div class="content-grid">
+        <header class="full-composed cs-chapter-head" data-reveal-group>
+          <span class="cs-chapter-rule" aria-hidden="true"></span>
+          <span class="mask cs-rowlabel"><h2 class="cs-chapter-title" id="ch-product">Product Design</h2></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">Product design at TL;DR wasn’t just hand-off work.</span>
+            I made most feature and UX direction calls, deciding not just how
+            things looked but what got built and why.
+          </p></span>
+        </header>
+      </div>
+
+      <!-- Three calls — label/body row, then the three calls as index rows
+           on the same columns, each jumping to its section below. -->
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed cs-row-lead" data-reveal-group>
+            <span class="mask cs-rowlabel"><p class="cs-label">Three calls from the start</p></span>
+            <span class="mask cs-rowbody"><p class="cs-body">
+              <span class="mut">Short clips are how streams find new viewers, and
+              most streamers have no time to make them.</span> Three calls made at
+              the start shaped everything after.
+            </p></span>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            <div class="cs-index">
+              {calls.map((c, i) => (
+                <a class="cs-index-row" href={`#${c.id}`} data-fade data-cursor-label="Jump to section ↓">
+                  <span class="cs-rowlabel cs-index-label">
+                    <span class="cs-mono">{String(i + 1).padStart(2, "0")}</span>
+                    <span>{c.title}</span>
+                  </span>
+                  <span class="cs-rowbody cs-index-body">
+                    <span>{c.body}</span>
+                    <svg class="cs-index-arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M1.5 6.5 6 11l4.5-4.5" /></svg>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 01 · Built for the minutes around a stream — dashboard screen
+           (left 9 cols) with a spotlight that steps through the four
+           questions it answers (right). -->
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed cs-row-lead" id="d-rhythm" data-reveal-group>
+            <div class="cs-rowlabel cs-rowlabel-stack">
+              <span class="mask"><p class="cs-mono">01</p></span>
+              <span class="mask"><p class="cs-label">Built for the minutes around a stream</p></span>
+            </div>
+            <span class="mask cs-rowbody"><p class="cs-body">
+              <span class="mut">Streamers don’t sit in TL;DR.</span> They open it
+              before going live, between sessions and right after, next to OBS
+              and Twitch. So the dashboard is dark, fast to scan, and every
+              question has a fixed place.
+            </p></span>
+          </div>
+        </div>
+        <div class="content-grid">
+          <!-- The list drives the screen: the active question's area stays
+               lit while the rest of the window dims. -->
+          <div class="full-composed cs-dash" data-reveal-group>
+            <figure class="cs-screen cs-bg-1 cs-scr-left" data-fade>
+              <div class="cs-shot" style="--x:6%;--y:9%;--w:124%">
+                <div class="cs-frame">
+                  <div class="cs-ui" data-ui="dash" style="aspect-ratio:1600/1000" role="img" aria-label="The TL;DR dashboard between streams: the status banner, which says Start Your Stream to Generate Clips and offers support if TL;DR missed the stream; StreamSignal, showing the socials and platforms it posts to; views, clips and the chat activity chart from the last stream; and Upcoming Scheduled Posts, listed by day."></div>
+                  <span class="cs-spot" aria-hidden="true" style={spotVars(dashRegions[0])}></span>
+                </div>
+              </div>
+              <figcaption class="cs-cap">The dashboard between streams</figcaption>
+            </figure>
+            <div class="cs-feat-col cs-feat-col-right">
+              <div class="cs-feat-head">
+                <span class="mask"><h3 class="cs-feat-title">Dashboard</h3></span>
+                <span class="mask"><p class="cs-feat-body">
+                  One screen answers the four questions a streamer brings to it,
+                  each in the same place every time.
+                </p></span>
+              </div>
+              <ol class="cs-qa">
+                {dashQuestions.map((q, i) => (
+                  <li class={`cs-qa-item${i === 0 ? " is-active" : ""}`} data-i={i + 1} data-spot={spotVars(dashRegions[i])} tabindex="0">
+                    <span class="cs-mono cs-qa-n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                    <div class="cs-qa-text">
+                      <span class="mask"><p class="cs-feat-lead">{q.q}</p></span>
+                      <span class="mask"><p class="cs-feat-body">{q.a}</p></span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 · Clips arrive while you're still live — the chat-activity demo,
+           the Video Library (notes left, animated screen right), then the
+           live dashboard + StreamSignal pair. -->
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed cs-row-lead" id="d-live" data-reveal-group>
+            <div class="cs-rowlabel cs-rowlabel-stack">
+              <span class="mask"><p class="cs-mono">02</p></span>
+              <span class="mask"><p class="cs-label">Clips arrive while you’re still live</p></span>
+            </div>
+            <div class="cs-rowbody cs-rowbody-stack">
+              <span class="mask"><p class="cs-body">
+                <span class="mut">TL;DR was the first to clip a stream while it’s
+                happening, not from the VOD afterwards.</span> So the product
+                shows each clip as it lands: when it happened, how it was caught
+                and how good it is.
+              </p></span>
+              <span class="mask"><p class="cs-body">
+                <span class="mut">A stream’s best moments show up in its chat.</span>
+                Try it on the stream below.
+              </p></span>
+            </div>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            <div class="tl-chat" id="chat" data-fade>
+              <div class="tl-plot" id="plot">
+                <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path id="chat-line" d=""></path></svg>
+                <div class="tl-guide" id="chat-guide"></div>
+                <div id="chat-marks"></div>
+                <div class="tl-dot" id="chat-dot"></div>
+                <input type="range" id="chat-range" min="0" max="35" step="1" value="35" aria-label="Position in the example stream" />
+              </div>
+              <div class="tl-side">
+                <div class="tl-head" aria-hidden="true">
+                  <p class="tl-num" id="chat-num">0</p>
+                  <p class="tl-sub"><span id="chat-unit">chats in total</span></p>
+                  <p class="tl-sub" id="chat-sub">Example stream, 3 hours</p>
+                </div>
+                <p class="tl-clipread" id="chat-clip" aria-live="polite"></p>
+                <ul class="tl-legend">
+                  <li><i></i>AI clip</li>
+                  <li><i class="tl-voice"></i>Voice clip</li>
+                </ul>
+              </div>
+              <p class="cs-cap tl-chat-cap">Clip markers are added for this page. In the product, the chart is only the line.</p>
+              <div class="tl-sr"><table id="chat-table"><caption>Chat activity in the example stream, per five minutes</caption><thead><tr><th scope="col">Time into stream</th><th scope="col">Chats</th><th scope="col">Clip</th></tr></thead><tbody></tbody></table></div>
+            </div>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed cs-feature" data-reveal-group>
+            <div class="cs-feat-col cs-feat-col-left">
+              <div class="cs-feat-head">
+                <span class="mask"><h3 class="cs-feat-title">Video Library</h3></span>
+                <span class="mask"><p class="cs-feat-body">
+                  Clips land here mid-stream, grouped by the stream they came from.
+                </p></span>
+              </div>
+              <ul class="cs-qa">
+                {libraryNotes.map((n) => (
+                  <li class="cs-qa-item">
+                    <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                    </svg>
+                    <div class="cs-qa-text">
+                      <span class="mask"><p class="cs-feat-lead">{n.title}</p></span>
+                      <span class="mask"><p class="cs-feat-body">{n.body}</p></span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <figure class="cs-screen cs-bg-5 cs-scr-right" data-fade>
+              <div class="cs-shot" style="--x:6%;--y:8%;--w:115%">
+                <div class="cs-frame"><div class="cs-ui" data-ui="library" data-anim="clips" style="aspect-ratio:1600/1400" role="img" aria-label="The Video Library: a Pro access banner, Group by Date or Stream, then today's livestream with clip cards for Insane 1v5 clutch moment (Voice Clip, wake words Clip that, Clip Score 92), Boss kill on hardcore mode (AI Clip, 74) and Chat loses it after this play (AI Clip, 88), each with views, time, platform, Edit Clip and Save to Library."></div></div>
+              </div>
+              <button class="cs-abtn" type="button" aria-pressed="false" hidden>Pause</button>
+              <figcaption class="cs-cap">Today’s stream, clipped while it was live</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed cs-feature" data-reveal-group>
+            <figure class="cs-screen cs-bg-3 cs-scr-half-l" data-fade>
+              <div class="cs-shot" style="--x:3.2%;--y:10%;--w:190%">
+                <div class="cs-frame"><div class="cs-ui" data-ui="live" data-anim="live" style="aspect-ratio:1600/1000" role="img" aria-label="The dashboard during a stream, zoomed in on its top left: a You're Live badge with the Twitch icon, the title You're Live on Twitch!, the line We're actively clipping your best highlights as you stream, and stat tiles for 48,219 views, 86 clips and 24 voice clips."></div></div>
+              </div>
+              <button class="cs-abtn" type="button" aria-pressed="false" hidden>Pause</button>
+              <figcaption class="cs-cap">Mid-stream, the dashboard says TL;DR is clipping</figcaption>
+            </figure>
+            <figure class="cs-screen cs-bg-4 cs-scr-half-r" data-fade>
+              <div class="cs-shot" style="--x:7%;--y:10%;--w:130%">
+                <div class="cs-frame">
+                  <video
+                    src="/tldr-streamsignal-loop.mp4" width="1920" height="1200"
+                    poster="/tldr-streamsignal-poster.jpg"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    tabindex="-1"
+                    aria-label="The StreamSignal page. The cursor picks different webcam frame shapes and layouts, and the vertical preview of the post rearranges to match each choice."
+                  ></video>
+                </div>
+              </div>
+              <figcaption class="cs-cap">StreamSignal posts the first clip while you’re still live</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 · At home next to Twitch — palette, then the pixel logotype and
+           the condensed display face on the Pro banner. -->
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed cs-row-lead" id="d-twitch" data-reveal-group>
+            <div class="cs-rowlabel cs-rowlabel-stack">
+              <span class="mask"><p class="cs-mono">03</p></span>
+              <span class="mask"><p class="cs-label">At home next to Twitch</p></span>
+            </div>
+            <div class="cs-rowbody cs-rowbody-stack">
+              <span class="mask"><p class="cs-body">
+                <span class="mut">TL;DR started as an extension inside Twitch,
+                installed 35,000+ times.</span> So it borrows what streamers
+                already trust, a purple close to Twitch’s on dark surfaces, and
+                adds a pixel logotype of its own.
+              </p></span>
+              <span class="mask"><p class="cs-body">
+                <span class="mut">Everything is tuned for a dark room.</span> Five
+                surface steps carry depth, and type is Open Sauce Two at two
+                weights.
+              </p></span>
+            </div>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            {swatches.map((s) => (
+              <div class="cs-swatch" data-fade>
+                <div class="cs-chip" style={`background:${s.fill};color:${s.ink}${s.ring ? `;box-shadow:inset 0 0 0 1px ${s.ring}` : ""}`}>{s.name}</div>
+                <p class="cs-mono cs-swatch-hex">{s.hex}</p>
+                <p class="cs-feat-body">{s.use}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed cs-feature" data-reveal-group>
+            <figure class="cs-screen cs-bg-3 cs-dim cs-scr-half-l" data-fade>
+              <div class="cs-mark">
+                <svg viewBox="0 0 96 26" fill="none" role="img" aria-label="TL;DR pixel logotype">
+                  <path d="M81.8976 13.4829H90.2919V18.9057H81.8976V26H76.2891V0H90.2919V5.38572H81.8976V13.4829ZM95.9005 13.4829H90.2919V5.38572H95.9005V13.4829ZM95.9005 26H90.2919V18.9057H95.9005V26Z" fill="#FFFFFF"/>
+                  <path d="M53.2197 26V0H66.7769V5.38572H72.1626V26H53.2197ZM66.554 5.38572H58.8283V20.6143H66.554V5.38572Z" fill="#FFFFFF"/>
+                  <rect x="42.0254" width="6.60333" height="6.60333" fill="#C197FF"/>
+                  <rect x="42.0254" y="12.7944" width="6.60333" height="6.60333" fill="#C197FF"/>
+                  <rect x="45.3281" y="19.3965" width="3.30167" height="6.60333" fill="#C197FF"/>
+                  <path d="M28.2717 20.6143H22.6631V0H28.2717V20.6143ZM39.4145 26H28.2717V20.6143H39.4145V26Z" fill="#FFFFFF"/>
+                  <path d="M0.5 0H20.4829V5.38572H13.3143V26H7.70571V5.38572H0.5V0Z" fill="#FFFFFF"/>
+                </svg>
+              </div>
+              <figcaption class="cs-cap">A pixel logotype, at home inside Twitch’s world</figcaption>
+            </figure>
+            <figure class="cs-screen cs-bg-1 cs-scr-half-r" data-fade>
+              <div class="cs-shot" style="--x:-80.4%;--y:21%;--w:175%">
+                <div class="cs-frame"><div class="cs-ui" data-ui="library" style="aspect-ratio:1600/1400" role="img" aria-label="The top of the Video Library, zoomed in on the You have Pro access banner: the words in a tall condensed display face with a lilac gradient, meters for unlimited clips per day and unlimited storage, and a glossy purple crown."></div></div>
+              </div>
+              <figcaption class="cs-cap">Big moments get a condensed display face</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- From clip to post — centred intro, then the editor and scheduler. -->
+      <section class="cs-band">
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            <div class="cs-intro cs-intro-stack">
+              <span class="mask"><p class="cs-label">From clip to post</p></span>
+              <span class="mask"><p class="cs-body cs-center">
+                <span class="mut">After the stream, the best clips go out.</span>
+                Edit them into vertical video, then schedule them across
+                platforms, without leaving TL;DR.
+              </p></span>
+            </div>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="full-composed" data-reveal-group>
+            <figure class="cs-screen cs-bg-2 cs-scr-half-l" data-fade>
+              <div class="cs-shot" style="--x:5%;--y:5%;--w:115%">
+                <div class="cs-frame"><img src="/tldr-ui-editor.jpg" width="2400" height="1726" loading="lazy" decoding="async" alt="The clip editor: a 16:9 gameplay clip with a vertical crop box over the middle and the webcam on the right, play and zoom controls, a timeline of frames with purple trim handles, a Process Clip button, and Clip Settings for webcam frame, layout, logo and clip style." /></div>
+              </div>
+              <figcaption class="cs-cap">Crop to vertical and place the webcam</figcaption>
+            </figure>
+            <figure class="cs-screen cs-bg-4 cs-scr-half-r" data-fade>
+              <div class="cs-shot" style="--x:7%;--y:11%;--w:132%">
+                <div class="cs-frame"><div class="cs-ui" data-ui="sched" style="aspect-ratio:1600/1000" role="img" aria-label="The Scheduler in calendar view for November 2026, with scheduled posts on many days, each showing a time, platform icons and a clip title."></div></div>
+              </div>
+              <figcaption class="cs-cap">A month of posts at a glance</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================================================================
+         CHAPTER · Front-End Builds — the old Feature Builds band; its
+         intro line now opens the chapter.
+         ================================================================ -->
+    <section class="cs-chapter" id="builds" aria-labelledby="ch-builds">
+      <div class="content-grid">
+        <header class="full-composed cs-chapter-head" data-reveal-group>
+          <span class="cs-chapter-rule" aria-hidden="true"></span>
+          <span class="mask cs-rowlabel"><h2 class="cs-chapter-title" id="ch-builds">Front-End Builds</h2></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">Every handoff lost something - spacing, states, motion.
+            So I cut the handoff: </span>Now I build my designs in React myself,
+            working with Claude Code and MCP tooling to ship accurate, functional
+            front-end at speed. Product development sped up by multiples.
+          </p></span>
+        </header>
+      </div>
+      <section class="cs-band">
+      <div class="content-grid">
+        <div class="full-composed" data-reveal-group>
+          <div class="cs-img cs-pair-half-left" data-fade>
+            <video
+              src="/tldr-figma-loop.mp4" width="1080" height="1080"
+              poster="/tldr-figma-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-badge">Before</p>
+            <p class="cs-img-caption">Figma files</p>
+            <p class="cs-hover-note">Every feature started as a full Figma flow — screens, states, and edge cases specced before any code.</p>
+          </div>
+          <div class="cs-img cs-pair-half-right" data-fade>
+            <video
+              src="/tldr-prototype-loop.mp4" width="1080" height="1080"
+              poster="/tldr-prototype-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+            <p class="cs-img-badge">After</p>
+            <p class="cs-img-caption">React prototype dashboard</p>
+            <p class="cs-hover-note">The same flows rebuilt as a working React dashboard — spacing, states, and motion carried over intact.</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="full-composed cs-row" data-reveal-group>
+          <span class="mask cs-rowlabel"><p class="cs-label">Feature Builds</p></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            Building front-end myself changed what I could take on. Instead of
+            designing features for someone else to build, I started ideating full
+            features and building them myself. Both featured in-depth below.
+          </p></span>
+        </div>
+      </div>
+
+      <!-- Feature: My TL:DR — image left, spec column right. -->
+      <div class="content-grid">
+        <div class="full-composed cs-feature" data-reveal-group>
+          <div class="cs-img cs-feat-img-left" data-fade>
+            <video
+              src="/tldr-mytldr-loop.mp4" width="1920" height="1440"
+              poster="/tldr-mytldr-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+          <div class="cs-feat-col cs-feat-col-right">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">My TL;DR</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                I designed and built out a fully functional prototyped version of My
+                TL;DR, an upgraded link-in-bio product specifically targeted towards
+                live streamers, while keeping everything inline with the TL;DR brand.
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
+              {myTldrFeatures.map((f) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <p class="cs-feat-body">{f}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature: Streamhub — spec column left, image right. -->
+      <div class="content-grid">
+        <div class="full-composed cs-feature" data-reveal-group>
+          <div class="cs-feat-col cs-feat-col-left">
+            <div class="cs-feat-head">
+              <span class="mask"><h3 class="cs-feat-title">Streamhub</h3></span>
+              <span class="mask"><p class="cs-feat-body">
+                I also designed and built out Streamhub for our B2B users, giving a
+                master account the ability to watch all the sub accounts streams
+                simultaneously on a customizable canvas
+              </p></span>
+            </div>
+            <div class="cs-feat-list">
+              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
+              {streamhubFeatures.map((f) => (
+                <div class="cs-feat-item">
+                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
+                  </svg>
+                  <p class="cs-feat-body">{f}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="cs-img cs-feat-img-right" data-fade>
+            <video
+              src="/tldr-streamhub-loop.mp4" width="1920" height="1440"
+              poster="/tldr-streamhub-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="-1"
+              aria-hidden="true"
+            ></video>
+          </div>
+        </div>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================================================================
+         CHAPTER · Brand & Marketing — the old Brand, Website and TwitchCon
+         bands, unchanged.
+         ================================================================ -->
+    <section class="cs-chapter" id="brand" aria-labelledby="ch-brand">
+      <div class="content-grid">
+        <header class="full-composed cs-chapter-head" data-reveal-group>
+          <span class="cs-chapter-rule" aria-hidden="true"></span>
+          <span class="mask cs-rowlabel"><h2 class="cs-chapter-title" id="ch-brand">Brand &amp; Marketing</h2></span>
+          <span class="mask cs-rowbody"><p class="cs-body">
+            <span class="mut">Before there was a dashboard, there was the brand.</span>
+            The identity, the website that sold the product, and the decks and
+            booths that took it to TwitchCon.
+          </p></span>
+        </header>
+      </div>
     <!-- 3 · Brand — final media: brand panel (5 cols) + the extension panel
          (7 cols) rebuilt in HTML, then The Brand System row. -->
     <section class="cs-band">
@@ -321,296 +871,6 @@ const streamhubFeatures = [
       </div>
     </section>
 
-    <!-- 5 · Product Design -->
-    <section class="cs-band">
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <span class="mask cs-intro"><p class="cs-body cs-center">
-            <span class="mut">Product design at TL;DR wasn’t just hand-off work. </span>
-            I made most feature and UX direction calls, deciding not just how things
-            looked but what features got built and why.
-          </p></span>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <div class="cs-img cs-img-wide" data-fade>
-            <video
-              src="/tldr-timeline-loop.mp4" width="1920" height="1080"
-              poster="/tldr-timeline-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          <span class="mask cs-rowlabel"><p class="cs-label">Product Design</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">
-            I designed the platform around the idea that streamers use TL;DR around
-            their streams - before going live, between sessions, and in the minutes
-            after ending. The UI was built for that rhythm: fast to scan and
-            dark-native alongside OBS and Twitch. I placed key components in
-            specific places for quick and easy usage of the platform.
-          </p></span>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          {/* Scheduled-posts panel: the dashboard's "Upcoming Scheduled
-              Posts" card REBUILT AS HTML, centered on the panel fill —
-              skeleton empty state loops into three populated posts
-              (usp-* global styles + script; timings in TIMELINE). */}
-          <div class="cs-img cs-pair-a-left cs-usp-panel" data-fade>
-            <img src="/tldr-scheduled-bg.jpg" width="1600" height="1200" alt="" loading="lazy" decoding="async" />
-            <div class="cs-usp-center">
-              <section class="usp-card" aria-hidden="true">
-                <div class="usp-layout">
-
-                  <header class="usp-head">
-                    <p class="usp-title">Upcoming<br />Scheduled Posts</p>
-                    <button class="usp-cta" type="button" tabindex="-1">
-                      Go to Content Calendar
-                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
-                        <path d="M1.5 7.5L7.5 1.5M7.5 1.5H2.7M7.5 1.5V6.3" stroke="white" stroke-opacity="0.72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </header>
-
-                  <div class="usp-list">
-
-                    <!-- empty state: skeleton stack + pill -->
-                    <div class="usp-empty" id="usp-empty" aria-hidden="true">
-                      <div class="usp-bones" id="usp-bones"></div>
-                      <div class="usp-pill-wrap">
-                        <span class="usp-pill" id="usp-pill">No posts scheduled</span>
-                      </div>
-                    </div>
-
-                    <!-- live layer: 3 posts across 2 day groups -->
-                    <div class="usp-posts" id="usp-posts">
-
-                      <div class="usp-dayrow usp-row" data-step="0">
-                        <time class="usp-day">Today · Fri, Aug 8</time>
-                        <span class="usp-divider"></span>
-                      </div>
-
-                      <article class="usp-item" data-step="1">
-                        <div class="usp-item-head">
-                          <time class="usp-time">3:00PM PST</time>
-                          <div class="usp-platforms">
-                            <!-- tiktok active · instagram dim · youtube dim -->
-                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white"/></svg>
-                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white" fill-opacity="0.32"/></svg>
-                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white" fill-opacity="0.32"/></svg>
-                          </div>
-                        </div>
-                        <p class="usp-item-title">Highlights from tonight's ranked climb</p>
-                      </article>
-
-                      <article class="usp-item" data-step="2">
-                        <div class="usp-item-head">
-                          <time class="usp-time">6:30PM PST</time>
-                          <div class="usp-platforms">
-                            <!-- tiktok dim · instagram active · youtube dim -->
-                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white" fill-opacity="0.32"/></svg>
-                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white"/></svg>
-                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white" fill-opacity="0.32"/></svg>
-                          </div>
-                        </div>
-                        <p class="usp-item-title">Behind the scenes at team scrims</p>
-                      </article>
-
-                      <div class="usp-dayrow usp-row" data-step="3">
-                        <time class="usp-day">Tomorrow · Sat, Aug 9</time>
-                        <span class="usp-divider"></span>
-                      </div>
-
-                      <article class="usp-item" data-step="4">
-                        <div class="usp-item-head">
-                          <time class="usp-time">11:00AM PST</time>
-                          <div class="usp-platforms">
-                            <!-- tiktok dim · instagram dim · youtube active -->
-                            <svg width="9.6" height="12" viewBox="0 0 8 10" fill="none"><path d="M6.80507 2.17009C6.31081 1.84841 5.95438 1.33349 5.84301 0.733557C5.81908 0.603966 5.80574 0.470469 5.80574 0.333984H4.22861L4.22608 6.64535C4.19961 7.35213 3.61699 7.91943 2.90298 7.91943C2.68093 7.91943 2.472 7.86406 2.28792 7.76733C1.86591 7.5456 1.57713 7.10397 1.57713 6.59572C1.57713 5.86574 2.17194 5.27178 2.90275 5.27178C3.0392 5.27178 3.17013 5.29429 3.29393 5.3329V3.72518C3.16576 3.70772 3.03552 3.69692 2.90275 3.69692C1.30215 3.69692 0 4.9972 0 6.59572C0 7.57639 0.49058 8.44423 1.23934 8.96903C1.71082 9.29967 2.28447 9.49429 2.90298 9.49429C4.50358 9.49429 5.80574 8.19401 5.80574 6.59572V3.39523C6.42425 3.83846 7.18221 4.09971 8 4.09971V2.52486C7.55958 2.52486 7.14931 2.39412 6.80507 2.17009Z" fill="white" fill-opacity="0.32"/></svg>
-                            <svg width="12" height="12" viewBox="0 0 8 8" fill="none"><path d="M2.34337 0.361959C1.91777 0.382039 1.62713 0.449959 1.37305 0.549799C1.11009 0.652279 0.887206 0.789799 0.665447 1.01236C0.443686 1.23492 0.307126 1.45796 0.205366 1.72132C0.106886 1.97596 0.0401665 2.26684 0.0213665 2.69268C0.00256649 3.11852 -0.00159351 3.2554 0.000486486 4.34164C0.00256649 5.42788 0.00736649 5.56404 0.0280065 5.99076C0.0483265 6.41628 0.116006 6.70684 0.215846 6.961C0.318486 7.22396 0.455846 7.44676 0.678486 7.6686C0.901127 7.89044 1.12401 8.02668 1.38801 8.1286C1.64241 8.22692 1.93337 8.29396 2.35913 8.3126C2.78489 8.33124 2.92193 8.33556 4.00785 8.33348C5.09377 8.3314 5.23049 8.3266 5.65713 8.30636C6.08377 8.28612 6.37281 8.21796 6.62705 8.1186C6.89001 8.01572 7.11297 7.8786 7.33465 7.65588C7.55633 7.43316 7.69281 7.20996 7.79449 6.94644C7.89305 6.69204 7.96001 6.40108 7.97849 5.97564C7.99713 5.54868 8.00153 5.41236 7.99945 4.32628C7.99737 3.2402 7.99249 3.10404 7.97225 2.67748C7.95201 2.25092 7.88425 1.96124 7.78449 1.70692C7.68169 1.44396 7.54449 1.22132 7.32193 0.999319C7.09937 0.777319 6.87601 0.640919 6.61257 0.539479C6.35801 0.440999 6.06721 0.373879 5.64145 0.355479C5.21569 0.337079 5.07865 0.332359 3.99233 0.334439C2.90601 0.336519 2.77001 0.341159 2.34337 0.361959ZM2.39009 7.593C2.00009 7.57604 1.78833 7.51124 1.64721 7.457C1.46033 7.385 1.32721 7.29796 1.18657 7.15868C1.04593 7.0194 0.959527 6.8858 0.886567 6.69932C0.831766 6.5582 0.765767 6.34668 0.747527 5.95668C0.727687 5.53516 0.723527 5.4086 0.721207 4.34068C0.718886 3.27276 0.722966 3.14636 0.741446 2.72468C0.758087 2.335 0.823287 2.123 0.877447 1.98196C0.949446 1.79484 1.03617 1.66196 1.17577 1.5214C1.31537 1.38084 1.44857 1.29428 1.63521 1.22132C1.77617 1.16628 1.98769 1.10084 2.37753 1.08228C2.79937 1.06228 2.92577 1.05828 3.99353 1.05596C5.06129 1.05364 5.18801 1.05764 5.61001 1.0762C5.99969 1.09316 6.21177 1.15772 6.35265 1.2122C6.53961 1.2842 6.67265 1.37068 6.81321 1.51052C6.95377 1.65036 7.04041 1.78308 7.11337 1.97012C7.16849 2.11068 7.23393 2.32212 7.25233 2.7122C7.27241 3.13404 7.27697 3.26052 7.27889 4.3282C7.28081 5.39588 7.27705 5.52268 7.25857 5.9442C7.24153 6.3342 7.17689 6.54604 7.12257 6.68732C7.05057 6.87412 6.96377 7.00732 6.82409 7.1478C6.68441 7.28828 6.55137 7.37484 6.36465 7.4478C6.22385 7.50276 6.01209 7.56836 5.62257 7.58692C5.20073 7.60676 5.07433 7.61092 4.00617 7.61324C2.93801 7.61556 2.81201 7.61124 2.39017 7.593M5.65097 2.19612C5.65112 2.29106 5.67944 2.38382 5.73232 2.46267C5.7852 2.54153 5.86028 2.60292 5.94805 2.6391C6.03583 2.67528 6.13237 2.68462 6.22545 2.66593C6.31854 2.64724 6.40399 2.60136 6.471 2.53411C6.53801 2.46685 6.58357 2.38123 6.60192 2.28808C6.62027 2.19493 6.61058 2.09843 6.57408 2.01078C6.53757 1.92314 6.4759 1.84828 6.39686 1.79569C6.31781 1.7431 6.22495 1.71513 6.13001 1.71532C6.00273 1.71557 5.88077 1.76637 5.79093 1.85653C5.7011 1.94669 5.65075 2.06884 5.65097 2.19612ZM1.94617 4.33796C1.94841 5.47236 2.86969 6.38988 4.00385 6.38772C5.13801 6.38556 6.05617 5.46436 6.05401 4.32996C6.05185 3.19556 5.13033 2.2778 3.99601 2.28004C2.86169 2.28228 1.94401 3.20372 1.94617 4.33796ZM2.66665 4.33652C2.66613 4.07281 2.74382 3.81486 2.88989 3.5953C3.03597 3.37574 3.24387 3.20443 3.48731 3.10303C3.73075 3.00163 3.99879 2.97469 4.25754 3.02563C4.51629 3.07657 4.75412 3.20309 4.94096 3.38919C5.12781 3.57529 5.25527 3.81262 5.30723 4.07117C5.35919 4.32971 5.33331 4.59786 5.23288 4.8417C5.13244 5.08554 4.96195 5.29412 4.74297 5.44106C4.524 5.58801 4.26636 5.66672 4.00265 5.66724C3.82754 5.66761 3.65408 5.63348 3.49217 5.5668C3.33025 5.50012 3.18306 5.4022 3.059 5.27862C2.93493 5.15505 2.83643 5.00825 2.76911 4.8466C2.70179 4.68495 2.66697 4.51163 2.66665 4.33652Z" fill="white" fill-opacity="0.32"/></svg>
-                            <svg width="16.5" height="12" viewBox="0 0 11 8" fill="none"><path d="M4.375 6.02229V2.64567L7.25 4.33406L4.375 6.02229ZM10.7701 1.58321C10.6436 1.09147 10.2709 0.704243 9.79762 0.572824C8.93981 0.333985 5.5 0.333984 5.5 0.333984C5.5 0.333984 2.06021 0.333985 1.20237 0.572824C0.7291 0.704243 0.356348 1.09147 0.229858 1.58321C0 2.47446 0 4.33398 0 4.33398C0 4.33398 0 6.19349 0.229858 7.08477C0.356348 7.5765 0.7291 7.96372 1.20237 8.0952C2.06021 8.33398 5.5 8.33398 5.5 8.33398C5.5 8.33398 8.93981 8.33398 9.79762 8.0952C10.2709 7.96372 10.6436 7.5765 10.7701 7.08477C11 6.19349 11 4.33398 11 4.33398C11 4.33398 11 2.47446 10.7701 1.58321Z" fill="white"/></svg>
-                          </div>
-                        </div>
-                        <p class="usp-item-title">Weekly top 5 plays</p>
-                      </article>
-
-                    </div>
-                  </div>
-                </div>
-
-                <div class="usp-fadeout" aria-hidden="true"></div>
-              </section>
-            </div>
-          </div>
-          <div class="cs-img cs-pair-b-right" data-fade>
-            <video
-              src="/tldr-micro-loop.mp4" width="1080" height="1456"
-              poster="/tldr-micro-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-            <p class="cs-img-caption cs-img-caption-top">Subtle micro-interactions</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6 · Feature Builds -->
-    <section class="cs-band">
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <span class="mask cs-intro"><p class="cs-body cs-center">
-            <span class="mut">Every handoff lost something - spacing, states, motion.
-            So I cut the handoff: </span>Now I build my designs in React myself,
-            working with Claude Code and MCP tooling to ship accurate, functional
-            front-end at speed. Product development sped up by multiples.
-          </p></span>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed" data-reveal-group>
-          <div class="cs-img cs-pair-half-left" data-fade>
-            <video
-              src="/tldr-figma-loop.mp4" width="1080" height="1080"
-              poster="/tldr-figma-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-            <p class="cs-img-badge">Before</p>
-            <p class="cs-img-caption">Figma files</p>
-            <p class="cs-hover-note">Every feature started as a full Figma flow — screens, states, and edge cases specced before any code.</p>
-          </div>
-          <div class="cs-img cs-pair-half-right" data-fade>
-            <video
-              src="/tldr-prototype-loop.mp4" width="1080" height="1080"
-              poster="/tldr-prototype-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-            <p class="cs-img-badge">After</p>
-            <p class="cs-img-caption">React prototype dashboard</p>
-            <p class="cs-hover-note">The same flows rebuilt as a working React dashboard — spacing, states, and motion carried over intact.</p>
-          </div>
-        </div>
-      </div>
-      <div class="content-grid">
-        <div class="full-composed cs-row" data-reveal-group>
-          <span class="mask cs-rowlabel"><p class="cs-label">Feature Builds</p></span>
-          <span class="mask cs-rowbody"><p class="cs-body">
-            Building front-end myself changed what I could take on. Instead of
-            designing features for someone else to build, I started ideating full
-            features and building them myself. Both featured in-depth below.
-          </p></span>
-        </div>
-      </div>
-
-      <!-- Feature: My TL:DR — image left, spec column right. -->
-      <div class="content-grid">
-        <div class="full-composed cs-feature" data-reveal-group>
-          <div class="cs-img cs-feat-img-left" data-fade>
-            <video
-              src="/tldr-mytldr-loop.mp4" width="1920" height="1440"
-              poster="/tldr-mytldr-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
-          <div class="cs-feat-col cs-feat-col-right">
-            <div class="cs-feat-head">
-              <span class="mask"><h3 class="cs-feat-title">My TL;DR</h3></span>
-              <span class="mask"><p class="cs-feat-body">
-                I designed and built out a fully functional prototyped version of My
-                TL;DR, an upgraded link-in-bio product specifically targeted towards
-                live streamers, while keeping everything inline with the TL;DR brand.
-              </p></span>
-            </div>
-            <div class="cs-feat-list">
-              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
-              {myTldrFeatures.map((f) => (
-                <div class="cs-feat-item">
-                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
-                  </svg>
-                  <p class="cs-feat-body">{f}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature: Streamhub — spec column left, image right. -->
-      <div class="content-grid">
-        <div class="full-composed cs-feature" data-reveal-group>
-          <div class="cs-feat-col cs-feat-col-left">
-            <div class="cs-feat-head">
-              <span class="mask"><h3 class="cs-feat-title">Streamhub</h3></span>
-              <span class="mask"><p class="cs-feat-body">
-                I also designed and built out Streamhub for our B2B users, giving a
-                master account the ability to watch all the sub accounts streams
-                simultaneously on a customizable canvas
-              </p></span>
-            </div>
-            <div class="cs-feat-list">
-              <span class="mask"><p class="cs-feat-lead">Some highlighted features include:</p></span>
-              {streamhubFeatures.map((f) => (
-                <div class="cs-feat-item">
-                  <svg class="cs-bullet" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M7.5 0C7.16563 6.89063 6.89063 7.16563 0 7.5C6.89063 7.83438 7.16563 8.10938 7.5 15C7.83438 8.10938 8.10938 7.83438 15 7.5C8.10938 7.16563 7.83438 6.89063 7.5 0Z" fill="url(#cs-spark-grad)" />
-                  </svg>
-                  <p class="cs-feat-body">{f}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div class="cs-img cs-feat-img-right" data-fade>
-            <video
-              src="/tldr-streamhub-loop.mp4" width="1920" height="1440"
-              poster="/tldr-streamhub-poster.jpg"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              tabindex="-1"
-              aria-hidden="true"
-            ></video>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- 7 · TwitchCon -->
     <section class="cs-band">
       <div class="content-grid">
@@ -660,6 +920,10 @@ const streamhubFeatures = [
       </div>
     </section>
 
+    </section>
+
+    </div>
+
     <!-- More work — the other featured case studies (shared component). -->
     <MoreWork current="tldr" />
   </main>
@@ -691,7 +955,7 @@ const streamhubFeatures = [
     // optimisation can pause them there without resuming on scroll — same
     // failure mode the homepage covers solve. Gate each on visibility.
     document
-      .querySelectorAll<HTMLVideoElement>("video.cs-ext-bg, .cs-img > video")
+      .querySelectorAll<HTMLVideoElement>("video.cs-ext-bg, .cs-img > video, .cs-frame > video")
       .forEach((v) => {
         new IntersectionObserver(
           (entries) => {
@@ -724,7 +988,7 @@ const streamhubFeatures = [
     });
   } else {
     // Reduced motion: the hero and extension loops stay on their posters.
-    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, video.cs-ext-bg, .cs-img > video").forEach((v) => {
+    document.querySelectorAll<HTMLVideoElement>("video.cs-hero-img, video.cs-ext-bg, .cs-img > video, .cs-frame > video").forEach((v) => {
       v.removeAttribute("autoplay");
       v.pause();
       v.currentTime = 0;
@@ -733,85 +997,513 @@ const streamhubFeatures = [
 </script>
 
 <script>
-  // Upcoming Scheduled Posts — the animated dashboard-card rebuild in the
-  // Product Design section. Self-contained: it only touches usp-* elements,
-  // and the loop restarts from the empty state each time the card scrolls
-  // into view. All timings live in TIMELINE.
-  const uspCard = document.querySelector(".usp-card");
-  const uspEmpty = document.getElementById("usp-empty");
-  const uspPill = document.getElementById("usp-pill");
-  const uspPosts = document.getElementById("usp-posts");
-  const uspBones = document.getElementById("usp-bones");
+  // Section tabs: sticky bar with scroll-spy and smooth jumps (Lenis when
+  // it's running, native scroll otherwise). In-page links elsewhere on the
+  // page (the three-call cards) use the same jump so they land clear of
+  // the bar.
+  const bar = document.querySelector<HTMLElement>(".cs-tabs");
+  const sentinel = document.querySelector<HTMLElement>(".cs-tabs-sentinel");
+  const list = bar?.querySelector<HTMLElement>(".cs-tabs-list");
+  const ink = bar?.querySelector<HTMLElement>(".cs-tabs-ink");
 
-  if (uspCard && uspEmpty && uspPill && uspPosts && uspBones) {
-    const rows = uspPosts.querySelectorAll("[data-step]");
+  if (bar && sentinel && list && ink) {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const tabs = Array.from(bar.querySelectorAll<HTMLAnchorElement>(".cs-tab"));
+    const targets = tabs.map((t) => document.getElementById(t.hash.slice(1)));
+    let current = -1;
+    let locked = false;
+    let unlockTimer: ReturnType<typeof setTimeout> | undefined;
 
-    // Skeleton stack (mirrors the production EmptyState).
-    const groups = [["72%", "58%", "84%"], ["66%", "78%"], ["54%", "70%", "62%"]];
-    uspBones.innerHTML = groups
-      .map(
-        (widths) =>
-          '<div class="usp-dayrow"><span class="usp-bone usp-bone--day"></span><span class="usp-divider"></span></div>' +
-          widths
-            .map(
-              (w) =>
-                '<div class="usp-item" style="border-color:transparent">' +
-                '<div class="usp-item-head"><span class="usp-bone usp-bone--time"></span>' +
-                '<div class="usp-platforms"><span class="usp-bone usp-bone--dot"></span><span class="usp-bone usp-bone--dot"></span><span class="usp-bone usp-bone--dot"></span></div></div>' +
-                '<span class="usp-bone usp-bone--title" style="width:' + w + '"></span></div>',
-            )
-            .join(""),
-      )
-      .join("");
+    const moveInk = () => {
+      const tab = tabs[current];
+      if (!tab) return;
+      ink.style.width = `${tab.offsetWidth}px`;
+      ink.style.transform = `translateX(${tab.offsetLeft}px)`;
+    };
 
-    // Reduced motion: the CSS shows the populated state statically.
-    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // [delay-from-loop-start(ms), action]
-      const TIMELINE: [number, () => void][] = [
-        [1400, () => uspPill.classList.add("usp-out")],
-        [1750, () => { uspEmpty.classList.add("usp-fade"); uspPosts.classList.add("usp-live"); }],
-        [1950, () => rows[0].classList.add("usp-in")], // day: today
-        [2150, () => rows[1].classList.add("usp-in")], // post 1
-        [2800, () => rows[2].classList.add("usp-in")], // post 2
-        [3450, () => rows[3].classList.add("usp-in")], // day: tomorrow
-        [3650, () => rows[4].classList.add("usp-in")], // post 3
-        [7400, () => uspPosts.classList.add("usp-fade")],
-        [7850, () => reset()],
-      ];
-
-      let timers: ReturnType<typeof setTimeout>[] = [];
-      let running = false;
-
-      const clearState = () => {
-        uspPosts.classList.remove("usp-live", "usp-fade");
-        uspEmpty.classList.remove("usp-fade");
-        uspPill.classList.remove("usp-out");
-        rows.forEach((r) => r.classList.remove("usp-in"));
-      };
-      const schedule = () => {
-        TIMELINE.forEach(([delay, action]) => timers.push(setTimeout(action, delay)));
-      };
-      function reset() {
-        clearState();
-        if (running) schedule();
+    const setActive = (i: number) => {
+      if (i === current) return;
+      current = i;
+      tabs.forEach((t, k) => {
+        if (k === i) t.setAttribute("aria-current", "true");
+        else t.removeAttribute("aria-current");
+      });
+      moveInk();
+      // Narrow screens scroll the strip sideways: keep the active tab in it.
+      if (list.scrollWidth > list.clientWidth) {
+        const tab = tabs[i];
+        list.scrollTo({
+          left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+          behavior: reduce ? "auto" : "smooth",
+        });
       }
-      const start = () => {
-        if (running) return;
-        running = true;
-        schedule();
-      };
-      const stop = () => {
-        running = false;
-        timers.forEach(clearTimeout);
-        timers = [];
-        clearState();
-      };
+    };
 
-      new IntersectionObserver(
-        (entries) => (entries[0].isIntersecting ? start() : stop()),
-        { threshold: 0.35 },
-      ).observe(uspCard);
+    // Active = the last section whose top has crossed 30% of the viewport.
+    const spy = () => {
+      if (locked) return;
+      const line = innerHeight * 0.3;
+      let i = 0;
+      targets.forEach((el, k) => {
+        if (el && el.getBoundingClientRect().top <= line) i = k;
+      });
+      setActive(i);
+    };
+
+    let ticking = false;
+    addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        spy();
+      });
+    }, { passive: true });
+    addEventListener("resize", () => { moveInk(); spy(); });
+    // Fonts settle tab widths after first paint.
+    document.fonts?.ready.then(moveInk);
+
+    // Stuck state: the sentinel sits right above the bar, so once it has
+    // scrolled out of the top the bar is pinned.
+    new IntersectionObserver(([e]) => {
+      bar.classList.toggle("is-stuck", !e.isIntersecting && e.boundingClientRect.top < 0);
+    }).observe(sentinel);
+
+    const release = () => {
+      clearTimeout(unlockTimer);
+      locked = false;
+      spy();
+    };
+    // A wheel or touch mid-jump hands control back to the reader.
+    addEventListener("wheel", () => { if (locked) release(); }, { passive: true });
+    addEventListener("touchstart", () => { if (locked) release(); }, { passive: true });
+
+    // Content lands one --space-4 below the pinned bar; Overview instead
+    // scrolls just past the sentinel, so the bar pins exactly at the top.
+    const jump = (el: HTMLElement, tabIndex?: number) => {
+      const offset = el === sentinel ? 1 : -(bar.offsetHeight + 32);
+      if (tabIndex !== undefined) {
+        setActive(tabIndex);
+        locked = true;
+        unlockTimer = setTimeout(release, 1800);
+      }
+      const lenis = (window as any).lenis;
+      if (lenis) {
+        // Lenis already honours the target's scroll-margin-top (set in CSS
+        // for native hash loads), so take it back out of the offset.
+        const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+        lenis.scrollTo(el, { offset: offset + margin, duration: 1.2, onComplete: release });
+      } else {
+        const top = el.getBoundingClientRect().top + scrollY + offset;
+        scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+        if (tabIndex !== undefined) {
+          clearTimeout(unlockTimer);
+          unlockTimer = setTimeout(release, reduce ? 50 : 900);
+        }
+      }
+    };
+
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", (e) => {
+        const el = targets[i];
+        if (!el) return;
+        e.preventDefault();
+        // Overview jumps to the very top of the chapters, bar included.
+        if (i === 0) jump(sentinel, 0);
+        else jump(el, i);
+        history.replaceState(null, "", t.hash);
+      });
+    });
+
+    document.querySelectorAll<HTMLAnchorElement>('.cs-chapters a[href^="#"]:not(.cs-tab)').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const el = document.getElementById(a.hash.slice(1));
+        if (!el) return;
+        e.preventDefault();
+        jump(el);
+      });
+    });
+
+    spy();
+  }
+</script>
+
+<script>
+  // Product UI panels. Each .cs-ui host gets a shadow root holding a snapshot
+  // of the TL;DR prototype's markup + CSS (public/tldr-ui/<id>.html), laid
+  // out at 1600px and scaled to the host via --k. Snapshots load as their
+  // panel approaches; all four are also warmed once the page is idle so a
+  // tab jump rarely lands on an empty panel.
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hosts = Array.from(document.querySelectorAll<HTMLElement>(".cs-ui[data-ui]"));
+  const cache = new Map<string, Promise<string>>();
+  const load = (id: string) => {
+    if (!cache.has(id)) {
+      cache.set(id, fetch(`/tldr-ui/${id}.html`).then((r) => (r.ok ? r.text() : Promise.reject(r.status))));
     }
+    return cache.get(id)!;
+  };
+  const fit = (h: HTMLElement) => h.style.setProperty("--k", String(h.clientWidth / 1600));
+  const ro = new ResizeObserver((es) => es.forEach((e) => fit(e.target as HTMLElement)));
+
+  const mount = async (h: HTMLElement) => {
+    if (h.shadowRoot) return;
+    let html: string;
+    try {
+      html = await load(h.dataset.ui!);
+    } catch {
+      return;
+    }
+    const root = h.attachShadow({ mode: "open" });
+    root.innerHTML = html;
+    h.inert = true;
+    fit(h);
+    ro.observe(h);
+    if (h.dataset.anim) animate(h);
+  };
+
+  const near = new IntersectionObserver((es) => {
+    es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      near.unobserve(e.target);
+      mount(e.target as HTMLElement);
+    });
+  }, { rootMargin: "1200px 0px" });
+  hosts.forEach((h) => near.observe(h));
+
+  const idle: (cb: () => void) => void =
+    (window as any).requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500));
+  idle(() => new Set(hosts.map((h) => h.dataset.ui!)).forEach((id) => load(id).catch(() => {})));
+
+  // ---- Animated panels (Web Animations API + timers) ----
+  type Anim = { start: () => void; stop: () => void };
+  const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+  const EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
+  const nf = new Intl.NumberFormat("en-US");
+  const leaf = (root: ParentNode, re: RegExp) => {
+    const all = root.querySelectorAll<HTMLElement>("span, div, p");
+    for (const el of all) if (el.children.length === 0 && re.test(el.textContent!.trim())) return el;
+    return null;
+  };
+  const scaleOf = (root: ShadowRoot) => root.querySelector(".snap-html")!.getBoundingClientRect().width / 1600;
+  const bump = (el: HTMLElement, v: number) => {
+    el.textContent = nf.format(v);
+    el.style.display = "inline-block";
+    el.animate([{ transform: "translateY(35%)", opacity: 0.25 }, { transform: "none", opacity: 1 }], { duration: 320, easing: EASE_OUT });
+  };
+
+  // A new clip lands at the front of today's stream; the rest reflow (FLIP).
+  function clipsAnim(root: ShadowRoot): Anim | null {
+    const grid = root.querySelector<HTMLElement>(".clips-grid");
+    if (!grid || grid.children.length < 2) return null;
+    const tick = () => {
+      const k = scaleOf(root) || 1;
+      const cards = Array.from(grid.children) as HTMLElement[];
+      const before = cards.map((c) => c.getBoundingClientRect());
+      const last = cards[cards.length - 1];
+      const fresh = last.cloneNode(true) as HTMLElement;
+      grid.insertBefore(fresh, grid.firstChild);
+      grid.removeChild(last);
+      cards.slice(0, -1).forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const dx = (before[i].left - r.left) / k;
+        const dy = (before[i].top - r.top) / k;
+        if (dx || dy) c.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: 640, easing: EASE_MOVE });
+      });
+      fresh.animate([{ opacity: 0, transform: "scale(0.94)" }, { opacity: 1, transform: "none" }], { duration: 520, delay: 200, easing: EASE_OUT, fill: "backwards" });
+      const card = fresh.firstElementChild as HTMLElement;
+      const ring = document.createElement("div");
+      ring.style.cssText = `position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:${getComputedStyle(card).borderRadius};box-shadow:0 0 0 2px #9851FB,0 0 40px rgba(152,81,251,.5)`;
+      fresh.appendChild(ring);
+      ring.animate([{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0 }], { duration: 2400, delay: 240, easing: "ease-out" }).onfinish = () => ring.remove();
+      const badge = fresh.querySelector<HTMLElement>('[class*="right-[10px]"]');
+      const score = badge && leaf(badge, /^\d{1,3}$/);
+      if (score) {
+        const to = +score.textContent!;
+        let t0: number | null = null;
+        score.textContent = "0";
+        const step = (t: number) => {
+          if (t0 === null) t0 = t;
+          const p = Math.min(1, (t - t0 - 300) / 700);
+          if (p > 0) score.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    };
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return {
+      start: () => {
+        if (timer) return;
+        const run = () => { tick(); timer = setTimeout(run, 3600); };
+        timer = setTimeout(run, 900);
+      },
+      stop: () => { if (timer) clearTimeout(timer); timer = null; },
+    };
+  }
+
+  // Mid-stream: the chat line draws in, then views, chats and clips count up.
+  function liveAnim(root: ShadowRoot): Anim | null {
+    const views = leaf(root, /^48,219$/);
+    const chats = leaf(root, /^2,479$/);
+    const clips = leaf(root, /^86$/);
+    const voice = leaf(root, /^24$/);
+    const path = root.querySelector<SVGPathElement>('svg path[stroke="currentColor"][stroke-width="2"]');
+    const dot = path?.parentNode?.querySelector<SVGCircleElement>("circle");
+    if (!views || !clips || !path || !dot) return null;
+    const n = { views: 48219, chats: 2479, clips: 86, voice: 24 };
+    let drawn = false;
+    let timers: ReturnType<typeof setInterval>[] = [];
+    let pulse: Animation | null = null;
+    const ring = dot.cloneNode(false) as SVGCircleElement;
+    ring.removeAttribute("class");
+    ring.setAttribute("fill", "none");
+    ring.setAttribute("stroke-width", "2");
+    ring.style.transformBox = "fill-box";
+    ring.style.transformOrigin = "center";
+    ring.style.opacity = "0";
+    dot.parentNode!.insertBefore(ring, dot);
+    let tickN = 0;
+    return {
+      start: () => {
+        if (!drawn) {
+          drawn = true;
+          const L = path.getTotalLength();
+          path.style.strokeDasharray = String(L);
+          path.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1600, easing: EASE_OUT });
+          dot.style.transformBox = "fill-box";
+          dot.style.transformOrigin = "center";
+          dot.animate([{ opacity: 0, transform: "scale(0.5)" }, { opacity: 1, transform: "none" }], { duration: 360, delay: 1350, easing: EASE_OUT, fill: "backwards" });
+        }
+        if (!pulse) pulse = ring.animate([{ transform: "scale(1)", opacity: 0.7 }, { transform: "scale(2.6)", opacity: 0 }], { duration: 1800, delay: 1600, iterations: Infinity, easing: EASE_OUT });
+        else pulse.play();
+        if (!timers.length) {
+          timers.push(setInterval(() => {
+            n.views += 7 + Math.floor(Math.random() * 30);
+            bump(views, n.views);
+            n.chats += 1 + Math.floor(Math.random() * 8);
+            if (chats) bump(chats, n.chats);
+          }, 1700));
+          timers.push(setInterval(() => {
+            tickN++;
+            n.clips++;
+            bump(clips, n.clips);
+            if (tickN % 3 === 0 && voice) { n.voice++; bump(voice, n.voice); }
+          }, 4300));
+        }
+      },
+      stop: () => { timers.forEach(clearInterval); timers = []; pulse?.pause(); },
+    };
+  }
+
+  // Runs only while the panel is on screen and the tab is visible; each has
+  // a Pause/Play button. Reduced motion: no animation, no button.
+  function animate(h: HTMLElement) {
+    if (reduce || !h.shadowRoot) return;
+    const a = (h.dataset.anim === "clips" ? clipsAnim : liveAnim)(h.shadowRoot);
+    const fig = h.closest("figure");
+    const btn = fig?.querySelector<HTMLButtonElement>(".cs-abtn");
+    if (!a || !fig || !btn) return;
+    let paused = false;
+    let seen = false;
+    btn.hidden = false;
+    const sync = () => {
+      btn.textContent = paused ? "Play" : "Pause";
+      btn.setAttribute("aria-pressed", paused ? "true" : "false");
+      btn.setAttribute("aria-label", `${paused ? "Play" : "Pause"} animation`);
+      if (seen && !paused && !document.hidden) a.start();
+      else a.stop();
+    };
+    btn.addEventListener("click", () => { paused = !paused; sync(); });
+    // Watch the figure: the UI inside is larger than its panel.
+    new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }, { threshold: 0.3 }).observe(fig);
+    document.addEventListener("visibilitychange", sync);
+    sync();
+  }
+</script>
+
+<script>
+  // Chat activity demo: an example 3-hour stream in 5-minute readings, with
+  // the clips captured in it. Moving along the line (pointer, or the hidden
+  // range input by keyboard) reads out the chats and reveals the clips.
+  const CHATS = [18, 34, 41, 47, 52, 58, 64, 131, 78, 70, 74, 81, 88, 176, 102, 94, 99, 105, 112, 121, 138, 248, 151, 140, 133, 129, 136, 142, 150, 231, 160, 148, 152, 158, 214, 166];
+  type Clip = { kind: "ai" | "voice"; title: string; score: number; wake?: string };
+  const CLIPS: Record<number, Clip> = {
+    7: { kind: "ai", title: "Boss kill on hardcore mode", score: 74 },
+    13: { kind: "voice", wake: "Clip it", title: "Funniest reaction of the stream", score: 63 },
+    21: { kind: "voice", wake: "Clip that", title: "Insane 1v5 clutch moment", score: 92 },
+    29: { kind: "ai", title: "Chat loses it after this play", score: 88 },
+    34: { kind: "ai", title: "Unbelievable no-scope", score: 79 },
+  };
+  const plot = document.getElementById("plot");
+  const line = document.getElementById("chat-line");
+
+  if (plot && line) {
+    const N = CHATS.length;
+    const MAX = 270;
+    const fmt = new Intl.NumberFormat("en-US");
+    const total = CHATS.reduce((a, b) => a + b, 0);
+    const X = (i: number) => (i / (N - 1)) * 1000;
+    const Y = (v: number) => 300 - (v / MAX) * 300;
+
+    // Monotone cubic (Fritsch–Carlson) tangents: the curve never overshoots.
+    const d: number[] = [];
+    const m: number[] = [];
+    for (let i = 0; i < N - 1; i++) d.push(CHATS[i + 1] - CHATS[i]);
+    m[0] = d[0];
+    m[N - 1] = d[N - 2];
+    for (let i = 1; i < N - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+    for (let i = 0; i < N - 1; i++) {
+      if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+      if (s > 9) { const t = 3 / Math.sqrt(s); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+    }
+    const dx = 1000 / (N - 1);
+    let path = `M${X(0)},${Y(CHATS[0])}`;
+    for (let i = 0; i < N - 1; i++) {
+      path += ` C${X(i) + dx / 3},${Y(CHATS[i] + m[i] / 3)} ${X(i + 1) - dx / 3},${Y(CHATS[i + 1] - m[i + 1] / 3)} ${X(i + 1)},${Y(CHATS[i + 1])}`;
+    }
+    line.setAttribute("d", path);
+    // Value on the drawn curve at a fractional index (cubic Hermite).
+    const at = (f: number) => {
+      const k = Math.min(Math.floor(f), N - 2), t = f - k;
+      const h00 = 2 * t ** 3 - 3 * t ** 2 + 1, h10 = t ** 3 - 2 * t ** 2 + t;
+      const h01 = -2 * t ** 3 + 3 * t ** 2, h11 = t ** 3 - t ** 2;
+      return h00 * CHATS[k] + h10 * m[k] + h01 * CHATS[k + 1] + h11 * m[k + 1];
+    };
+
+    const dot = document.getElementById("chat-dot")!;
+    const guide = document.getElementById("chat-guide")!;
+    const range = document.getElementById("chat-range") as HTMLInputElement;
+    const num = document.getElementById("chat-num")!;
+    const unit = document.getElementById("chat-unit")!;
+    const sub = document.getElementById("chat-sub")!;
+    const clipEl = document.getElementById("chat-clip")!;
+    const marks = document.getElementById("chat-marks")!;
+    const markEls: Record<number, HTMLElement> = {};
+    Object.keys(CLIPS).forEach((key) => {
+      const k = +key, c = CLIPS[k], el = document.createElement("i");
+      el.className = "tl-mk" + (c.kind === "voice" ? " tl-voice" : "");
+      el.style.left = `${(k / (N - 1)) * 100}%`;
+      el.style.top = `${(Y(CHATS[k]) / 300) * 100}%`;
+      marks.appendChild(el);
+      markEls[k] = el;
+    });
+    const when = (min: number) => {
+      const h = Math.floor(min / 60), mm = min % 60;
+      return h ? `${h}h${mm ? ` ${mm}m` : ""}` : `${mm}m`;
+    };
+    const tbody = document.querySelector("#chat-table tbody")!;
+    CHATS.forEach((v, k) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${when(k * 5)}</td><td>${v}</td><td>${CLIPS[k] ? CLIPS[k].title : ""}</td>`;
+      tbody.appendChild(tr);
+    });
+    const bolt = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>';
+    const clipHtml = (c: Clip) =>
+      `<span class="tl-chip tl-chip--type">${c.kind === "voice" ? "Voice Clip" : "AI Clip"}</span>` +
+      (c.wake ? `<span class="tl-chip tl-chip--wake">“${c.wake}”</span>` : "") +
+      `<strong>${c.title}</strong>` +
+      `<span class="tl-chip tl-chip--score" aria-label="Clip score ${c.score} out of 100">${bolt}${c.score}</span>`;
+    const place = (f: number) => {
+      const x = (f / (N - 1)) * 100;
+      dot.style.left = `${x}%`;
+      dot.style.top = `${(Y(at(f)) / 300) * 100}%`;
+      guide.style.left = `${x}%`;
+    };
+    let lastNear: number | null = null;
+    const show = (f: number) => {
+      place(f);
+      const k = Math.round(f);
+      let nearest: number | null = null;
+      for (let j = k - 1; j <= k + 1; j++) if (CLIPS[j]) { nearest = j; break; }
+      plot.classList.add("is-scrub");
+      num.textContent = fmt.format(Math.round(at(f)));
+      unit.textContent = "chats";
+      sub.textContent = `${when(Math.round(f * 5))} into the stream`;
+      if (nearest !== lastNear) {
+        if (lastNear !== null) markEls[lastNear].classList.remove("is-on");
+        if (nearest !== null) markEls[nearest].classList.add("is-on");
+        clipEl.innerHTML = nearest !== null ? clipHtml(CLIPS[nearest]) : "No clip here. Keep moving to find one of the five.";
+        lastNear = nearest;
+      }
+      range.setAttribute("aria-valuetext", `${when(k * 5)} into the stream, ${CHATS[k]} chats${CLIPS[k] ? `, clip captured: ${CLIPS[k].title}, score ${CLIPS[k].score}` : ""}`);
+    };
+    const rest = () => {
+      place(N - 1);
+      plot.classList.remove("is-scrub");
+      num.textContent = fmt.format(total);
+      unit.textContent = "chats in total";
+      sub.textContent = "Example stream, 3 hours";
+      if (lastNear !== null) markEls[lastNear].classList.remove("is-on");
+      lastNear = null;
+      clipEl.innerHTML = "<span>Five clips captured: <strong>three by AI, two by voice</strong>. Move along the line to find them.</span>";
+    };
+    const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+    plot.addEventListener("pointermove", (e) => {
+      if (!fine && e.pointerType !== "mouse") return;
+      const r = plot.getBoundingClientRect();
+      show(Math.max(0, Math.min(N - 1, ((e.clientX - r.left) / r.width) * (N - 1))));
+    });
+    plot.addEventListener("pointerleave", () => { if (document.activeElement !== range) rest(); });
+    range.addEventListener("input", () => show(+range.value));
+    range.addEventListener("focus", () => show(+range.value));
+    range.addEventListener("blur", rest);
+    rest();
+  }
+</script>
+
+<script>
+  // Dashboard spotlight. Hovering or focusing a question moves the spotlight
+  // to its area; while the band is in view it steps through the four by
+  // itself, and the active row's top line filling is the timer.
+  const dash = document.querySelector<HTMLElement>(".cs-dash");
+  if (dash) {
+    const items = Array.from(dash.querySelectorAll<HTMLElement>(".cs-qa-item"));
+    const spot = dash.querySelector<HTMLElement>(".cs-spot");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let inView = false;
+    let hovering = false;
+
+    const set = (i: number) => {
+      items.forEach((li) => li.classList.toggle("is-active", li.dataset.i === String(i)));
+      const vars = items[i - 1]?.dataset.spot;
+      if (spot && vars) spot.setAttribute("style", vars);
+    };
+    const sync = () => {
+      dash.classList.toggle("is-auto", !reduce);
+      dash.classList.toggle("is-playing", inView && !hovering);
+    };
+
+    items.forEach((li) => {
+      const i = Number(li.dataset.i);
+      li.addEventListener("pointerenter", () => set(i));
+      li.addEventListener("focus", () => set(i));
+      li.addEventListener("click", () => set(i));
+      li.addEventListener("animationend", (e) => {
+        if (e.target === li && e.pseudoElement === "::after") set((i % items.length) + 1);
+      });
+    });
+
+    // The tour pauses under a mouse and outside the viewport.
+    dash.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse") return;
+      hovering = true;
+      sync();
+    });
+    dash.addEventListener("pointerleave", () => {
+      hovering = false;
+      sync();
+    });
+    new IntersectionObserver(
+      ([e]) => {
+        inView = e.isIntersecting;
+        sync();
+      },
+      { threshold: 0.35 },
+    ).observe(dash);
+
+    sync();
   }
 </script>
 
@@ -994,16 +1686,6 @@ const streamhubFeatures = [
   .cs-pair-narrow-left { grid-column: 1 / 5; }
   .cs-pair-broad-right { grid-column: 5 / 13; aspect-ratio: 856 / 648; }
   .cs-img-wide { grid-column: 1 / 13; aspect-ratio: 1296 / 806; }
-  /* Scheduled-posts panel: real HTML, not a video — the card centers on
-     the panel fill. Component styles live in the is:global block below. */
-  .cs-usp-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-3);
-  }
   .cs-img-caption {
     position: absolute;
     left: var(--space-2);
@@ -1399,22 +2081,19 @@ const streamhubFeatures = [
        stacked panel takes its media's intrinsic ratio — the medium flows
        in-layout instead of cover-filling an imposed box. Every panel
        img/video carries real width/height attrs, so the ratio is known
-       before load and nothing shifts. Composed panels (the extension mock,
-       the scheduled-posts card) keep their own boxes via the :not()s. */
+       before load and nothing shifts. Composed panels (the extension mock)
+       keep their own boxes via the :not(); the product screens aren't
+       .cs-img at all and keep their 4:3 box. */
     .cs-pair-a-left, .cs-pair-a-right, .cs-pair-b-left, .cs-pair-b-right,
     .cs-pair-half-left, .cs-pair-half-right,
     .cs-pair-narrow-left, .cs-pair-broad-right,
     .cs-feat-img-left, .cs-feat-img-right,
     .cs-img-wide { height: auto; aspect-ratio: auto; }
-    .cs-img:not(.cs-ext-panel):not(.cs-usp-panel) > img,
-    .cs-img:not(.cs-ext-panel):not(.cs-usp-panel) > video {
+    .cs-img:not(.cs-ext-panel) > img,
+    .cs-img:not(.cs-ext-panel) > video {
       position: static;
       height: auto;
     }
-    /* The scheduled-posts card is content-sized HTML — let the panel wrap
-       the card instead of clipping it. */
-    .cs-usp-panel { height: auto; aspect-ratio: auto; }
-    .cs-usp-center { position: static; padding: var(--space-3); }
     /* Stat boxes: tighter box, all text at 14px on mobile. */
     .cs-stat { padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2); }
     .cs-stat-num,
@@ -1448,245 +2127,535 @@ const streamhubFeatures = [
        phones rather than force the bar past the screen edge. */
     .cs-stat-brand .cs-stat-nums { flex: 0 1 auto; min-width: 0; }
   }
-</style>
 
-<style is:global>
-  /* ---- Upcoming Scheduled Posts (usp-*) ----
-     Component styles for the scheduled-posts card in Product Design.
-     Global, not scoped: the skeleton rows are injected by script at
-     runtime, so Astro's scope attribute would never reach them. Every
-     selector is usp-prefixed — nothing can leak. Colors/typography are
-     the product's real design tokens, not the site scale, matching how
-     the Twitch extension rebuild carries its own file-exact values. */
-  .usp-card {
-    --usp-font: 'Open Sauce Two', 'Inter', -apple-system, BlinkMacSystemFont,
-      'Segoe UI', Roboto, sans-serif;
-    --usp-surface-0: #111111;   /* card            */
-    --usp-surface-1: #161616;   /* post item       */
-    --usp-surface-2: #202020;   /* button          */
-    --usp-hairline: rgba(255, 255, 255, 0.07);
-    --usp-text-high: #ffffff;
-    --usp-text-med: rgba(255, 255, 255, 0.72);
-    --usp-text-low: rgba(255, 255, 255, 0.48);
-    --usp-bone: rgba(255, 255, 255, 0.05);
-    --usp-bone-strong: rgba(255, 255, 255, 0.07);
-    --usp-accent: rgba(193, 151, 255, 0.4); /* landing glow */
+  /* ============================================================
+     Chapters, section tabs and the Product Design chapter.
+     ============================================================ */
 
-    position: relative;
-    overflow: hidden;
-    width: min(640px, 100%);
-    border: 1px solid var(--usp-hairline);
-    border-radius: 24px;
-    background: var(--usp-surface-0);
-    padding: 24px;
-    font-family: var(--usp-font);
-    box-shadow:
-      0px 56px 56px -28px rgba(0, 0, 0, 0.04),
-      0px 32px 32px -16px rgba(0, 0, 0, 0.04),
-      0px 6px 6px -3px rgba(0, 0, 0, 0.04),
-      0px 3px 3px -1.5px rgba(0, 0, 0, 0.04),
-      0px 1px 1px -0.5px rgba(0, 0, 0, 0.04);
+  /* ---- Section tabs ----
+     In flow under the hero, then pinned to the top until the chapters end
+     (.cs-chapters is the sticky containing block). */
+  .cs-tabs-sentinel { height: 0; }
+  .cs-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(10, 10, 11, 0.82);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-block-end: 1px solid rgba(255, 255, 255, 0.08);
   }
-
-  .usp-layout { display: flex; flex-direction: column; gap: 20px; }
-  @media (min-width: 560px) {
-    .usp-layout { flex-direction: row; }
-  }
-
-  .usp-head {
-    min-width: 215px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 32px;
-  }
-  .usp-title {
+  .cs-tabs-row { align-items: center; }
+  /* Project name rides the label column; it only appears once the bar is
+     pinned (the hero title is right above it until then). */
+  .cs-tabs-name {
+    grid-column: 1 / 6;
     margin: 0;
-    font-size: 22px;
-    line-height: 32px;
-    font-weight: 400;
-    color: var(--usp-text-high);
-  }
-  .usp-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 32px;
-    padding: 8px;
-    border: 0;
-    border-radius: 8px;
-    background: var(--usp-surface-2);
-    color: var(--usp-text-med);
-    font-family: var(--usp-font);
-    font-size: 11px;
-    line-height: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow:
-      0px -1px 3px -2px rgba(0, 0, 0, 0.07) inset,
-      0px 2px 3px -1px rgba(255, 255, 255, 0.07) inset,
-      0px 1px 1px -0.5px rgba(0, 0, 0, 0.04);
-    transition: background 0.2s ease;
-  }
-  .usp-cta:hover { background: #272727; }
-  .usp-cta svg { display: block; }
-
-  /* posts column — skeleton layer and live layer stacked in one cell */
-  .usp-list {
-    flex: 1;
-    min-width: 0;
-    height: 288px; /* fits the 3 populated posts; skeleton clips under the fade */
-    display: grid;
-  }
-  /* Stacked layout only: flex: 1's 0% basis is vertical there, so the list
-     would content-size to the 560px skeleton and ignore the height above.
-     (Must come after the base rule — media queries don't add specificity.) */
-  @media (max-width: 559.98px) {
-    .usp-list { flex: none; }
-  }
-  .usp-empty, .usp-posts { grid-area: 1 / 1; }
-
-  /* ---- day header row (shared by both layers) ---- */
-  .usp-dayrow {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 8px;
-  }
-  .usp-day {
-    font-size: 11px;
-    line-height: 16px;
-    color: var(--usp-text-med);
-    white-space: nowrap;
-  }
-  .usp-divider {
-    flex: 1;
-    height: 1px;
-    border-radius: 999px;
-    background: var(--usp-hairline);
-  }
-
-  /* ---- post item ---- */
-  .usp-item {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    border: 1px solid var(--usp-hairline);
-    border-radius: 8px;
-    background: var(--usp-surface-1);
-    padding: 8px;
-    margin-bottom: 8px;
-  }
-  .usp-item-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .usp-time {
-    font-size: 11px;
-    line-height: 16px;
-    color: var(--usp-text-low);
-  }
-  .usp-platforms { display: flex; align-items: center; gap: 6px; }
-  .usp-platforms svg { display: block; }
-  .usp-item-title {
-    margin: 0;
-    font-size: 11px;
-    line-height: 16px;
-    font-weight: 400;
-    color: var(--usp-text-high);
-  }
-
-  /* ---- skeleton (empty state) ---- */
-  .usp-empty {
-    position: relative;
-    overflow: hidden;
-    transition: opacity 0.45s ease;
-  }
-  .usp-bones { opacity: 0.5; }
-  .usp-bone { border-radius: 8px; background: var(--usp-bone); display: block; }
-  .usp-bone--day { height: 8px; width: 88px; }
-  .usp-bone--time { height: 8px; width: 68px; }
-  .usp-bone--title { height: 8px; background: var(--usp-bone-strong); }
-  .usp-bone--dot { height: 14px; width: 14px; border-radius: 999px; }
-
-  .usp-pill-wrap {
-    pointer-events: none;
-    position: absolute;
-    inset: 118px 0 auto 0;
-    display: flex;
-    justify-content: center;
-    z-index: 10;
-  }
-  .usp-pill {
-    font-size: 18px;
-    line-height: 24px;
-    font-weight: 500;
-    color: var(--usp-text-med);
-    border: 1px solid var(--usp-hairline);
-    border-radius: 8px;
-    background: rgba(22, 22, 22, 0.9);
-    padding: 8px 16px;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow:
-      0 18px 48px rgba(0, 0, 0, 0.52),
-      0 6px 18px rgba(0, 0, 0, 0.38);
-    transition: opacity 0.35s ease, transform 0.35s ease;
-  }
-
-  /* ---- live layer ---- */
-  .usp-posts {
-    position: relative;
-    z-index: 5;
-    visibility: hidden;
-    transition: opacity 0.4s ease;
-  }
-  .usp-posts.usp-live { visibility: visible; }
-
-  /* rows start hidden; .usp-in plays the entrance */
-  .usp-posts .usp-row,
-  .usp-posts .usp-item {
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #fff;
     opacity: 0;
+    transform: translateY(var(--space-1));
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .usp-posts .usp-row.usp-in {
-    animation: usp-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  .cs-tabs.is-stuck .cs-tabs-name { opacity: 1; transform: none; }
+  /* Tabs start on the body column, same line as every row's body copy. */
+  .cs-tabs-list {
+    grid-column: 6 / 13;
+    position: relative;
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    scrollbar-width: none;
   }
-  .usp-posts .usp-item.usp-in {
-    animation:
-      usp-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-      usp-land 1.1s ease-out forwards;
+  .cs-tabs-list::-webkit-scrollbar { display: none; }
+  @media (min-width: 1650px) { .cs-tabs-list { grid-column: 7 / 13; } }
+  @media (min-width: 1980px) { .cs-tabs-list { grid-column: 8 / 13; } }
+  .cs-tab {
+    flex: none;
+    padding-block: var(--space-2);
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: color 0.25s ease;
   }
-  @keyframes usp-enter {
-    from { opacity: 0; transform: translateY(14px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  /* brief brand-tinted border glow as each card lands */
-  @keyframes usp-land {
-    0%   { border-color: var(--usp-accent); box-shadow: 0 0 0 3px rgba(193, 151, 255, 0.12); }
-    100% { border-color: var(--usp-hairline); box-shadow: 0 0 0 0 rgba(193, 151, 255, 0); }
-  }
-
-  /* exit states driven by JS */
-  .usp-out { opacity: 0 !important; transform: translateY(-6px) scale(0.97); }
-  .usp-fade { opacity: 0 !important; }
-
-  /* bottom fade — same as production */
-  .usp-fadeout {
-    pointer-events: none;
+  .cs-tab:hover,
+  .cs-tab[aria-current="true"] { color: #fff; }
+  .cs-tab:focus-visible { outline: 1px solid #fff; outline-offset: -1px; }
+  .cs-tab-short { display: none; }
+  /* Active marker: one white rule that slides between tabs. */
+  .cs-tabs-ink {
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 100%;
-    height: 103px;
-    background: linear-gradient(to bottom, rgba(17, 17, 17, 0), #111111);
-    z-index: 8;
+    width: 0;
+    height: 1px;
+    background: #fff;
+    pointer-events: none;
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-tabs-name, .cs-tabs-ink, .cs-tab { transition: none; }
   }
 
+  /* Jump targets land clear of the pinned bar (native hash loads; the
+     script's jumps use the same allowance). */
+  .cs-chapter, .cs-about, [id^="d-"] { scroll-margin-top: var(--space-7); }
+
+  /* ---- Chapter openers: hairline, display title (label column) and a
+         statement (body column). ---- */
+  .cs-chapter-head {
+    row-gap: var(--space-4);
+    padding-block-end: var(--space-7);
+  }
+  .cs-chapter-rule {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .cs-chapter-title {
+    margin: 0;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: #fff;
+  }
+
+  /* ---- Product Design: shared bits ---- */
+  .cs-mono {
+    margin: 0;
+    font-family: var(--font-geist-mono);
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.75px;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  /* A row that opens a band (no lead-in above it): the gap to what follows. */
+  .cs-row-lead { margin-block-end: var(--space-6); }
+  .cs-rowlabel-stack { display: flex; flex-direction: column; gap: var(--space-1); }
+  .cs-rowbody-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .cs-intro-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* ---- Three calls: an index on the page's own label/body columns. Each
+         row is a subgrid of the 12 columns, so .cs-rowlabel and .cs-rowbody
+         (and their wide-screen steps) place it unchanged. ---- */
+  .cs-index {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    border-block-end: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .cs-index-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-block-start: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .cs-index-label,
+  .cs-index-body {
+    align-self: baseline;
+    display: flex;
+    align-items: baseline;
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .cs-index-label { gap: var(--space-3); color: #fff; }
+  .cs-index-body {
+    justify-content: space-between;
+    gap: var(--space-3);
+    text-wrap: pretty; /* .cs-rowbody balances, which halves short lines */
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .cs-index-row { color: #fff; text-decoration: none; }
+  .cs-index-row:focus-visible { outline: 1px solid #fff; outline-offset: var(--space-1); }
+  .cs-index-body { transition: color var(--dur-ui) ease; }
+  .cs-index-row:hover .cs-index-body { color: #fff; }
+  /* A thin down-arrow that drops on hover. */
+  .cs-index-arrow {
+    flex: none;
+    align-self: center;
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    color: rgba(255, 255, 255, 0.5);
+    transition: transform var(--dur-ui) ease, color var(--dur-ui) ease;
+  }
+  .cs-index-row:hover .cs-index-arrow { color: #fff; transform: translateY(25%); }
   @media (prefers-reduced-motion: reduce) {
-    .usp-posts .usp-row, .usp-posts .usp-item { opacity: 1 !important; animation: none !important; }
-    .usp-posts { visibility: visible !important; }
-    .usp-empty { opacity: 0 !important; }
+    .cs-index-row:hover .cs-index-arrow { transform: none; }
+  }
+
+  /* Q&A / note lists beside a screen. */
+  .cs-qa {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .cs-qa-item { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .cs-qa-text { display: flex; flex-direction: column; gap: var(--space-1); }
+
+  /* ---- Screen panels: an app window on TL;DR's pixel texture. The window
+         (--x/--y place its corner, --w sizes it against the panel) runs off
+         the panel edge on purpose. ---- */
+  .cs-screen {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    min-width: 0;
+    margin: 0;
+    background: #141018 center / cover no-repeat;
+  }
+  .cs-bg-1 { background-image: url("/tldr-panel-bg-1.jpg"); }
+  .cs-bg-2 { background-image: url("/tldr-panel-bg-2.jpg"); }
+  .cs-bg-3 { background-image: url("/tldr-panel-bg-3.jpg"); }
+  .cs-bg-4 { background-image: url("/tldr-panel-bg-4.jpg"); }
+  .cs-bg-5 { background-image: url("/tldr-panel-bg-5.jpg"); }
+  .cs-screen.cs-dim::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 8, 14, 0.5);
+  }
+  .cs-scr-left { grid-column: 1 / 10; }
+  .cs-scr-right { grid-column: 4 / 13; }
+  .cs-scr-half-l { grid-column: 1 / 7; }
+  .cs-scr-half-r { grid-column: 7 / 13; }
+  .cs-shot { position: absolute; left: var(--x); top: var(--y); width: var(--w); }
+  .cs-frame {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #0b0b0b;
+    box-shadow: 0 0 0 1px rgba(193, 151, 255, 0.18), 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  }
+  .cs-frame > img,
+  .cs-frame > video { display: block; width: 100%; height: auto; }
+  .cs-ui { position: relative; display: block; width: 100%; pointer-events: none; }
+  /* Caption chip: the screens run under it, so it carries its own glass. */
+  .cs-cap {
+    position: absolute;
+    left: var(--space-2);
+    bottom: var(--space-2);
+    z-index: 2;
+    max-width: calc(100% - 2 * var(--space-2));
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(10, 10, 11, 0.66);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* ---- Dashboard spotlight: the active question's area stays lit and the
+         rest of the window dims (the huge spread is clipped by the frame).
+         The dim does the highlighting; the edge line is barely there, just
+         enough to hold the shape against the dark UI. The window is the
+         size container, so cqw radii track the scaled snapshot. ---- */
+  .cs-dash .cs-frame { container-type: inline-size; }
+  .cs-spot {
+    position: absolute;
+    z-index: 1;
+    left: var(--l);
+    top: var(--t);
+    width: var(--w);
+    height: var(--h);
+    border-radius: var(--r);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 200vmax rgba(8, 6, 12, 0.7);
+    pointer-events: none;
+    transition:
+      left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      top 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      border-radius 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* The question list: hairline rows with mono numerals. Inactive rows
+     recede; the active row's top line fills while it waits to move on. */
+  .cs-dash .cs-qa { gap: 0; }
+  .cs-dash .cs-qa-item {
+    position: relative;
+    align-items: baseline;
+    padding-block: var(--space-2);
+    border-block-start: 1px solid rgba(255, 255, 255, 0.12);
+    outline: none;
+    cursor: default;
+  }
+  .cs-dash .cs-qa-item:focus-visible .cs-feat-lead { text-decoration: underline; text-underline-offset: 3px; }
+  .cs-qa-n { flex: none; }
+  .cs-dash .cs-qa-text { transition: opacity var(--dur-ui) ease; }
+  .cs-dash .cs-qa-item:not(.is-active) .cs-qa-text { opacity: 0.45; }
+  .cs-dash .cs-qa-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 1px;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .cs-dash .cs-qa-item.is-active::after { transform: none; }
+  .cs-dash.is-auto .cs-qa-item.is-active::after {
+    animation: cs-qa-fill 4s linear both;
+    animation-play-state: paused;
+  }
+  .cs-dash.is-auto.is-playing .cs-qa-item.is-active::after { animation-play-state: running; }
+  @keyframes cs-qa-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-spot, .cs-dash .cs-qa-text { transition: none; }
+  }
+  /* Pause/Play for the animated panels (shown by script). */
+  .cs-abtn {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    z-index: 3;
+    min-height: 32px;
+    padding: 0 var(--space-2);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font: 400 13px/1 var(--font-geist-sans);
+    color: #fff;
+    background: rgba(13, 9, 20, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: pointer;
+    transition: background-color 0.16s ease, transform 0.12s ease;
+  }
+  .cs-abtn[hidden] { display: none; }
+  .cs-abtn:hover { background: rgba(39, 30, 52, 0.9); }
+  .cs-abtn:active { transform: scale(0.97); }
+
+  /* The pixel logotype, centred on its panel. */
+  .cs-mark {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+  }
+  .cs-mark svg { width: min(62%, 24rem); height: auto; }
+
+  /* Palette */
+  .cs-swatch {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+  .cs-chip {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-2);
+    margin-block-end: var(--space-1);
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 500;
+  }
+  .cs-swatch-hex { color: #fff; }
+  .cs-swatch .cs-feat-body { max-width: none; }
+
+  @media (max-width: 900px) {
+    .cs-tabs-name { display: none; }
+    .cs-tabs-list { grid-column: 1 / -1; gap: var(--space-3); }
+    .cs-tab-long { display: none; }
+    .cs-tab-short { display: inline; }
+    .cs-chapter-head { padding-block-end: var(--space-6); }
+    .cs-scr-left, .cs-scr-right, .cs-scr-half-l, .cs-scr-half-r { grid-column: 1 / -1; }
+    /* Index rows stack number over title over body. */
+    .cs-index-label { flex-direction: column; gap: var(--space-1); }
+    /* Screens keep their 4:3 box (composed panels): media leads stacked
+       feature rows, same as the image-right builds. */
+    .cs-scr-right { order: -1; }
+    .cs-swatch { grid-column: span 4; }
+  }
+  @media (max-width: 640px) {
+    .cs-swatch { grid-column: span 6; }
+    .cs-cap { left: var(--space-1); bottom: var(--space-1); max-width: calc(100% - 2 * var(--space-1)); font-size: 13px; }
+    .cs-abtn { top: var(--space-1); right: var(--space-1); }
+  }
+</style>
+
+<style is:global>
+  /* ---- Product UI snapshot fonts ----
+     The snapshots render inside shadow roots, and @font-face can't be
+     declared there — so their faces (the prototype's Open Sauce Two, Quinn
+     and N27 builds) are registered at the document level. */
+  @font-face { font-family: openSauceTwo; src: url("/tldr-ui/fonts/8495602506.ttf") format("truetype"); font-display: swap; font-weight: 400; font-style: normal; }
+  @font-face { font-family: openSauceTwo; src: url("/tldr-ui/fonts/6eb7e8f39f.ttf") format("truetype"); font-display: swap; font-weight: 500; font-style: normal; }
+  @font-face { font-family: openSauceTwo; src: url("/tldr-ui/fonts/ee1f3d8127.ttf") format("truetype"); font-display: swap; font-weight: 700; font-style: normal; }
+  @font-face { font-family: "openSauceTwo Fallback"; src: local("Arial"); ascent-override: 90.93%; descent-override: 21.55%; line-gap-override: 0%; size-adjust: 109.98%; }
+  @font-face { font-family: quinn; src: url("/tldr-ui/fonts/bef6a30a35.woff2") format("woff2"); font-display: swap; font-weight: 700; font-style: normal; }
+  @font-face { font-family: "quinn Fallback"; src: local("Arial"); ascent-override: 121.04%; descent-override: 48.42%; line-gap-override: 0%; size-adjust: 82.62%; }
+  @font-face { font-family: n27; src: url("/tldr-ui/fonts/8a74e705cf.woff2") format("woff2"); font-display: swap; font-weight: 400; font-style: normal; }
+  @font-face { font-family: "n27 Fallback"; src: local("Arial"); ascent-override: 93.35%; descent-override: 25.71%; line-gap-override: 0%; size-adjust: 102.93%; }
+  @property --gradient-start { syntax: "<percentage>"; inherits: false; initial-value: 35.16%; }
+  @property --gradient-end { syntax: "<percentage>"; inherits: false; initial-value: 37.89%; }
+
+  /* ---- Chat activity demo (tl-*) ----
+     Global, not scoped: the clip markers and read-out chips are created by
+     script, so Astro's scope attribute never reaches them. Everything is
+     tl-prefixed and nested under .tl-chat. */
+  .tl-chat {
+    grid-column: 1 / 13;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: center;
+    padding: var(--space-7);
+    background:
+      linear-gradient(rgba(10, 8, 14, 0.64), rgba(10, 8, 14, 0.64)),
+      url("/tldr-panel-bg-2.jpg") center 40% / cover no-repeat,
+      #141018;
+    color: #fff;
+  }
+  .tl-chat p { margin: 0; }
+  .tl-plot { position: relative; height: clamp(12rem, 24vw, 20rem); cursor: crosshair; touch-action: pan-y; }
+  .tl-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .tl-plot path { fill: none; stroke: #c197ff; stroke-width: 2px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .tl-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .tl-plot.is-scrub .tl-guide { opacity: 0.6; }
+  .tl-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid #c197ff;
+    background: #0d0914;
+    pointer-events: none;
+  }
+  .tl-mk {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .tl-mk.tl-voice { background: #0d0914; box-shadow: inset 0 0 0 2px #fff; }
+  .tl-mk.is-on { transform: translate(-50%, -50%) scale(1.5); }
+  .tl-plot input[type="range"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: crosshair;
+  }
+  .tl-plot:has(input:focus-visible) { outline: 2px solid #c197ff; outline-offset: 6px; }
+  .tl-side { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+  .tl-head { display: flex; flex-direction: column; gap: var(--space-1); font-variant-numeric: tabular-nums; }
+  .tl-num {
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .tl-sub { font-size: 16px; line-height: 1.35; letter-spacing: -0.01em; color: rgba(255, 255, 255, 0.65); }
+  .tl-clipread {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 3.4em;
+    font-size: 16px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .tl-clipread strong { color: #fff; font-weight: 400; }
+  .tl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .tl-chip--type { color: #fff; background: rgba(152, 81, 251, 0.3); box-shadow: inset 0 0 0 1px rgba(193, 151, 255, 0.45); }
+  .tl-chip--wake { color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+  .tl-chip--score { color: #fff; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); font-variant-numeric: tabular-nums; }
+  .tl-chip--score svg { width: 12px; height: 12px; fill: #c197ff; }
+  .tl-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .tl-legend li { display: inline-flex; align-items: center; gap: var(--space-1); }
+  .tl-legend i { width: 10px; height: 10px; border-radius: 2px; background: #fff; }
+  .tl-legend i.tl-voice { background: transparent; box-shadow: inset 0 0 0 2px #fff; }
+  .tl-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  @media (max-width: 900px) {
+    .tl-chat {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-3);
+    }
+    /* Beats the scoped .cs-cap (absolute) — the caption joins the stack. */
+    .tl-chat p.tl-chat-cap { position: static; max-width: none; justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tl-mk { transition: none; }
   }
 </style>
 
